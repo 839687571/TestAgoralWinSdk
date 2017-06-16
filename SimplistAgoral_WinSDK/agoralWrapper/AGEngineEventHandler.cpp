@@ -43,7 +43,7 @@ void CAGEngineEventHandler::onJoinChannelSuccess(const char* channel, uid_t uid,
 	LogMessage(__FUNCTION__);
 }
 
-void CAGEngineEventHandler::onRejoinChannelSuccess(const char* channel, uid_t uid, int elapsed)
+void CAGEngineEventHandler::onReJoinChannelSuccess(const char* channel, uid_t uid, int elapsed)
 {
 	LPAGE_REJOINCHANNEL_SUCCESS lpData = new AGE_REJOINCHANNEL_SUCCESS;
 

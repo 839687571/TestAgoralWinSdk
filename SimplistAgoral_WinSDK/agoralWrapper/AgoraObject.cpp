@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <assert.h>
-
+#include "Utils.h"
 
 CAgoraObject *CAgoraObject::m_lpAgoraObject = NULL;
 IRtcEngine *CAgoraObject::m_lpAgoraEngine = NULL;
@@ -158,32 +158,12 @@ BOOL CAgoraObject::GetVideoTestFlag()
 	return (m_dwEngineFlag & AG_ENGFLAG_VIDEOTEST) != 0;
 }
 
-BOOL CAgoraObject::SetLogFilePath(LPCTSTR lpLogPath)
+BOOL CAgoraObject::SetLogFilePath(const char * lpLogPath)
 {
 	assert(m_lpAgoraEngine != NULL);
 
-	CHAR szLogPathA[MAX_PATH];
-	CHAR szLogPathTrans[MAX_PATH];
-
-	int ret = 0;
 	RtcEngineParameters rep(*m_lpAgoraEngine);
-
-	if (::GetFileAttributes(lpLogPath) == INVALID_FILE_ATTRIBUTES) {
-		::GetModuleFileNameA(NULL, szLogPathA, MAX_PATH);
-		LPSTR lpLastSlash = strrchr(szLogPathA, '\\')+1;
-		strcpy_s(lpLastSlash, 64, "AgoraSDK.log");
-	}
-	else {
-#ifdef UNICODE
-		::WideCharToMultiByte(CP_UTF8, 0, lpLogPath, -1, szLogPathA, MAX_PATH, NULL, NULL);
-#else
-		::MultiByteToWideChar(CP_UTF8, 0, lpLogPath, -1, (WCHAR *)szLogPathA, MAX_PATH, NULL, NULL);
-#endif
-	}
-
-	CAGResourceVisitor::TransWinPathA(szLogPathA, szLogPathTrans, MAX_PATH);
-
-	ret = rep.setLogFile(szLogPathTrans);
+	int  ret = rep.setLogFile(lpLogPath);
 
 	return ret == 0 ? TRUE : FALSE;
 }
@@ -193,11 +173,7 @@ BOOL CAgoraObject::JoinChannel(const char * lpChannelName, UINT nUID)
 	int nRet = 0;
 
 //	m_lpAgoraEngine->setVideoProfile(VIDEO_PROFILE_720P);
-#ifdef UNICODE
 	nRet = m_lpAgoraEngine->joinChannel(NULL, lpChannelName, NULL, nUID);
-#else
-	nRet = m_lpAgoraEngine->joinChannel(NULL, lpChannelName, NULL, nUID);
-#endif
 
 	if (nRet == 0)
 		m_strChannelName = lpChannelName;
@@ -383,17 +359,18 @@ BOOL CAgoraObject::SetLogFilter(LOG_FILTER_TYPE logFilterType, LPCTSTR lpLogPath
 	return nRet == 0 ? TRUE : FALSE;
 }
 
-BOOL CAgoraObject::SetEncryptionSecret(LPCTSTR lpKey, int nEncryptType)
+
+/*
+在加入频道之前，应用程序需调用 setEncryptionSecret指定secret来启用内置的加密功能，同一频道内的所有用户应设置相同的secret。
+当用户离开频道时，该频道的secret会自动清除。如果未指定secret或将secret设置为空, 则无法激活加密功能。
+*/
+BOOL CAgoraObject::SetEncryptionSecret(const char * lpKey, int nEncryptType)
 {
 	CHAR szUTF8[MAX_PATH];
 
-#ifdef UNICODE
-	::WideCharToMultiByte(CP_UTF8, 0, lpKey, -1, szUTF8, MAX_PATH, NULL, NULL);
-#else
-	WCHAR szAnsi[MAX_PATH];
-	::MultiByteToWideChar(CP_ACP, 0, lpKey, -1, szAnsi, MAX_PATH);
-	::WideCharToMultiByte(CP_UTF8, 0, szAnsi, -1, szUTF8, MAX_PATH, NULL, NULL);
-#endif
+	CUtils::Convert(lpKey, szUTF8, CP_ACP, CP_UTF8);
+
+	int nRet = m_lpAgoraEngine->setEncryptionSecret(szUTF8);
     switch (nEncryptType)
     {
     case 0:
@@ -406,7 +383,7 @@ BOOL CAgoraObject::SetEncryptionSecret(LPCTSTR lpKey, int nEncryptType)
         m_lpAgoraEngine->setEncryptionMode("aes-128-xts");
         break;
     }
-	int nRet = m_lpAgoraEngine->setEncryptionSecret(szUTF8);
+
 
 	return nRet == 0 ? TRUE : FALSE;
 }
@@ -431,19 +408,15 @@ int CAgoraObject::CreateMessageStream()
     return nDataStream;
 }
 
-BOOL CAgoraObject::SendChatMessage(int nStreamID, LPCTSTR lpChatMessage)
+BOOL CAgoraObject::SendChatMessage(int nStreamID, const char * lpChatMessage)
 {
     _ASSERT(nStreamID != 0);
-    int nMessageLen = _tcslen(lpChatMessage);
+    int nMessageLen = strlen(lpChatMessage);
     _ASSERT(nMessageLen < 128);
 
     CHAR szUTF8[256];
 
-#ifdef UNICODE
-    int nUTF8Len = ::WideCharToMultiByte(CP_UTF8, 0, lpChatMessage, nMessageLen, szUTF8, 256, NULL, NULL);
-#else
-    int nUTF8Len = ::MultiByteToWideChar(CP_UTF8, lpChatMessage, nMessageLen, szUTF8, 256);
-#endif
+	int nUTF8Len = CUtils::Convert(lpChatMessage, szUTF8, CP_ACP, CP_UTF8);
 
     int nRet = m_lpAgoraEngine->sendStreamMessage(nStreamID, szUTF8, nUTF8Len);
 

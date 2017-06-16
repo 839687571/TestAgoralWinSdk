@@ -21,10 +21,10 @@ public:
 	UINT GetDeviceCount();
 
 	std::string GetCurDeviceID();
-	BOOL SetCurDevice(LPCTSTR lpDeviceID);
+	BOOL SetCurDevice(const char * pDeviceID);
 
 	BOOL GetDevice(UINT nIndex, std::string  &rDeviceName, std::string &rDeviceID);
-	void TestCameraDevice(HWND hVideoWnd, BOOL bTestOn = TRUE);
+	BOOL TestCameraDevice(HWND hVideoWnd, BOOL bTestOn = TRUE);
 
 	BOOL IsTesting() { return m_bTestingOn; };
 

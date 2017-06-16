@@ -20,7 +20,7 @@ using namespace agora::rtc;
 #define AG_CODEC_EVP	0x00000001
 #define AG_CODEC_VP8	0x00000002
 
-#define APP_ID ("1dd3051a7f7045ff91ee482bab5effb2")
+#define APP_ID ("")
 
 class CAgoraObject
 {
@@ -45,7 +45,7 @@ public:
 	void SetMsgHandlerWnd(HWND hWnd);
 	HWND GetMsgHandlerWnd();
 
-	BOOL SetLogFilePath(LPCTSTR lpLogPath = NULL);
+	BOOL SetLogFilePath(const char *  lpLogPath = NULL);
 
 	BOOL JoinChannel(const char * lpChannelName, UINT nUID = 0);
 	BOOL LeaveCahnnel();
@@ -77,12 +77,12 @@ public:
 
 	BOOL SetLogFilter(LOG_FILTER_TYPE logFilterType, LPCTSTR lpLogPath);
 
-    BOOL SetEncryptionSecret(LPCTSTR lpKey, int nEncryptType = 0);
+	BOOL SetEncryptionSecret(const char * lpKey, int nEncryptType = 0);
 
     BOOL EnableLocalRender(BOOL bEnable);
 
     int CreateMessageStream();
-    BOOL SendChatMessage(int nStreamID, LPCTSTR lpChatMessage);
+	BOOL SendChatMessage(int nStreamID, const char *  lpChatMessage);
 
 	static IRtcEngine *GetEngine();
 	

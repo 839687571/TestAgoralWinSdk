@@ -126,6 +126,8 @@
     <ClInclude Include="agoralWrapper\AgoraObject.h" />
     <ClInclude Include="agoralWrapper\AgoraPlayoutManager.h" />
     <ClInclude Include="agoralWrapper\AGResourceVisitor.h" />
+    <ClInclude Include="agoralWrapper\DeviceManager.h" />
+    <ClInclude Include="agoralWrapper\Utils.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SimplistAgoral_WinSDK.h" />
     <ClInclude Include="SimplistAgoral_WinSDKDlg.h" />
@@ -142,6 +144,8 @@
     <ClCompile Include="agoralWrapper\AgoraObject.cpp" />
     <ClCompile Include="agoralWrapper\AgoraPlayoutManager.cpp" />
     <ClCompile Include="agoralWrapper\AGResourceVisitor.cpp" />
+    <ClCompile Include="agoralWrapper\DeviceManager.cpp" />
+    <ClCompile Include="agoralWrapper\Utils.cpp" />
     <ClCompile Include="SimplistAgoral_WinSDK.cpp" />
     <ClCompile Include="SimplistAgoral_WinSDKDlg.cpp" />
     <ClCompile Include="stdafx.cpp">

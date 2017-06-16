@@ -4,6 +4,8 @@
 #include "AgoraAudInputManager.h"
 #include "AgoraObject.h"
 #include <assert.h>
+#include "Utils.h"
+
 
 CAgoraAudInputManager::CAgoraAudInputManager()
 	: m_ptrDeviceManager(NULL)
@@ -77,8 +79,8 @@ UINT CAgoraAudInputManager::GetDeviceCount()
 
 BOOL CAgoraAudInputManager::GetDevice(UINT nIndex, std::string &rDeviceName, std::string &rDeviceID)
 {
-	CHAR szDeviceName[agora::rtc::MAX_DEVICE_ID_LENGTH];
-	CHAR szDeviceID[agora::rtc::MAX_DEVICE_ID_LENGTH];
+	CHAR szDeviceName[MAX_DEVICE_ID_LENGTH];
+	CHAR szDeviceID[MAX_DEVICE_ID_LENGTH];
 
 	assert(nIndex < GetDeviceCount());
 
@@ -92,19 +94,14 @@ BOOL CAgoraAudInputManager::GetDevice(UINT nIndex, std::string &rDeviceName, std
 	if (nRet != 0)
 		return FALSE;
 
+	char ansiDevName[MAX_DEVICE_ID_LENGTH];
+	CUtils::Convert(szDeviceName, ansiDevName, CP_UTF8, CP_ACP);
 
-	rDeviceName = szDeviceName;
-	rDeviceID = szDeviceID;
-#ifdef UNICODE
-	//::MultiByteToWideChar(CP_UTF8, 0, szDeviceName, -1, rDeviceName.GetBuffer(MAX_DEVICE_ID_LENGTH), MAX_DEVICE_ID_LENGTH);
-//	::MultiByteToWideChar(CP_UTF8, 0, szDeviceID, -1, rDeviceID.GetBuffer(MAX_DEVICE_ID_LENGTH), MAX_DEVICE_ID_LENGTH);
-//
-	//rDeviceName.ReleaseBuffer();
-	//rDeviceID.ReleaseBuffer();
-#else
-	strDeviceName = szDeviceName;
-	strDeviceID = szDeviceID;
-#endif
+	char ansiDevId[MAX_DEVICE_ID_LENGTH];
+	CUtils::Convert(szDeviceID, ansiDevId, CP_UTF8, CP_ACP);
+
+	rDeviceName = ansiDevName;
+	rDeviceID = ansiDevId;
 
 	return TRUE;
 }
@@ -119,35 +116,26 @@ std::string CAgoraAudInputManager::GetCurDeviceID()
 	if (*m_ptrDeviceManager != NULL)
 		(*m_ptrDeviceManager)->getRecordingDevice(szDeviceID);
 
-#ifdef UNICODE
-	::MultiByteToWideChar(CP_UTF8, 0, szDeviceID, -1, wszDeviceId, agora::rtc::MAX_DEVICE_ID_LENGTH);
-	
-#else
-	strDeviceName = szDeviceID;
-#endif
+	char ansiDevId[MAX_DEVICE_ID_LENGTH];
+	CUtils::Convert(szDeviceID, ansiDevId, CP_UTF8, CP_ACP);
 
-	str = szDeviceID;
+	str = ansiDevId;
 	return str;
 }
 
-BOOL CAgoraAudInputManager::SetCurDevice(LPCTSTR lpDeviceID)
+BOOL CAgoraAudInputManager::SetCurDevice(const char *pDeviceID)
 {
 	if (*m_ptrDeviceManager == NULL)
 		return FALSE;
 
-#ifdef UNICODE
-	CHAR szDeviceID[128];
-	::WideCharToMultiByte(CP_ACP, 0, lpDeviceID, -1, szDeviceID, 128, NULL, NULL);
-	int nRet = (*m_ptrDeviceManager)->setRecordingDevice(szDeviceID);
-#else
-	int nRet = (*m_ptrDeviceManager)->setRecordingDevice(lpDeviceID);
-#endif
+	int nRet = (*m_ptrDeviceManager)->setRecordingDevice(pDeviceID);
 
 	return nRet == 0 ? TRUE : FALSE;
 }
 
-void CAgoraAudInputManager::TestAudInputDevice(HWND hMsgWnd, BOOL bTestOn)
+int CAgoraAudInputManager::TestAudInputDevice(HWND hMsgWnd, BOOL bTestOn)
 {
+	int ret = 0;
 	if (bTestOn && !m_bTestingOn) {
 		m_hOldMsgWnd = CAgoraObject::GetAgoraObject()->GetMsgHandlerWnd();
 		CAgoraObject::GetAgoraObject()->SetMsgHandlerWnd(hMsgWnd);
@@ -155,13 +143,15 @@ void CAgoraAudInputManager::TestAudInputDevice(HWND hMsgWnd, BOOL bTestOn)
 		IRtcEngine *lpRtcEngine = CAgoraObject::GetEngine();
 		RtcEngineParameters rep(*lpRtcEngine);
 		rep.enableAudioVolumeIndication(1000, 10);
-		(*m_ptrDeviceManager)->startRecordingDeviceTest(1000);
+		ret = (*m_ptrDeviceManager)->startRecordingDeviceTest(1000);
 	}
 	else if (!bTestOn && m_bTestingOn){
 		CAgoraObject::GetAgoraObject()->SetMsgHandlerWnd(m_hOldMsgWnd);
-		(*m_ptrDeviceManager)->stopRecordingDeviceTest();
+		ret = (*m_ptrDeviceManager)->stopRecordingDeviceTest();
 	}
 
 	m_bTestingOn = bTestOn;
+
+	return ret;
 
 }

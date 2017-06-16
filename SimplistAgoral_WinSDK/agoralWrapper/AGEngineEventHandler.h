@@ -21,7 +21,7 @@ using namespace  agora::rtc;
 		HWND GetMsgReceiver() { return m_hMainWnd; };
 
 		virtual void onJoinChannelSuccess(const char* channel, uid_t uid, int elapsed);
-		virtual void onRejoinChannelSuccess(const char* channel, uid_t uid, int elapsed);
+		virtual void onReJoinChannelSuccess(const char* channel, uid_t uid, int elapsed);
 		virtual void onWarning(int warn, const char* msg);
 		virtual void onError(int err, const char* msg);
 		virtual void onAudioQuality(uid_t uid, int quality, unsigned short delay, unsigned short lost);

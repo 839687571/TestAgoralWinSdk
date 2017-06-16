@@ -28,6 +28,8 @@ public:
 	BOOL GetDevice(UINT nIndex, std::string  &rDeviceName, std::string &rDeviceID);
 	void TestPlaybackDevice(UINT nWavID, BOOL bTestOn = TRUE);
 
+	int  TestPlaybackDevice(const char *fileName, BOOL bTestOn);
+
 	BOOL IsTesting() { return m_bTestingOn; };
 private:
 	AAudioDeviceManager			*m_ptrDeviceManager;

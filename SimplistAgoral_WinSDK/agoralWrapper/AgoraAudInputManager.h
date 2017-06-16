@@ -21,11 +21,11 @@ public:
 	UINT GetDeviceCount();
 
 	std::string GetCurDeviceID();
-	BOOL SetCurDevice(LPCTSTR lpDeviceID);
+	BOOL SetCurDevice(const char *pDeviceID);
 
 	BOOL GetDevice(UINT nIndex, std::string &rDeviceName, std::string &rDeviceID);
 	
-	void TestAudInputDevice(HWND hMsgWnd, BOOL bTestOn);
+	int TestAudInputDevice(HWND hMsgWnd, BOOL bTestOn);
 
 	BOOL IsTesting() { return m_bTestingOn; };
 private:

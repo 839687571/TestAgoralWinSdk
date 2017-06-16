@@ -1,6 +1,10 @@
 #include "StdAfx.h"
 #include "AgoraPlayoutManager.h"
 #include "AGResourceVisitor.h"
+#include "Utils.h"
+
+
+
 
 CAgoraPlayoutManager::CAgoraPlayoutManager()
 	: m_ptrDeviceManager(NULL)
@@ -73,14 +77,20 @@ BOOL CAgoraPlayoutManager::GetDevice(UINT nIndex, std::string &rDeviceName, std:
 	if (nIndex >= GetDeviceCount())
 		return FALSE;
 
+
+	// ·µ»ØUTF8±àÂë
 	int nRet = m_lpCollection->getDevice(nIndex, szDeviceName, szDeviceID);
 	if (nRet != 0)
 		return FALSE;
 
+	char ansiDevName[MAX_DEVICE_ID_LENGTH];
+	CUtils::Convert(szDeviceName, ansiDevName, CP_UTF8, CP_ACP);
 
-	rDeviceName = szDeviceName;
+	char ansiDevId[MAX_DEVICE_ID_LENGTH];
+	CUtils::Convert(szDeviceID, ansiDevId, CP_UTF8, CP_ACP);
+
+	rDeviceName = ansiDevName;
 	rDeviceID = szDeviceID;
-
 
 	return TRUE;
 }
@@ -92,22 +102,38 @@ std::string CAgoraPlayoutManager::GetCurDeviceID()
 	
 	(*m_ptrDeviceManager)->getPlaybackDevice(szDeviceID);
 
-	str = szDeviceID;
+	char ansiDevId[MAX_DEVICE_ID_LENGTH];
+	CUtils::Convert(szDeviceID, ansiDevId, CP_UTF8, CP_ACP);
+
+	str = ansiDevId;
 
 	return str;
 }
 
 BOOL CAgoraPlayoutManager::SetCurDevice(const char * lpDeviceID)
 {
-#ifdef UNICODE
 
 	int nRet = (*m_ptrDeviceManager)->setPlaybackDevice(lpDeviceID);
-#else
-	int nRet = (*m_ptrDeviceManager)->setPlaybackDevice(lpDeviceID);
-#endif
 
 	return nRet == 0 ? TRUE : FALSE;
 }
+
+int   CAgoraPlayoutManager::TestPlaybackDevice(const char *fileName, BOOL bTestOn)
+{
+	int ret = 0;
+	if (bTestOn && !m_bTestingOn) {
+		ret = (*m_ptrDeviceManager)->startPlaybackDeviceTest(fileName);
+	} if (!bTestOn && m_bTestingOn){
+	ret  = (*m_ptrDeviceManager)->stopPlaybackDeviceTest();
+
+	}
+	if (ret == 0) {
+		m_bTestingOn = bTestOn;
+	}
+	return ret;
+}
+
+
 
 void CAgoraPlayoutManager::TestPlaybackDevice(UINT nWavID, BOOL bTestOn)
 {
@@ -128,6 +154,8 @@ void CAgoraPlayoutManager::TestPlaybackDevice(UINT nWavID, BOOL bTestOn)
 #else
 		(*m_ptrDeviceManager)->startPlaybackDeviceTest(szWavPathA);
 #endif
+
+
 	}
 	else if (!bTestOn && m_bTestingOn)
 		(*m_ptrDeviceManager)->stopPlaybackDeviceTest();

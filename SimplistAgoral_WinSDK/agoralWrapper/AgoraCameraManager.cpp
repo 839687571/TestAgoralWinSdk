@@ -1,11 +1,12 @@
 #include "stdafx.h"
 #include "AgoraCameraManager.h"
 #include "AgoraObject.h"
-
+#include "Utils.h"
 
 CAgoraCameraManager::CAgoraCameraManager()
 	: m_ptrDeviceManager(NULL)
 	, m_lpCollection(NULL)
+	, m_bTestingOn(FALSE)
 {
 }
 
@@ -89,48 +90,43 @@ BOOL CAgoraCameraManager::GetDevice(UINT nIndex, std::string &rDeviceName, std::
 	if (nRet != 0)
 		return FALSE;
 
-	rDeviceID = szDeviceID;
-	rDeviceName = szDeviceName;
+	char ansiDevName[MAX_DEVICE_ID_LENGTH];
+	CUtils::Convert(szDeviceName, ansiDevName, CP_UTF8, CP_ACP);
 
-#ifdef UNICODE
-	//::MultiByteToWideChar(CP_UTF8, 0, szDeviceName, -1, rDeviceName.GetBuffer(MAX_DEVICE_ID_LENGTH), MAX_DEVICE_ID_LENGTH);
-	//::MultiByteToWideChar(CP_UTF8, 0, szDeviceID, -1, rDeviceID.GetBuffer(MAX_DEVICE_ID_LENGTH), MAX_DEVICE_ID_LENGTH);
+	char ansiDevId[MAX_DEVICE_ID_LENGTH];
+	CUtils::Convert(szDeviceID, ansiDevId, CP_UTF8, CP_ACP);
 
-	//rDeviceName.ReleaseBuffer();
-	//rDeviceID.ReleaseBuffer();
-#else
-	strDeviceName = szDeviceName;
-	strDeviceID = szDeviceID;
-#endif
+
+	rDeviceID = ansiDevId;
+	rDeviceName = ansiDevName;
 
 	return TRUE;
 }
 
-BOOL CAgoraCameraManager::SetCurDevice(LPCTSTR lpDeviceID)
+BOOL CAgoraCameraManager::SetCurDevice(const char * pDeviceID)
 {
 	if (m_ptrDeviceManager == NULL || *m_ptrDeviceManager == NULL)
 		return FALSE;
 
-#ifdef UNICODE
-	CHAR szDeviceID[128];
-	::WideCharToMultiByte(CP_ACP, 0, lpDeviceID, -1, szDeviceID, 128, NULL, NULL);
-	int nRet = (*m_ptrDeviceManager)->setDevice(szDeviceID);
-#else
-	int nRet = (*m_ptrDeviceManager)->setDevice(lpDeviceID);
-#endif
+	int nRet = (*m_ptrDeviceManager)->setDevice(pDeviceID);
+
 
 	return nRet == 0 ? TRUE : FALSE;
 }
 
-void CAgoraCameraManager::TestCameraDevice(HWND hVideoWnd, BOOL bTestOn)
+BOOL CAgoraCameraManager::TestCameraDevice(HWND hVideoWnd, BOOL bTestOn)
 {
+	BOOL ret = FALSE;
 	if (bTestOn && !m_bTestingOn) {
 		ASSERT(hVideoWnd != NULL);
-		CAgoraObject::GetAgoraObject()->LocalVideoPreview(hVideoWnd, TRUE);
+		ret = CAgoraObject::GetAgoraObject()->LocalVideoPreview(hVideoWnd, TRUE);
 	}
 	else if(!bTestOn && m_bTestingOn){
-		CAgoraObject::GetAgoraObject()->LocalVideoPreview(NULL, FALSE);
+		ret = CAgoraObject::GetAgoraObject()->LocalVideoPreview(NULL, FALSE);
 	}
 
-	m_bTestingOn = bTestOn;
+	if (ret) {
+		m_bTestingOn = bTestOn;
+	}
+	return ret;
 }

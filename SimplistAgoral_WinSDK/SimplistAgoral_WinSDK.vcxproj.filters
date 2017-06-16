@@ -75,6 +75,12 @@
     <ClInclude Include="agoralWrapper\AgoralWrapper.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="agoralWrapper\DeviceManager.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="agoralWrapper\Utils.h">
+      <Filter>Source Files\AGClass</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -112,6 +118,12 @@
     </ClCompile>
     <ClCompile Include="agoralWrapper\AgoralWrapper.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="agoralWrapper\DeviceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="agoralWrapper\Utils.cpp">
+      <Filter>Source Files\AGClass</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
