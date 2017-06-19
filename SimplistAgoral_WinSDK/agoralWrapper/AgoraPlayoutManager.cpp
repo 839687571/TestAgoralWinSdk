@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "AgoraPlayoutManager.h"
 #include "AGResourceVisitor.h"
-#include "Utils.h"
+#include "AgoralUtils.h"
 
 
 
@@ -84,10 +84,10 @@ BOOL CAgoraPlayoutManager::GetDevice(UINT nIndex, std::string &rDeviceName, std:
 		return FALSE;
 
 	char ansiDevName[MAX_DEVICE_ID_LENGTH];
-	CUtils::Convert(szDeviceName, ansiDevName, CP_UTF8, CP_ACP);
+	CAgoralUtils::Convert(szDeviceName, ansiDevName, CP_UTF8, CP_ACP);
 
 	char ansiDevId[MAX_DEVICE_ID_LENGTH];
-	CUtils::Convert(szDeviceID, ansiDevId, CP_UTF8, CP_ACP);
+	CAgoralUtils::Convert(szDeviceID, ansiDevId, CP_UTF8, CP_ACP);
 
 	rDeviceName = ansiDevName;
 	rDeviceID = szDeviceID;
@@ -103,7 +103,7 @@ std::string CAgoraPlayoutManager::GetCurDeviceID()
 	(*m_ptrDeviceManager)->getPlaybackDevice(szDeviceID);
 
 	char ansiDevId[MAX_DEVICE_ID_LENGTH];
-	CUtils::Convert(szDeviceID, ansiDevId, CP_UTF8, CP_ACP);
+	CAgoralUtils::Convert(szDeviceID, ansiDevId, CP_UTF8, CP_ACP);
 
 	str = ansiDevId;
 

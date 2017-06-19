@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <assert.h>
-#include "Utils.h"
+#include "AgoralUtils.h"
 
 CAgoraObject *CAgoraObject::m_lpAgoraObject = NULL;
 IRtcEngine *CAgoraObject::m_lpAgoraEngine = NULL;
@@ -368,7 +368,7 @@ BOOL CAgoraObject::SetEncryptionSecret(const char * lpKey, int nEncryptType)
 {
 	CHAR szUTF8[MAX_PATH];
 
-	CUtils::Convert(lpKey, szUTF8, CP_ACP, CP_UTF8);
+	CAgoralUtils::Convert(lpKey, szUTF8, CP_ACP, CP_UTF8);
 
 	int nRet = m_lpAgoraEngine->setEncryptionSecret(szUTF8);
     switch (nEncryptType)
@@ -416,7 +416,7 @@ BOOL CAgoraObject::SendChatMessage(int nStreamID, const char * lpChatMessage)
 
     CHAR szUTF8[256];
 
-	int nUTF8Len = CUtils::Convert(lpChatMessage, szUTF8, CP_ACP, CP_UTF8);
+	int nUTF8Len = CAgoralUtils::Convert(lpChatMessage, szUTF8, CP_ACP, CP_UTF8);
 
     int nRet = m_lpAgoraEngine->sendStreamMessage(nStreamID, szUTF8, nUTF8Len);
 

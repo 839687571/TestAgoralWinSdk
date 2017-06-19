@@ -2,10 +2,10 @@
 
 #include <string>
 
-class CUtils {
+class CAgoralUtils {
 public:
-	CUtils();
-	~CUtils();
+	CAgoralUtils();
+	~CAgoralUtils();
 
 	/**
 	

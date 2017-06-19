@@ -78,11 +78,11 @@
     <ClInclude Include="agoralWrapper\DeviceManager.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="agoralWrapper\Utils.h">
-      <Filter>Source Files\AGClass</Filter>
-    </ClInclude>
     <ClInclude Include="AGSliderCtrl.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="agoralWrapper\AgoralUtils.h">
+      <Filter>Source Files\AGClass</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -125,11 +125,11 @@
     <ClCompile Include="agoralWrapper\DeviceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="agoralWrapper\Utils.cpp">
-      <Filter>Source Files\AGClass</Filter>
-    </ClCompile>
     <ClCompile Include="AGSliderCtrl.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="agoralWrapper\AgoralUtils.cpp">
+      <Filter>Source Files\AGClass</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

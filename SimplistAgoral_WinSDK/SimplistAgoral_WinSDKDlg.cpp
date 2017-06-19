@@ -9,7 +9,7 @@
 #include "resource.h"
 #include "agoralWrapper/DeviceManager.h"
 #include <vector>
-#include "agoralWrapper/Utils.h"
+#include "agoralWrapper/AgoralUtils.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -86,7 +86,7 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 	m_pAgroObject->SetRemoetHwnd((HWND)remoteCtrl->GetSafeHwnd());
 	m_pAgroObject->SetMainHWND(m_hWnd);
 
-	std::string appPath = CUtils::getAppPath();
+	std::string appPath = CAgoralUtils::getAppPath();
 	appPath += "//agorl.log";
 	m_pAgroObject->InitAgoral(appPath.c_str());
 

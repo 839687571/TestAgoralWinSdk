@@ -1,17 +1,17 @@
 #include "stdafx.h"
-#include "Utils.h"
+#include "AgoralUtils.h"
 
 
-CUtils::CUtils()
+CAgoralUtils::CAgoralUtils()
 {
 }
 
 
-CUtils::~CUtils()
+CAgoralUtils::~CAgoralUtils()
 {
 }
 
-int  CUtils::Convert(const char* strIn, char* strOut, int sourceCodepage, int targetCodepage)
+int  CAgoralUtils::Convert(const char* strIn, char* strOut, int sourceCodepage, int targetCodepage)
 {
 
 	int len = strlen(strIn);
@@ -34,7 +34,7 @@ int  CUtils::Convert(const char* strIn, char* strOut, int sourceCodepage, int ta
 }
 
 
-std::wstring CUtils::StringToWString(const std::string &str)
+std::wstring CAgoralUtils::StringToWString(const std::string &str)
 {
 	std::wstring wstr(str.length(), L' ');
 	std::copy(str.begin(), str.end(), wstr.begin());
@@ -42,7 +42,7 @@ std::wstring CUtils::StringToWString(const std::string &str)
 }
 
 
-std::string CUtils::WStringToString(const std::wstring &wstr)
+std::string CAgoralUtils::WStringToString(const std::wstring &wstr)
 {
 	std::string str(wstr.length(), ' ');
 	std::copy(wstr.begin(), wstr.end(), str.begin());
@@ -50,7 +50,7 @@ std::string CUtils::WStringToString(const std::wstring &wstr)
 }
 
 
-std::string  CUtils::getAppPath()
+std::string  CAgoralUtils::getAppPath()
 {
 	TCHAR szPath[MAX_PATH] = { 0 };
 	::GetModuleFileName(NULL, szPath, MAX_PATH);
@@ -59,7 +59,7 @@ std::string  CUtils::getAppPath()
 	for (int nPos = (int)strPath.size() - 1; nPos >= 0; --nPos) {
 		TCHAR cChar = strPath[nPos];
 		if (_T('\\') == cChar || _T('/') == cChar)
-			return CUtils::WStringToString(strPath.substr(0, nPos + 1));
+			return CAgoralUtils::WStringToString(strPath.substr(0, nPos + 1));
 	}
-	return CUtils::WStringToString(strPath);
+	return CAgoralUtils::WStringToString(strPath);
 }

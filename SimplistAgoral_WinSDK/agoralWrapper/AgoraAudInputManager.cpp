@@ -4,7 +4,7 @@
 #include "AgoraAudInputManager.h"
 #include "AgoraObject.h"
 #include <assert.h>
-#include "Utils.h"
+#include "AgoralUtils.h"
 
 
 CAgoraAudInputManager::CAgoraAudInputManager()
@@ -95,10 +95,10 @@ BOOL CAgoraAudInputManager::GetDevice(UINT nIndex, std::string &rDeviceName, std
 		return FALSE;
 
 	char ansiDevName[MAX_DEVICE_ID_LENGTH];
-	CUtils::Convert(szDeviceName, ansiDevName, CP_UTF8, CP_ACP);
+	CAgoralUtils::Convert(szDeviceName, ansiDevName, CP_UTF8, CP_ACP);
 
 	char ansiDevId[MAX_DEVICE_ID_LENGTH];
-	CUtils::Convert(szDeviceID, ansiDevId, CP_UTF8, CP_ACP);
+	CAgoralUtils::Convert(szDeviceID, ansiDevId, CP_UTF8, CP_ACP);
 
 	rDeviceName = ansiDevName;
 	rDeviceID = ansiDevId;
@@ -117,7 +117,7 @@ std::string CAgoraAudInputManager::GetCurDeviceID()
 		(*m_ptrDeviceManager)->getRecordingDevice(szDeviceID);
 
 	char ansiDevId[MAX_DEVICE_ID_LENGTH];
-	CUtils::Convert(szDeviceID, ansiDevId, CP_UTF8, CP_ACP);
+	CAgoralUtils::Convert(szDeviceID, ansiDevId, CP_UTF8, CP_ACP);
 
 	str = ansiDevId;
 	return str;
