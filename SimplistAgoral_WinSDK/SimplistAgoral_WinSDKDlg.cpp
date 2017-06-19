@@ -29,7 +29,7 @@ CSimplistAgoral_WinSDKDlg::CSimplistAgoral_WinSDKDlg(CWnd* pParent /*=NULL*/)
 
 CSimplistAgoral_WinSDKDlg::~CSimplistAgoral_WinSDKDlg()
 {
-	CAgoraObject::CloseAgoraObject();
+
 }
 void CSimplistAgoral_WinSDKDlg::DoDataExchange(CDataExchange* pDX)
 {
@@ -43,7 +43,7 @@ BEGIN_MESSAGE_MAP(CSimplistAgoral_WinSDKDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDOK, &CSimplistAgoral_WinSDKDlg::OnBnClickedJoin)
-	ON_BN_CLICKED(IDCANCEL, &CSimplistAgoral_WinSDKDlg::OnBnClickedLeave)
+	ON_BN_CLICKED(IDC_BUTTON_LEAVE, &CSimplistAgoral_WinSDKDlg::OnBnClickedLeave)
 	ON_BN_CLICKED(IDC_CHECK1, &CSimplistAgoral_WinSDKDlg::OnBnClickedCheck)
 	ON_BN_CLICKED(ID_BUTTON_PREVIEW, &CSimplistAgoral_WinSDKDlg::OnBnClickedButtonPreview)
 	ON_BN_CLICKED(ID_BUTTON_TEST_AIN, &CSimplistAgoral_WinSDKDlg::OnBnClickedButtonTestAin)
@@ -176,12 +176,19 @@ void CSimplistAgoral_WinSDKDlg::OnBnClickedLeave()
 
 BOOL CSimplistAgoral_WinSDKDlg::PreTranslateMessage(MSG* pMsg)
 {
+
+	printf("msgid  = %d\n",pMsg->message);
+
+	if (pMsg->message == WM_COMMAND) {
+		int i = 0;
+	}
 	if (m_pAgroObject != NULL) {
 		m_pAgroObject->MsgHandle(pMsg->message, pMsg->wParam);
 	}
 	if (m_deviceManager != NULL) {
 		m_deviceManager->MsgHandle(pMsg->message, pMsg->wParam);
 	}
+	
 	
 	return CDialogEx::PreTranslateMessage(pMsg);
 }

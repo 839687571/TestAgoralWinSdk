@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../stdafx.h"
 
 #include "agoral/IAgoraMediaEngine.h"
@@ -86,6 +88,10 @@ public:
 	CAgoralWrapper();
 	~CAgoralWrapper();
 
+
+	static void GlobalInit();
+	static void GlobalUinit();
+
 	void InitAgoral(const char * logFile);
 
 	void JoinChannel(const char * channelName);
@@ -122,8 +128,8 @@ private:
 	//·Ö±æÂÊ
 	int m_nVideoSolution;
 	// agoral
-	IRtcEngine		*m_pRtcEngine;
-	CAgoraObject	*m_pAgoraObject;
+	static IRtcEngine	*m_pRtcEngine;
+	static CAgoraObject	*m_pAgoraObject;
 
 
 	std::vector<AGVIDEO_WNDINFO>   m_vecJoinedUsers;

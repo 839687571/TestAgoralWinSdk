@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "SimplistAgoral_WinSDK.h"
 #include "SimplistAgoral_WinSDKDlg.h"
+#include "agoralWrapper/AgoralWrapper.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -61,15 +62,9 @@ BOOL CSimplistAgoral_WinSDKApp::InitInstance()
 	// 激活“Windows Native”视觉管理器，以便在 MFC 控件中启用主题
 	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerWindows));
 
-	// 标准初始化
-	// 如果未使用这些功能并希望减小
-	// 最终可执行文件的大小，则应移除下列
-	// 不需要的特定初始化例程
-	// 更改用于存储设置的注册表项
-	// TODO:  应适当修改该字符串，
-	// 例如修改为公司或组织名
 	SetRegistryKey(_T("应用程序向导生成的本地应用程序"));
 
+	CAgoralWrapper::GlobalInit();
 	CSimplistAgoral_WinSDKDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
@@ -94,6 +89,8 @@ BOOL CSimplistAgoral_WinSDKApp::InitInstance()
 	{
 		delete pShellManager;
 	}
+
+	CAgoralWrapper::GlobalUinit();
 
 	// 由于对话框已关闭，所以将返回 FALSE 以便退出应用程序，
 	//  而不是启动应用程序的消息泵。

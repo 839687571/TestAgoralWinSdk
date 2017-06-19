@@ -12,8 +12,10 @@ void LogMessage(char *msg)
 }
 
 
+IRtcEngine	*CAgoralWrapper::m_pRtcEngine = NULL;
+CAgoraObject	*CAgoralWrapper::m_pAgoraObject = NULL;
 
-CAgoralWrapper::CAgoralWrapper()
+CAgoralWrapper::CAgoralWrapper() 
 {
 }
 
@@ -21,12 +23,30 @@ CAgoralWrapper::~CAgoralWrapper()
 {
 }
 
+
+void CAgoralWrapper::GlobalInit()
+{
+	if (m_pRtcEngine == NULL) {
+		m_pRtcEngine = CAgoraObject::GetEngine();
+	}
+	if (m_pAgoraObject == NULL) {
+		m_pAgoraObject = CAgoraObject::GetAgoraObject(APP_ID);
+	}
+}
+
+void CAgoralWrapper::GlobalUinit()
+{
+	CAgoraObject::CloseAgoraObject();
+
+	m_pAgoraObject = NULL;
+	m_pAgoraObject = NULL;
+}
+
+
 void CAgoralWrapper::InitAgoral(const char *logFile)
 {
 
-	m_pAgoraObject = CAgoraObject::GetAgoraObject(APP_ID);
-	m_pRtcEngine = CAgoraObject::GetEngine();
-
+	GlobalInit();
 	m_pAgoraObject->EnableVideo(TRUE);
 	m_pAgoraObject->SetLogFilePath(logFile);
 	m_pAgoraObject->EnableNetworkTest(TRUE);
