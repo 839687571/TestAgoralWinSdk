@@ -54,6 +54,8 @@ public:
 	BOOL SetCurrentAudioOutputDev(const char *devId);
 
 
+	std::string  GetCurrentUseAudioInputDevId();
+
 	BOOL MuteLocalVideo(BOOL mute);
 
 	BOOL GetIsTestVideoDev()

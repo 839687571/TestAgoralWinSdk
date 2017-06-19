@@ -6,6 +6,7 @@
 
 #include "agoralWrapper/AgoralWrapper.h"
 #include "agoralWrapper/DeviceManager.h"
+#include "AGSliderCtrl.h"
 
 
 // CSimplistAgoral_WinSDKDlg ¶Ô»°¿ò
@@ -40,6 +41,9 @@ protected:
 	CComboBox  *m_cmbOutputAudDev;
 	CComboBox  *m_cmbVideoDev;
 
+	CAGSliderCtrl  m_sliderInVolume;
+	CAGSliderCtrl  m_sliderOutVolume;
+
 	CProgressCtrl  *m_silderVolIndicate;
 
 public:
@@ -56,4 +60,17 @@ public:
 	afx_msg void OnCbnSelchangeComboAinput();
 	afx_msg void OnCbnSelchangeComboxVinput();
 	afx_msg void OnCbnSelchangeComboxAout();
+	afx_msg void OnNMCustomdrawSliderAin(NMHDR *pNMHDR, LRESULT *pResult);
+// 	BEGIN_MSG_MAP(CSimplistAgoral_WinSDKDlg)
+// 		MESSAGE_HANDLER(WM_HSCROLL, OnHScroll)
+// 	END_MSG_MAP()
+// 	LRESULT OnHScroll(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+
+	afx_msg void OnHScroll(
+		UINT nSBCode,
+		UINT nPos,
+		CScrollBar* pScrollBar
+		);
+
+	//LRESULT OnHScroll(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 };

@@ -34,6 +34,9 @@ CSimplistAgoral_WinSDKDlg::~CSimplistAgoral_WinSDKDlg()
 void CSimplistAgoral_WinSDKDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+
+	DDX_Control(pDX, IDC_SLIDER_AIN, m_sliderInVolume);
+	DDX_Control(pDX, IDC_SLIDER_AOUT, m_sliderOutVolume);
 }
 
 BEGIN_MESSAGE_MAP(CSimplistAgoral_WinSDKDlg, CDialogEx)
@@ -48,6 +51,8 @@ BEGIN_MESSAGE_MAP(CSimplistAgoral_WinSDKDlg, CDialogEx)
 	ON_CBN_SELCHANGE(IDC_COMBO_AINPUT, &CSimplistAgoral_WinSDKDlg::OnCbnSelchangeComboAinput)
 	ON_CBN_SELCHANGE(IDC_COMBOX_VINPUT, &CSimplistAgoral_WinSDKDlg::OnCbnSelchangeComboxVinput)
 	ON_CBN_SELCHANGE(IDC_COMBOX_AOUT, &CSimplistAgoral_WinSDKDlg::OnCbnSelchangeComboxAout)
+	ON_WM_HSCROLL()
+
 END_MESSAGE_MAP()
 
 
@@ -74,7 +79,7 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 	m_cmbOutputAudDev = (CComboBox*)GetDlgItem(IDC_COMBOX_AOUT);
 	m_cmbVideoDev = (CComboBox*)GetDlgItem(IDC_COMBOX_VINPUT);
 	m_silderVolIndicate = (CProgressCtrl*)GetDlgItem(IDC_PROGRESS_VOL_IDC);
-	m_silderVolIndicate->SetRange(0, 1000);
+	m_silderVolIndicate->SetRange(0, 255);
 
 	m_pAgroObject = new CAgoralWrapper;
 	m_pAgroObject->SetLocalHwnd((HWND)localCtrl->GetSafeHwnd());
@@ -119,6 +124,13 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 		m_cmbVideoDev->SetCurSel(0);
 	}
 
+
+	m_sliderInVolume.SetRange(0, 255);
+	m_sliderOutVolume.SetRange(0, 255);
+
+
+	m_sliderInVolume.SetPos(200);
+	m_sliderOutVolume.SetPos(200);
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE	
 }
 
@@ -129,7 +141,9 @@ void CSimplistAgoral_WinSDKDlg::onAudioVolumIndication(const void *param)
 	m_silderVolIndicate->SetPos(lpData->totalVolume);
 
 
-	printf("vol = %d\n", lpData->totalVolume);
+	std::string devid = m_deviceManager->GetCurrentUseAudioInputDevId();
+
+	printf("\n vol = %d number =%d devid  = %s\n", lpData->totalVolume, lpData->speakerNumber, devid.c_str());
 	delete lpData;
 }
 void CSimplistAgoral_WinSDKDlg::OnPaint()
@@ -237,10 +251,11 @@ void CSimplistAgoral_WinSDKDlg::OnBnClickedButtonTestAout()
 void CSimplistAgoral_WinSDKDlg::OnCbnSelchangeComboAinput()
 {
 	int index = m_cmbInputAudDev->GetCurSel();
-	std::vector<DevicesInfo> &audioDevs = m_deviceManager->GetVideoDeviceLists();
+	std::vector<DevicesInfo> &audioDevs = m_deviceManager->GetAudioInputDeviceLists();
 
 	DevicesInfo info = audioDevs.at(index);
 
+	printf("set cur dev id  = %s\n", info.deviceId.c_str());
 	m_deviceManager->SetCurrentAudioInputDev(info.deviceId.c_str());
 }
 
@@ -252,6 +267,7 @@ void CSimplistAgoral_WinSDKDlg::OnCbnSelchangeComboxVinput()
 
 	DevicesInfo info = videoDevs.at(index);
 
+	printf("set cur dev id  = %s\n", info.deviceId.c_str());
 	m_deviceManager->SetCurrentVidoeInputDev(info.deviceId.c_str());
 }
 
@@ -259,9 +275,99 @@ void CSimplistAgoral_WinSDKDlg::OnCbnSelchangeComboxVinput()
 void CSimplistAgoral_WinSDKDlg::OnCbnSelchangeComboxAout()
 {
 	int index = m_cmbInputAudDev->GetCurSel();
-	std::vector<DevicesInfo> &audioODevs = m_deviceManager->GetVideoDeviceLists();
+	std::vector<DevicesInfo> &audioODevs = m_deviceManager->GetAudioOutputDeviceLists();
 
 	DevicesInfo info = audioODevs.at(index);
 
 	m_deviceManager->SetCurrentAudioOutputDev(info.deviceId.c_str());
+}
+
+
+afx_msg void CSimplistAgoral_WinSDKDlg::OnHScroll(
+	UINT nSBCode,
+	UINT nPos,
+	CScrollBar* pScrollBar
+	)
+{
+
+// 	CAGSliderCtrl  *slider = (CScrollBar*)pScrollBar;
+// 	int pos = slider->GetPos();
+// 	printf("set volum = %d\n", pos);
+// 
+
+
+	// Get the minimum and maximum scroll-bar positions.
+	int minpos;
+	int maxpos;
+	pScrollBar->GetScrollRange(&minpos, &maxpos);
+	maxpos = pScrollBar->GetScrollLimit();
+	// Get the current position of scroll box.
+	int curpos = pScrollBar->GetScrollPos();
+	// Determine the new position of scroll box.
+	switch (nSBCode) {
+	case SB_LEFT:      // Scroll to far left.
+		curpos = minpos;
+		break;
+	case SB_RIGHT:      // Scroll to far right.
+		curpos = maxpos;
+		break;
+	case SB_ENDSCROLL:   // End scroll.
+		break;
+	case SB_LINELEFT:      // Scroll left.
+		if (curpos > minpos)
+			curpos--;
+		break;
+	case SB_LINERIGHT:   // Scroll right.
+		if (curpos < maxpos)
+			curpos++;
+		break;
+	case SB_PAGELEFT:    // Scroll one page left.
+	{
+		// Get the page size. 
+		SCROLLINFO   info;
+		pScrollBar->GetScrollInfo(&info, SIF_ALL);
+
+		if (curpos > minpos)
+			curpos = max(minpos, curpos - (int)info.nPage);
+	}
+	break;
+	case SB_PAGERIGHT:      // Scroll one page right.
+	{
+		// Get the page size. 
+		SCROLLINFO   info;
+		pScrollBar->GetScrollInfo(&info, SIF_ALL);
+		if (curpos < maxpos)
+			curpos = min(maxpos, curpos + (int)info.nPage);
+	}
+	break;
+	case SB_THUMBPOSITION: // Scroll to absolute position. nPos is the position
+		curpos = nPos;      // of the scroll box at the end of the drag operation.
+		break;
+	case SB_THUMBTRACK:   // Drag scroll box to specified position. nPos is the
+		curpos = nPos;     // position that the scroll box has been dragged to.
+		break;
+	}
+	// Set the new position of the thumb (scroll box).
+	pScrollBar->SetScrollPos(curpos);
+
+
+	printf("set volum = %d\n", curpos);
+
+	
+	if (pScrollBar->GetDlgCtrlID() == IDC_SLIDER_AIN) {
+
+		if (m_deviceManager != NULL) {
+			if (curpos > 0)
+			m_deviceManager->SetCurrentInputVolume(curpos);
+		}
+	} else if (pScrollBar->GetDlgCtrlID() == IDC_SLIDER_AOUT) {
+		if (m_deviceManager != NULL) {
+			if (curpos > 0)
+			m_deviceManager->SetCurrentOutputVolume(curpos);
+		} 
+	}
+
+
+	
+	CDialogEx::OnHScroll(nSBCode, nPos, pScrollBar);
 }

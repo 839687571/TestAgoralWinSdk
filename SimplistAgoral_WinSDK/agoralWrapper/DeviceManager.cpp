@@ -86,6 +86,11 @@ BOOL CDeviceManager::SetCurrentAudioOutputDev(const char *devId)
 	return m_agPlayout.SetCurDevice(devId);
 }
 
+std::string  CDeviceManager::GetCurrentUseAudioInputDevId()
+{
+	return m_agAudioin.GetCurDeviceID();
+}
+
 BOOL  CDeviceManager::TestCurrentVideoDev(HWND hwnd)
 {
 	if (m_agCamera.IsTesting()) {

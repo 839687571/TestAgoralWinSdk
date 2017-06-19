@@ -128,6 +128,7 @@
     <ClInclude Include="agoralWrapper\AGResourceVisitor.h" />
     <ClInclude Include="agoralWrapper\DeviceManager.h" />
     <ClInclude Include="agoralWrapper\Utils.h" />
+    <ClInclude Include="AGSliderCtrl.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SimplistAgoral_WinSDK.h" />
     <ClInclude Include="SimplistAgoral_WinSDKDlg.h" />
@@ -146,6 +147,7 @@
     <ClCompile Include="agoralWrapper\AGResourceVisitor.cpp" />
     <ClCompile Include="agoralWrapper\DeviceManager.cpp" />
     <ClCompile Include="agoralWrapper\Utils.cpp" />
+    <ClCompile Include="AGSliderCtrl.cpp" />
     <ClCompile Include="SimplistAgoral_WinSDK.cpp" />
     <ClCompile Include="SimplistAgoral_WinSDKDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
