@@ -12,15 +12,18 @@ m_lpRtcEngine(NULL)
 CDeviceManager::~CDeviceManager()
 {
 
-
 }
-void CDeviceManager::InitManager()
+void CDeviceManager::InitManager(const char *logPath)
 {
 	m_lpRtcEngine = CAgoraObject::GetEngine();
 
 	m_agPlayout.Create(m_lpRtcEngine);
 	m_agAudioin.Create(m_lpRtcEngine);
 	m_agCamera.Create(m_lpRtcEngine);
+
+
+	CAgoraObject::GetAgoraObject()->SetLogFilePath(logPath);
+
 
 	for (UINT nIndex = 0; nIndex < m_agPlayout.GetDeviceCount(); nIndex++) {
 		std::string strDeviceName, strDeviceID;

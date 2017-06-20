@@ -92,7 +92,7 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 
 	m_deviceManager = new CDeviceManager;
 
-	m_deviceManager->InitManager();
+	m_deviceManager->InitManager(appPath.c_str());
 	m_deviceManager->SetCurrentObserver(this);
 	m_deviceManager->SetMsgHandleWnd(m_hWnd);
 
@@ -176,8 +176,6 @@ void CSimplistAgoral_WinSDKDlg::OnBnClickedLeave()
 
 BOOL CSimplistAgoral_WinSDKDlg::PreTranslateMessage(MSG* pMsg)
 {
-
-	printf("msgid  = %d\n",pMsg->message);
 
 	if (pMsg->message == WM_COMMAND) {
 		int i = 0;

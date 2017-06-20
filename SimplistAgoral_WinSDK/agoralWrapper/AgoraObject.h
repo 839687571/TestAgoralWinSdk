@@ -110,6 +110,7 @@ private:
 	BOOL		m_bLocalVideoMuted;
 	BOOL		m_bScreenCapture;
 
+	std::string  m_logFileName;
 //	int			m_nCodecType;
 
 public:

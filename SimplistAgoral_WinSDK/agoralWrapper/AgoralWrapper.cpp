@@ -32,6 +32,8 @@ void CAgoralWrapper::GlobalInit()
 	if (m_pAgoraObject == NULL) {
 		m_pAgoraObject = CAgoraObject::GetAgoraObject(APP_ID);
 	}
+
+	m_pAgoraObject->EnableVideo(TRUE);
 }
 
 void CAgoralWrapper::GlobalUinit()
@@ -47,7 +49,7 @@ void CAgoralWrapper::InitAgoral(const char *logFile)
 {
 
 	GlobalInit();
-	m_pAgoraObject->EnableVideo(TRUE);
+
 	m_pAgoraObject->SetLogFilePath(logFile);
 	m_pAgoraObject->EnableNetworkTest(TRUE);
 	m_pAgoraObject->SetMsgHandlerWnd(m_mMainHwnd);

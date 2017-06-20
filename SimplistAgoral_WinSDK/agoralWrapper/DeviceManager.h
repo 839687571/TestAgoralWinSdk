@@ -33,7 +33,7 @@ public:
 	std::vector<DevicesInfo>  &GetAudioInputDeviceLists();
 	std::vector<DevicesInfo>  &GetAudioOutputDeviceLists();
 
-	void  InitManager();
+	void  InitManager(const char *logPath);
 
 
 	UINT  GetCurrentInputVolume();

@@ -162,9 +162,14 @@ BOOL CAgoraObject::SetLogFilePath(const char * lpLogPath)
 {
 	assert(m_lpAgoraEngine != NULL);
 
+	if (!m_logFileName.empty()) return FALSE;
+
 	RtcEngineParameters rep(*m_lpAgoraEngine);
 	int  ret = rep.setLogFile(lpLogPath);
 
+	if (ret == 0) {
+		m_logFileName = lpLogPath;
+	}
 	return ret == 0 ? TRUE : FALSE;
 }
 
