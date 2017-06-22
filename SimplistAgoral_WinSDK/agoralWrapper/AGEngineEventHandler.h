@@ -28,6 +28,16 @@ using namespace  agora::rtc;
 		virtual void onAudioVolumeIndication(const  AudioVolumeInfo* speakers, unsigned int speakerNumber, int totalVolume);
 
 		virtual void onLeaveChannel(const  RtcStats& stat);
+
+		//SDK定期向应用程序报告当前通话的统计信息，每两秒触发一次。
+		/*
+		duration: 通话时长（秒），累计值
+		txBytes: 发送字节数（bytes），累计值
+		rxBytes: 接收字节数（bytes），累计值
+		txKBitRate: 发送码率（kbps），瞬时值
+		rxKBitRate: 接收码率（kbps），瞬时值
+		lastmileQuality: 以瞬时值表示的客户端机器的当前网络连接质量。
+		*/
 		virtual void onRtcStats(const  RtcStats& stat);
 		virtual void onMediaEngineEvent(int evt);
 

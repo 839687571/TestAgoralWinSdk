@@ -120,7 +120,10 @@ private:
 	void onHostJoinSuccess(DWORD msgId, WPARAM wParam);
 
 	void onStatisticRemoteVideoInfo(DWORD msgId, WPARAM wParam);
+	void onStatisticLocalVideoInfo(DWORD msgId, WPARAM wParam);
 
+	void onLostConnect(DWORD msgId, WPARAM wParam);
+	void onNetWorkQuality(DWORD msgId, WPARAM wParam);
 	HWND  m_loaclVideoWnd; /* 本地视频 */
 	HWND  m_remoteVideoWnd; /* 远端视频视频 -- 在 老师端  看到学生视频 为远程视频*/
 	HWND  m_mMainHwnd;

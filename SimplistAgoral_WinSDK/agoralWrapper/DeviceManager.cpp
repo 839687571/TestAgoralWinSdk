@@ -126,7 +126,7 @@ void CDeviceManager::MsgHandle(DWORD msgId, WPARAM wParam)
 		case WM_MSGID(EID_AUDIO_VOLUME_INDICATION):
 			m_pObserver->onAudioVolumIndication((void*)wParam);
 			break;
-		case WM_MSGID(EID_LASTMILE_QUALITY):
+		case WM_MSGID(EID_NETWORK_QUALITY):
 			//m_lpRtcEngine->disableLastmileTest();
 			m_pObserver->onLastmileQuality((void*)wParam);
 			default:

@@ -76,6 +76,8 @@ void CAgoralWrapper::JoinChannel(const char * channelName)
 	lpAgoraObject->SetEncryptionSecret("", 0);// USE DEFAULT encryption
 	lpAgoraObject->JoinChannel(channelName);
 	lpAgoraObject->SetMsgHandlerWnd(m_mMainHwnd);
+
+	///lpAgoraObject->EnableNetworkTest(TRUE);
 }
 
 void CAgoralWrapper::onUserJoinedMsg(DWORD msgId, WPARAM wParam)
@@ -100,6 +102,7 @@ void CAgoralWrapper::onUserJoinedMsg(DWORD msgId, WPARAM wParam)
 		BindRemoteVideoWnd(&videoInfo);
 	}
 
+	delete lpData;
 }
 
 void CAgoralWrapper::onUserOfflineMsg(DWORD msgId, WPARAM wParam)
@@ -116,7 +119,7 @@ void CAgoralWrapper::onUserOfflineMsg(DWORD msgId, WPARAM wParam)
 			break;
 		}
 	}
-	
+	delete lpData;
 }
 void CAgoralWrapper::onStatisticRemoteVideoInfo(DWORD msgId, WPARAM wParam)
 {
@@ -128,6 +131,8 @@ void CAgoralWrapper::onStatisticRemoteVideoInfo(DWORD msgId, WPARAM wParam)
 	rWndInfo.nWidth = lpData->width;
 	rWndInfo.nHeight = lpData->height;
 	LogWinInfo(rWndInfo);
+
+	delete lpData;
 }
 void CAgoralWrapper::onHostJoinSuccess(DWORD msgId, WPARAM wParam)
 {
@@ -139,6 +144,35 @@ void CAgoralWrapper::onHostJoinSuccess(DWORD msgId, WPARAM wParam)
 		_pAgoraObject->GetChanelName().c_str()
 		, _pAgoraObject->GetCallID().c_str()
 		, _pAgoraObject->GetVendorKey().c_str());
+	LogMessage(buf);
+	delete lpData;
+}
+void CAgoralWrapper::onStatisticLocalVideoInfo(DWORD msgId, WPARAM wParam)
+{
+	PAGE_LOCAL_VIDEO_STAT lpData = (PAGE_LOCAL_VIDEO_STAT)wParam;
+
+	char buf[512];
+	sprintf_s(buf, "===sentbitrate = %d, sentload fps = %d ", lpData->sentBitrate,
+		lpData->sentFrameRate);
+	LogMessage(buf);
+	delete lpData;
+}
+
+void CAgoralWrapper::onLostConnect(DWORD msgId, WPARAM wParam)
+{
+
+	char buf[512];
+	sprintf_s(buf, "=== host is lost connect ");
+	LogMessage(buf);
+
+}
+
+
+void CAgoralWrapper::onNetWorkQuality(DWORD msgId, WPARAM wParam)
+{
+	PAGE_NETWORK_QUALITY pData = (PAGE_NETWORK_QUALITY)wParam;
+	char buf[512];
+	sprintf_s(buf, "=== net work qulity  = %d", pData->quality);
 	LogMessage(buf);
 }
 
@@ -157,9 +191,14 @@ void CAgoralWrapper::MsgHandle(DWORD msgId, WPARAM wParam)
 	case WM_MSGID(EID_REMOTE_VIDEO_STAT):
 		onStatisticRemoteVideoInfo(msgId, wParam);
 		break;
-		// 		case WM_MSGID(EID_REMOTE_VIDEO_STAT):
-		// 			onStatisticRemoteVideoInfo(msgId, wParam);
-		// 			break;
+	case WM_MSGID(EID_LOCAL_VIDEO_STAT):
+		onStatisticLocalVideoInfo(msgId, wParam);
+		break;
+	case WM_MSGID(EID_CONNECTION_LOST):
+		onLostConnect(msgId, wParam);
+		break;
+	case WM_MSGID(EID_NETWORK_QUALITY): //ÍøÂçÖÊÁ¿
+		onNetWorkQuality(msgId, wParam);
 	default:
 		break;
 	}
@@ -177,3 +216,8 @@ void CAgoralWrapper::BindRemoteVideoWnd(AGVIDEO_WNDINFO *videoInfo)
 	canvas.view = videoInfo->hHwnd;
 	CAgoraObject::GetEngine()->setupRemoteVideo(canvas);
 }
+
+
+
+
+
