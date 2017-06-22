@@ -11,7 +11,9 @@ m_lpRtcEngine(NULL)
 
 CDeviceManager::~CDeviceManager()
 {
-
+	m_agPlayout.Close();
+	m_agAudioin.Close();
+	m_agCamera.Close();
 }
 void CDeviceManager::InitManager(const char *logPath)
 {
@@ -75,6 +77,11 @@ int  CDeviceManager::TestCurrentAudioOutDev( const char *auidoFile)
 			return	m_agPlayout.TestPlaybackDevice(auidoFile,TRUE);
 		}
 }
+int CDeviceManager::StartTestNetWork()
+{
+	return m_lpRtcEngine->enableLastmileTest();
+}
+
 
 BOOL CDeviceManager::SetCurrentVidoeInputDev(const char *devId)
 {
@@ -113,6 +120,9 @@ void CDeviceManager::MsgHandle(DWORD msgId, WPARAM wParam)
 		case WM_MSGID(EID_AUDIO_VOLUME_INDICATION):
 			m_pObserver->onAudioVolumIndication((void*)wParam);
 			break;
+		case WM_MSGID(EID_LASTMILE_QUALITY):
+			m_lpRtcEngine->disableLastmileTest();
+			m_pObserver->onLastmileQuality((void*)wParam);
 			default:
 				break;
 		}

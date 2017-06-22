@@ -53,6 +53,7 @@ BEGIN_MESSAGE_MAP(CSimplistAgoral_WinSDKDlg, CDialogEx)
 	ON_CBN_SELCHANGE(IDC_COMBOX_AOUT, &CSimplistAgoral_WinSDKDlg::OnCbnSelchangeComboxAout)
 	ON_WM_HSCROLL()
 
+	ON_BN_CLICKED(IDC_BUTTON_NETWORK, &CSimplistAgoral_WinSDKDlg::OnBnClickedButtonNetwork)
 END_MESSAGE_MAP()
 
 
@@ -129,8 +130,8 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 	m_sliderOutVolume.SetRange(0, 255);
 
 
-	m_sliderInVolume.SetPos(200);
-	m_sliderOutVolume.SetPos(200);
+	m_sliderInVolume.SetPos(m_deviceManager->GetCurrentInputVolume());
+	m_sliderOutVolume.SetPos(m_deviceManager->GetCurrentInputVolume());
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE	
 }
 
@@ -144,6 +145,13 @@ void CSimplistAgoral_WinSDKDlg::onAudioVolumIndication(const void *param)
 	std::string devid = m_deviceManager->GetCurrentUseAudioInputDevId();
 
 	printf("\n vol = %d number =%d devid  = %s\n", lpData->totalVolume, lpData->speakerNumber, devid.c_str());
+	delete lpData;
+}
+void  CSimplistAgoral_WinSDKDlg::onLastmileQuality(const void *wParam)
+{
+	LPAGE_LASTMILE_QUALITY lpData = (LPAGE_LASTMILE_QUALITY)wParam;
+	printf("\n on quality ret  = %d\n", lpData->quality);
+
 	delete lpData;
 }
 void CSimplistAgoral_WinSDKDlg::OnPaint()
@@ -375,4 +383,10 @@ afx_msg void CSimplistAgoral_WinSDKDlg::OnHScroll(
 
 	
 	CDialogEx::OnHScroll(nSBCode, nPos, pScrollBar);
+}
+
+
+void CSimplistAgoral_WinSDKDlg::OnBnClickedButtonNetwork()
+{
+	m_deviceManager->StartTestNetWork();
 }

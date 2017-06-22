@@ -7,6 +7,8 @@
 
 interface  IDeviceMsgObserver {
 	virtual void onAudioVolumIndication(const void *param) {};
+	// network test
+	virtual void  onLastmileQuality(const void *wParam) {};
 };
 
 typedef struct _DevicesInfo {
@@ -76,7 +78,7 @@ public:
 		return m_agPlayout.IsTesting();
 	}
 
-
+	int StartTestNetWork();
 	/*
 	  测试 音视频设备的过程中 ,引擎通过消息形式返回上传,
 	  因此需要添加 消息处理函数.

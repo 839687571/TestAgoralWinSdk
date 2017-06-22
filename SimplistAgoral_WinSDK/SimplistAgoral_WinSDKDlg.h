@@ -37,6 +37,7 @@ protected:
 
 
 	void onAudioVolumIndication(const void *param);
+	void  onLastmileQuality(const void *wParam);
 	CComboBox  *m_cmbInputAudDev;
 	CComboBox  *m_cmbOutputAudDev;
 	CComboBox  *m_cmbVideoDev;
@@ -73,4 +74,5 @@ public:
 		);
 
 	//LRESULT OnHScroll(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
+	afx_msg void OnBnClickedButtonNetwork();
 };

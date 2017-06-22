@@ -51,8 +51,9 @@ void CAgoraAudInputManager::Close()
 
 UINT CAgoraAudInputManager::GetVolume()
 {
-	int nVol = 0;
+	if (m_ptrDeviceManager->get() == NULL || m_ptrDeviceManager == NULL) return 0;
 
+	int nVol = 0;
 	if (*m_ptrDeviceManager != NULL)
 		(*m_ptrDeviceManager)->getRecordingDeviceVolume(&nVol);
 
@@ -61,8 +62,10 @@ UINT CAgoraAudInputManager::GetVolume()
 
 BOOL CAgoraAudInputManager::SetVolume(UINT nVol)
 {
+
+	if (m_ptrDeviceManager->get() == NULL || m_ptrDeviceManager == NULL) return 0;
 	int nRet = -1;
-	
+
 	if (*m_ptrDeviceManager != NULL)
 		nRet = (*m_ptrDeviceManager)->setRecordingDeviceVolume((int)nVol);
 
@@ -143,7 +146,7 @@ int CAgoraAudInputManager::TestAudInputDevice(HWND hMsgWnd, BOOL bTestOn)
 		IRtcEngine *lpRtcEngine = CAgoraObject::GetEngine();
 		RtcEngineParameters rep(*lpRtcEngine);
 		rep.enableAudioVolumeIndication(1000, 10);
-		ret = (*m_ptrDeviceManager)->startRecordingDeviceTest(1000);
+		ret = (*m_ptrDeviceManager)->startRecordingDeviceTest(200);
 	}
 	else if (!bTestOn && m_bTestingOn){
 		CAgoraObject::GetAgoraObject()->SetMsgHandlerWnd(m_hOldMsgWnd);
