@@ -152,6 +152,8 @@ void  CSimplistAgoral_WinSDKDlg::onLastmileQuality(const void *wParam)
 	LPAGE_LASTMILE_QUALITY lpData = (LPAGE_LASTMILE_QUALITY)wParam;
 	printf("\n on quality ret  = %d\n", lpData->quality);
 
+
+	m_deviceManager->StopTestNetWork();
 	delete lpData;
 }
 void CSimplistAgoral_WinSDKDlg::OnPaint()
@@ -388,5 +390,5 @@ afx_msg void CSimplistAgoral_WinSDKDlg::OnHScroll(
 
 void CSimplistAgoral_WinSDKDlg::OnBnClickedButtonNetwork()
 {
-	m_deviceManager->StartTestNetWork();
+	m_deviceManager->StartTestNetWork(m_hWnd);
 }

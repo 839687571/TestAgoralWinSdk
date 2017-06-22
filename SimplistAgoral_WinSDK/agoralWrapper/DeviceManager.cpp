@@ -77,9 +77,15 @@ int  CDeviceManager::TestCurrentAudioOutDev( const char *auidoFile)
 			return	m_agPlayout.TestPlaybackDevice(auidoFile,TRUE);
 		}
 }
-int CDeviceManager::StartTestNetWork()
+int CDeviceManager::StartTestNetWork(HWND hwnd)
 {
+	CAgoraObject::GetAgoraObject()->SetMsgHandlerWnd(hwnd);
 	return m_lpRtcEngine->enableLastmileTest();
+}
+
+int  CDeviceManager::StopTestNetWork()
+{
+	return m_lpRtcEngine->disableLastmileTest();
 }
 
 
@@ -121,7 +127,7 @@ void CDeviceManager::MsgHandle(DWORD msgId, WPARAM wParam)
 			m_pObserver->onAudioVolumIndication((void*)wParam);
 			break;
 		case WM_MSGID(EID_LASTMILE_QUALITY):
-			m_lpRtcEngine->disableLastmileTest();
+			//m_lpRtcEngine->disableLastmileTest();
 			m_pObserver->onLastmileQuality((void*)wParam);
 			default:
 				break;
