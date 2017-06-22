@@ -195,14 +195,16 @@ void CAGEngineEventHandler::onVideoDeviceStateChanged(const char* deviceId, int 
 
 }
 
+
+
 void CAGEngineEventHandler::onLastmileQuality(int quality)
 {
-    LPAGE_LASTMILE_QUALITY lpData = new AGE_LASTMILE_QUALITY;
+	LPAGE_LASTMILE_QUALITY lpData = new AGE_LASTMILE_QUALITY;
 
 	lpData->quality = quality;
 
-	if(m_hMainWnd != NULL)
-        ::PostMessage(m_hMainWnd, WM_MSGID(EID_LASTMILE_QUALITY), (WPARAM)lpData, 0);
+	if (m_hMainWnd != NULL)
+		::PostMessage(m_hMainWnd, WM_MSGID(EID_LASTMILE_QUALITY), (WPARAM)lpData, 0);
 
 	//LogMessage(__FUNCTION__);
 

@@ -1,4 +1,5 @@
-#pragma onceusing namespace
+#pragma once
+
 #include "../stdafx.h"
 #include "agoral/IAgoraRtcEngine.h"
 #include "AGEngineEventHandler.h"
@@ -20,7 +21,7 @@ using namespace agora::rtc;
 #define AG_CODEC_EVP	0x00000001
 #define AG_CODEC_VP8	0x00000002
 
-#define APP_ID ("")
+
 
 class CAgoraObject
 {

@@ -149,7 +149,7 @@ void CSimplistAgoral_WinSDKDlg::onAudioVolumIndication(const void *param)
 }
 void  CSimplistAgoral_WinSDKDlg::onLastmileQuality(const void *wParam)
 {
-	LPAGE_NETWORK_QUALITY lpData= (LPAGE_NETWORK_QUALITY)wParam;
+	LPAGE_LASTMILE_QUALITY lpData = (LPAGE_LASTMILE_QUALITY)wParam;
 	printf("\n on quality ret  = %d\n", lpData->quality);
 
 

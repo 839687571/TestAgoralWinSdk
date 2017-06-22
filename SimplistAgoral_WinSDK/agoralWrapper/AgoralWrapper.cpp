@@ -170,7 +170,7 @@ void CAgoralWrapper::onLostConnect(DWORD msgId, WPARAM wParam)
 
 void CAgoralWrapper::onNetWorkQuality(DWORD msgId, WPARAM wParam)
 {
-	PAGE_NETWORK_QUALITY pData = (PAGE_NETWORK_QUALITY)wParam;
+	PAGE_LASTMILE_QUALITY pData = (PAGE_LASTMILE_QUALITY)wParam;
 	char buf[512];
 	sprintf_s(buf, "=== net work qulity  = %d", pData->quality);
 	LogMessage(buf);
@@ -197,7 +197,7 @@ void CAgoralWrapper::MsgHandle(DWORD msgId, WPARAM wParam)
 	case WM_MSGID(EID_CONNECTION_LOST):
 		onLostConnect(msgId, wParam);
 		break;
-	case WM_MSGID(EID_NETWORK_QUALITY): //网络质量
+	case WM_MSGID(EID_LASTMILE_QUALITY): //网络质量
 		onNetWorkQuality(msgId, wParam);
 	default:
 		break;
