@@ -11,6 +11,7 @@ CAgoraAudInputManager::CAgoraAudInputManager()
 	: m_ptrDeviceManager(NULL)
 	, m_lpCollection(NULL)
 	, m_bTestingOn(FALSE)
+	, m_lpRtcEngine(FALSE)
 {
 }
 
@@ -22,6 +23,7 @@ CAgoraAudInputManager::~CAgoraAudInputManager()
 
 BOOL CAgoraAudInputManager::Create(agora::rtc::IRtcEngine *lpRtcEngine)
 {
+	//m_lpRtcEngine = lpRtcEngine;
 	m_ptrDeviceManager = new agora::rtc::AAudioDeviceManager(*lpRtcEngine);
 	if (m_ptrDeviceManager->get() == NULL)
 		return FALSE;
@@ -35,6 +37,27 @@ BOOL CAgoraAudInputManager::Create(agora::rtc::IRtcEngine *lpRtcEngine)
 	
 	return m_lpCollection != NULL ? TRUE : FALSE;
 }
+
+// BOOL  CAgoraAudInputManager::UpataDevice()
+// {
+// 	if (m_lpCollection != NULL) {
+// 		m_lpCollection->release();
+// 		m_lpCollection = NULL;
+// 	}
+// 
+// 	if (m_ptrDeviceManager == NULL) {
+// 		m_ptrDeviceManager = new agora::rtc::AAudioDeviceManager(*m_lpRtcEngine);
+// 		if (m_ptrDeviceManager->get() == NULL)
+// 			return FALSE;
+// 	}
+// 
+// 	m_lpCollection = (*m_ptrDeviceManager)->enumerateRecordingDevices();
+// 	if (m_lpCollection == NULL) {
+// 		
+// 	}
+// 
+// 	return m_lpCollection != NULL ? TRUE : FALSE;
+// }
 
 void CAgoraAudInputManager::Close()
 {
@@ -51,7 +74,7 @@ void CAgoraAudInputManager::Close()
 
 UINT CAgoraAudInputManager::GetVolume()
 {
-	if (m_ptrDeviceManager->get() == NULL || m_ptrDeviceManager == NULL) return 0;
+	if (m_ptrDeviceManager == NULL  || m_ptrDeviceManager->get() == NULL  ) return 0;
 
 	int nVol = 0;
 	if (*m_ptrDeviceManager != NULL)
@@ -63,7 +86,7 @@ UINT CAgoraAudInputManager::GetVolume()
 BOOL CAgoraAudInputManager::SetVolume(UINT nVol)
 {
 
-	if (m_ptrDeviceManager->get() == NULL || m_ptrDeviceManager == NULL) return 0;
+	if (m_ptrDeviceManager == NULL|| m_ptrDeviceManager->get() == NULL ) return 0;
 	int nRet = -1;
 
 	if (*m_ptrDeviceManager != NULL)
@@ -139,6 +162,9 @@ BOOL CAgoraAudInputManager::SetCurDevice(const char *pDeviceID)
 int CAgoraAudInputManager::TestAudInputDevice(HWND hMsgWnd, BOOL bTestOn)
 {
 	int ret = 0;
+
+	if (m_ptrDeviceManager == NULL) return FALSE;
+
 	if (bTestOn && !m_bTestingOn) {
 		m_hOldMsgWnd = CAgoraObject::GetAgoraObject()->GetMsgHandlerWnd();
 		CAgoraObject::GetAgoraObject()->SetMsgHandlerWnd(hMsgWnd);

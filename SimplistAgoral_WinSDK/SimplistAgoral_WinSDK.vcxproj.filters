@@ -116,9 +116,6 @@
     <ClCompile Include="SimplistAgoral_WinSDK.cpp">
       <Filter>Source Files\AGClass</Filter>
     </ClCompile>
-    <ClCompile Include="SimplistAgoral_WinSDKDlg.cpp">
-      <Filter>Source Files\AGClass</Filter>
-    </ClCompile>
     <ClCompile Include="agoralWrapper\AgoralWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -130,6 +127,9 @@
     </ClCompile>
     <ClCompile Include="agoralWrapper\AgoralUtils.cpp">
       <Filter>Source Files\AGClass</Filter>
+    </ClCompile>
+    <ClCompile Include="SimplistAgoral_WinSDKDlg.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

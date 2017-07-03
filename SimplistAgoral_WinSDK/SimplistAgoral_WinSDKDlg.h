@@ -10,7 +10,7 @@
 
 
 // CSimplistAgoral_WinSDKDlg 对话框
-class CSimplistAgoral_WinSDKDlg : public CDialogEx, IDeviceMsgObserver
+class CSimplistAgoral_WinSDKDlg : public CDialogEx, IDeviceMsgObserver,IAgoralObjectMsgMsgObserver
 {
 // 构造
 public:
@@ -38,9 +38,19 @@ protected:
 
 	void onAudioVolumIndication(const void *param);
 	void  onLastmileQuality(const void *wParam);
+	void  onAudioDeviceChange(const void *wParam);
+	void  onVideoDeviceChange(const void *wParam);
+
 	CComboBox  *m_cmbInputAudDev;
 	CComboBox  *m_cmbOutputAudDev;
+
 	CComboBox  *m_cmbVideoDev;
+	CComboBox  *m_cmbVideoDev2;
+
+	std::string  m_strInputAudDevId;
+	std::string  m_strOutputAudDevId;
+	std::string  m_strVideoDevId;
+
 
 	CAGSliderCtrl  m_sliderInVolume;
 	CAGSliderCtrl  m_sliderOutVolume;
@@ -53,7 +63,7 @@ public:
 
 	CAgoralWrapper *m_pAgroObject;
 	CDeviceManager  *m_deviceManager;
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
+//	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnBnClickedCheck();
 	afx_msg void OnBnClickedButtonPreview();
 	afx_msg void OnBnClickedButtonTestAin();
@@ -75,4 +85,35 @@ public:
 
 	//LRESULT OnHScroll(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	afx_msg void OnBnClickedButtonNetwork();
+
+
+	void UpdateAoutDev( int devState);
+	void UpdateAinDev(int devState);
+
+	void UpdateVideoDev(int devState);
+	afx_msg void OnBnClickedButtonJoin2();
+	afx_msg void OnBnClickedButtonLeave2();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnBnClickedButtonPreview2();
+	afx_msg void OnCbnSelchangeComboxVinput2();
+
+private:
+	void setDevWithCursel(int index);
+
+
+	void PostTeacher2Msg(DWORD message,WPARAM wParam,LPARAM lParam);
+public:
+	afx_msg void OnBnClickedCancel();
+
+	int     m_nCamera1Index;
+	int     m_nCamera2Index;
+	afx_msg void OnBnClickedButtonClose();
+	afx_msg void OnStnClickedStaticLocal2();
+
+	CRect rectTeacher2;
+	CRect m_rcAroundSize;
+	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
+
+	virtual void OnUserOffline(unsigned int userId );
+
 };

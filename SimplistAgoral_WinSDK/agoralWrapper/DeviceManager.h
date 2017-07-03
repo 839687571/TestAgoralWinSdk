@@ -9,6 +9,10 @@ interface  IDeviceMsgObserver {
 	virtual void onAudioVolumIndication(const void *param) {};
 	// network test
 	virtual void  onLastmileQuality(const void *wParam) {};
+
+	virtual void  onAudioDeviceChange(const void *wParam) {};
+
+	virtual void  onVideoDeviceChange(const void *wParam) {};
 };
 
 typedef struct _DevicesInfo {
@@ -37,6 +41,9 @@ public:
 
 	void  InitManager(const char *logPath);
 
+	void UpdateDeviceList();
+
+	void ObtainDeviceList();
 
 	UINT  GetCurrentInputVolume();
 	UINT  GetCurrentOutputVolume();

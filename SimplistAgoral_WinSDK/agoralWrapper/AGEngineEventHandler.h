@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../stdafx.h"
 #include "agoral/IAgoraMediaEngine.h"
 #include "agoral/IAgoraRtcEngine.h"
 
@@ -45,6 +44,7 @@ using namespace  agora::rtc;
 		virtual void onVideoDeviceStateChanged(const char* deviceId, int deviceType, int deviceState);
 
 		virtual void onLastmileQuality(int quality);
+		virtual void onNetworkQuality(uid_t uid, int txQuality, int rxQuality);
 		virtual void onFirstLocalVideoFrame(int width, int height, int elapsed);
 		virtual void onFirstRemoteVideoDecoded(uid_t uid, int width, int height, int elapsed);
 		virtual void onFirstRemoteVideoFrame(uid_t uid, int width, int height, int elapsed);

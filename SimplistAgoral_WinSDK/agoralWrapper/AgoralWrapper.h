@@ -7,7 +7,25 @@
 #include "AGEventDef.h"
 #include <vector>
 
+
+//call 方式集成SDK, stundent 显示内容到老师端
+
+// setChannelProfile  可以设置 模式:
+/*
+通信	通信为默认模式，用于常见的一对一或群聊，频道中的任何用户可以自由说话。
+直播	直播模式有主播和观众两种用户角色，可以通过调用setClientRole设置。主播可收发语音和视频，但观众只能收，不能发。
+游戏语音	频道内任何用户可自由发言。该模式下默认使用低功耗低码率的编解码器。
+
+*/
+
+
 extern void LogMessage(char *msg);
+
+
+interface  IAgoralObjectMsgMsgObserver {
+	virtual void OnUserOffline(unsigned int userId ) {}
+};
+
 
 
 typedef enum _AgoralVdieoProfile {
@@ -82,6 +100,13 @@ typedef enum  _UserIdType
 	USER_ID_TEACHER,
 }UserIdType;
 
+typedef enum _ClientType {
+	CLIENT_TYPE_TEACHER = 0,
+	CLIENT_TYPE_STUDENT = 1,
+	CLIENT_TYPE_TEACHER_CAMERA2 = 3,
+
+}ClientType;
+
 class CAgoralWrapper
 {
 public:
@@ -89,28 +114,55 @@ public:
 	~CAgoralWrapper();
 
 
-	static void GlobalInit();
+	static void GlobalInit(const char *app_id);
 	static void GlobalUinit();
 
 	void InitAgoral(const char * logFile);
 
-	void JoinChannel(const char * channelName);
-	void BindRemoteVideoWnd(AGVIDEO_WNDINFO *videoInfo);
+	void JoinChannel(const char * channelName,INT32 uid,int solution);
+	void LeaveChanel();
+	void BindVideoWnd(AGVIDEO_WNDINFO *videoInfo);
 
 	void SetMainHWND(HWND hwnd){
 		m_mMainHwnd = hwnd;
 	}
 
 	void SetLocalHwnd(HWND hwnd){
-		m_loaclVideoWnd = hwnd;
+		m_TeacherVideoWnd = hwnd;
+	}
+	
+	void SetLocalCamera2Hwnd(HWND hwnd)
+	{
+		m_localCamera2Wnd = hwnd;
 	}
 
 	void SetRemoetHwnd(HWND hwnd){
 		m_remoteVideoWnd = hwnd;
 	}
 
+	void SetClientType(int type)
+	{
+		m_nClientType = type;
+	}
 	// 处理引擎回调消息.
 	void MsgHandle(DWORD msgId, WPARAM wParam);
+
+	void SetMsgObserver(IAgoralObjectMsgMsgObserver *observer)
+	{
+		m_pObserver = observer;
+	}
+	//set before join channel 
+	void SetAudioEnabled(BOOL enable)
+	{
+		IRtcEngine		*lpRtcEngine = CAgoraObject::GetEngine();
+		if (!enable)
+		lpRtcEngine->disableAudio();
+		else {
+			lpRtcEngine->enableAudio();
+		}
+	}
+
+	BOOL  SendChatMessage(const char *msg);
 private:
 
 	void onUserJoinedMsg(DWORD msgId, WPARAM wParam);
@@ -118,14 +170,22 @@ private:
 	void onUserOfflineMsg(DWORD msgId, WPARAM wParam);
 
 	void onHostJoinSuccess(DWORD msgId, WPARAM wParam);
+	void onUserLeaveChannel(DWORD msgId, WPARAM wParam);
+
 
 	void onStatisticRemoteVideoInfo(DWORD msgId, WPARAM wParam);
 	void onStatisticLocalVideoInfo(DWORD msgId, WPARAM wParam);
 
 	void onLostConnect(DWORD msgId, WPARAM wParam);
 	void onNetWorkQuality(DWORD msgId, WPARAM wParam);
-	HWND  m_loaclVideoWnd; /* 本地视频 */
+
+	void onGetUserSendMessage(DWORD msgId, WPARAM wParam);
+	HWND  m_TeacherVideoWnd; /* 老师视频 */
+	HWND  m_localCamera2Wnd; /*教师2的摄像头*/
+
 	HWND  m_remoteVideoWnd; /* 远端视频视频 -- 在 老师端  看到学生视频 为远程视频*/
+
+
 	HWND  m_mMainHwnd;
 
 	//分辨率
@@ -134,7 +194,18 @@ private:
 	static IRtcEngine	*m_pRtcEngine;
 	static CAgoraObject	*m_pAgoraObject;
 
+	static std::string  m_strAppId;
+
+	int  m_nStreamID;
+	/*
+	1.学生.
+	2.老师.
+	3.老师2
+	*/
+	int  m_nClientType;
 
 	std::vector<AGVIDEO_WNDINFO>   m_vecJoinedUsers;
+
+	IAgoralObjectMsgMsgObserver  *m_pObserver;
 };
 

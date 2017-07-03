@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../stdafx.h"
 #include <string>
 #include "agoral/IAgoraRtcEngine.h"
 #include "agoral/IAgoraMediaEngine.h"
@@ -28,10 +27,14 @@ public:
 	int TestAudInputDevice(HWND hMsgWnd, BOOL bTestOn);
 
 	BOOL IsTesting() { return m_bTestingOn; };
+
+	//BOOL  UpataDevice();
 private:
 	BOOL						m_bTestingOn;
 	HWND						m_hOldMsgWnd;
 	agora::rtc::AAudioDeviceManager			*m_ptrDeviceManager;
 	agora::rtc::IAudioDeviceCollection		*m_lpCollection;
+
+	agora::rtc::IRtcEngine *                 m_lpRtcEngine;
 };
 

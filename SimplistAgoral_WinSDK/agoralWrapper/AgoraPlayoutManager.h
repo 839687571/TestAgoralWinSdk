@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../stdafx.h"
 #include "agoral/IAgoraMediaEngine.h"
 #include "agoral/IAgoraRtcEngine.h"
 

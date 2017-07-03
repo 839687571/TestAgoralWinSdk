@@ -3,16 +3,12 @@
 #include "AGResourceVisitor.h"
 #include "AgoralUtils.h"
 
-
-
-
 CAgoraPlayoutManager::CAgoraPlayoutManager()
 	: m_ptrDeviceManager(NULL)
 	, m_lpCollection(NULL)
 	, m_bTestingOn(FALSE)
 {
 }
-
 
 CAgoraPlayoutManager::~CAgoraPlayoutManager()
 {

@@ -26,7 +26,23 @@ void CDeviceManager::InitManager(const char *logPath)
 
 	CAgoraObject::GetAgoraObject()->SetLogFilePath(logPath);
 
+	ObtainDeviceList();
+}
 
+void CDeviceManager::UpdateDeviceList()
+{
+
+	m_agAudioin.Close();
+	m_agAudioin.Create(m_lpRtcEngine);
+
+	m_audioOutputDevList.clear();
+	m_audioInputDevList.clear();
+	m_videoDevList.clear();
+	ObtainDeviceList();
+}
+
+void CDeviceManager::ObtainDeviceList()
+{
 	for (UINT nIndex = 0; nIndex < m_agPlayout.GetDeviceCount(); nIndex++) {
 		std::string strDeviceName, strDeviceID;
 		m_agPlayout.GetDevice(nIndex, strDeviceName, strDeviceID);
@@ -57,7 +73,6 @@ void CDeviceManager::InitManager(const char *logPath)
 
 		m_videoDevList.push_back(info);
 	}
-
 }
 
 
@@ -129,6 +144,13 @@ void CDeviceManager::MsgHandle(DWORD msgId, WPARAM wParam)
 		case WM_MSGID(EID_LASTMILE_QUALITY):
 			//m_lpRtcEngine->disableLastmileTest();
 			m_pObserver->onLastmileQuality((void*)wParam);
+			break;
+		case WM_MSGID(EID_AUDIO_DEVICE_STATE_CHANGED):
+			m_pObserver->onAudioDeviceChange((void*)wParam);
+			break;
+		case WM_MSGID(EID_VIDEO_DEVICE_STATE_CHANGED):
+			m_pObserver->onVideoDeviceChange((void*)wParam);
+			break;
 			default:
 				break;
 		}

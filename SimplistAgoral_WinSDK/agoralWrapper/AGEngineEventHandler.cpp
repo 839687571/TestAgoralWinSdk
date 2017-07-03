@@ -66,6 +66,7 @@ void CAGEngineEventHandler::onWarning(int warn, const char* msg)
 	str = ("onWarning");
 
 	LogMessage(__FUNCTION__);
+	LogMessage((char *)msg);
 }
 
 void CAGEngineEventHandler::onError(int err, const char* msg)
@@ -106,7 +107,7 @@ void CAGEngineEventHandler::onAudioQuality(uid_t uid, int quality, unsigned shor
 	if(m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_AUDIO_QUALITY), (WPARAM)lpData, 0);
 
-	//LogMessage(__FUNCTION__);
+	LogMessage(__FUNCTION__);
 }
 
 
@@ -141,7 +142,7 @@ void CAGEngineEventHandler::onRtcStats(const RtcStats& stat)
 	std::string str;
 
 	str = ("stat");
-	///LogMessage(__FUNCTION__);
+	LogMessage(__FUNCTION__);
 }
 
 
@@ -206,8 +207,13 @@ void CAGEngineEventHandler::onLastmileQuality(int quality)
 	if (m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_LASTMILE_QUALITY), (WPARAM)lpData, 0);
 
-	//LogMessage(__FUNCTION__);
+	LogMessage(__FUNCTION__);
 
+}
+void CAGEngineEventHandler::onNetworkQuality(uid_t uid, int txQuality, int rxQuality)
+{ 
+
+	LogMessage(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onFirstLocalVideoFrame(int width, int height, int elapsed)
@@ -343,7 +349,7 @@ void CAGEngineEventHandler::onLocalVideoStats(const LocalVideoStats& stats)
 	if(m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_LOCAL_VIDEO_STAT), (WPARAM)lpData, 0);
 
-	//LogMessage(__FUNCTION__);
+	LogMessage(__FUNCTION__);
 
 }
 
@@ -362,7 +368,7 @@ void CAGEngineEventHandler::onRemoteVideoStats(const RemoteVideoStats& stats)
 	if(m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_REMOTE_VIDEO_STAT), (WPARAM)lpData, 0);
 
-	//LogMessage(__FUNCTION__);
+	LogMessage(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onCameraReady()
