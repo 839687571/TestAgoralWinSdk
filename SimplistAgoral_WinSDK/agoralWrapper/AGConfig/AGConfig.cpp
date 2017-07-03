@@ -2,6 +2,8 @@
 #include "AGConfig.h"
 
 
+
+
 CAGConfig::CAGConfig()
 {
 	::GetModuleFileName(NULL, m_szConfigFile, MAX_PATH);
@@ -18,6 +20,8 @@ CAGConfig::CAGConfig()
 CAGConfig::~CAGConfig()
 {
 }
+
+/*
 
 int CAGConfig::GetCodec()
 {
@@ -47,6 +51,9 @@ BOOL CAGConfig::SetCodec(int nCodec)
 #endif
 }
 
+#endif
+
+*/
 /*
 int CAGConfig::GetResolution()
 {
@@ -67,7 +74,7 @@ BOOL CAGConfig::SetResolution(int nResolution)
 
 	return ::WritePrivateProfileString(_T("VideoConfig"), _T("ResolutionIndex"), strResolution, m_szConfigFile);
 }
-
+/*
 int CAGConfig::GetFPS()
 {
 	CString strFps;
@@ -111,7 +118,7 @@ BOOL CAGConfig::SetMaxRate(int nMaxRate)
 */
 
 
-/*
+
 
 
 int CAGConfig::GetSolution()
@@ -133,28 +140,27 @@ BOOL CAGConfig::SetSolution(int nResolution)
 
     return ::WritePrivateProfileString(_T("VideoConfig"), _T("SolutionIndex"), strResolution, m_szConfigFile);
 }
+// 
+// BOOL CAGConfig::EnableAutoSave(BOOL bEnable)
+// {
+// 	CString strSave;
+// 
+// 	if (bEnable)
+// 		strSave = _T("1");
+// 	else
+// 		strSave = _T("0");
+// 
+// 	return ::WritePrivateProfileString(_T("VideoConfig"), _T("SaveSetting"), strSave, m_szConfigFile);
+// }
+// 
+// BOOL CAGConfig::IsAutoSaveEnabled()
+// {
+// 	WCHAR buf[];
+// 
+// 	::GetPrivateProfileString(_T("VideoConfig"), _T("SaveSetting"), _T("0"), strSaveSetting.GetBuffer(MAX_PATH), MAX_PATH, m_szConfigFile);
+// 
+// 	strSaveSetting.ReleaseBuffer();
+// 
+// 	return (_ttoi(strSaveSetting) == 1) ? TRUE : FALSE;
+// }
 
-BOOL CAGConfig::EnableAutoSave(BOOL bEnable)
-{
-	CString strSave;
-
-	if (bEnable)
-		strSave = _T("1");
-	else
-		strSave = _T("0");
-
-	return ::WritePrivateProfileString(_T("VideoConfig"), _T("SaveSetting"), strSave, m_szConfigFile);
-}
-
-BOOL CAGConfig::IsAutoSaveEnabled()
-{
-	WCHAR buf[];
-
-	::GetPrivateProfileString(_T("VideoConfig"), _T("SaveSetting"), _T("0"), strSaveSetting.GetBuffer(MAX_PATH), MAX_PATH, m_szConfigFile);
-
-	strSaveSetting.ReleaseBuffer();
-
-	return (_ttoi(strSaveSetting) == 1) ? TRUE : FALSE;
-}
-
-*/

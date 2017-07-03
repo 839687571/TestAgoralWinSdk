@@ -1,4 +1,6 @@
 #pragma once
+
+# if 1
 class CAGConfig
 {
 public:
@@ -20,10 +22,11 @@ public:
 // 	BOOL EnableAutoSave(BOOL bEnable);
 // 	BOOL IsAutoSaveEnabled();
 // 
-//     BOOL SetSolution(int nIndex);
-//     int GetSolution();
+    BOOL SetSolution(int nIndex);
+    int GetSolution();
 
 private:
 	TCHAR m_szConfigFile[MAX_PATH];
 };
 
+#endif

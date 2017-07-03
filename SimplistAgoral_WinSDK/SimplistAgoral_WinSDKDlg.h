@@ -7,6 +7,7 @@
 #include "agoralWrapper/AgoralWrapper.h"
 #include "agoralWrapper/DeviceManager.h"
 #include "AGSliderCtrl.h"
+#include "agoralWrapper/AGConfig.h"
 
 
 // CSimplistAgoral_WinSDKDlg 对话框
@@ -31,6 +32,9 @@ protected:
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
+
+	void InitRescombox();
+
 	HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
@@ -47,6 +51,8 @@ protected:
 	CComboBox  *m_cmbVideoDev;
 	CComboBox  *m_cmbVideoDev2;
 
+	CComboBox  *m_cmbVideoRes;
+
 	std::string  m_strInputAudDevId;
 	std::string  m_strOutputAudDevId;
 	std::string  m_strVideoDevId;
@@ -56,6 +62,9 @@ protected:
 	CAGSliderCtrl  m_sliderOutVolume;
 
 	CProgressCtrl  *m_silderVolIndicate;
+
+	LPTSTR			    m_szProfileDes[64];
+	int					m_nProfileValue[64];
 
 public:
 	afx_msg void OnBnClickedJoin();
@@ -116,4 +125,7 @@ public:
 
 	virtual void OnUserOffline(unsigned int userId );
 
+	afx_msg void OnCbnSelchangeComboResulotion();
+
+	CAGConfig		m_agConfig;
 };
