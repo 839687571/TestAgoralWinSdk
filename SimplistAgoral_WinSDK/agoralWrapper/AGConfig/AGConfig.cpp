@@ -1,24 +1,69 @@
 #include "stdafx.h"
 #include "AGConfig.h"
+#include "../AgoralUtils.h"
 
 
 
 
 CAGConfig::CAGConfig()
 {
-	::GetModuleFileName(NULL, m_szConfigFile, MAX_PATH);
-	LPTSTR lpLastSlash = _tcsrchr(m_szConfigFile, _T('\\')) + 1;
-	_tcscpy_s(lpLastSlash, MAX_PATH, _T("VideoConfig.ini"));
 
-	if (::GetFileAttributes(m_szConfigFile) == INVALID_FILE_ATTRIBUTES){
-		HANDLE hFile = ::CreateFile(m_szConfigFile, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	std::string configFile  =  CAgoralUtils::getAppPath();
+	configFile += "VideoConfig.ini";
+
+	wFile = CAgoralUtils::StringToWString(configFile);
+
+	if (::GetFileAttributes(wFile.c_str()) == INVALID_FILE_ATTRIBUTES) {
+		HANDLE hFile = ::CreateFile(wFile.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		::CloseHandle(hFile);
 	}
+
+	
 }
 
 
 CAGConfig::~CAGConfig()
 {
+}
+
+
+int CAGConfig::GetSolution()
+{
+	CString strResolution;
+
+	::GetPrivateProfileString(_T("VideoConfig"), _T("SolutionIndex"), _T("1"), strResolution.GetBuffer(MAX_PATH), MAX_PATH, wFile.c_str());
+
+	strResolution.ReleaseBuffer();
+
+	return _ttoi(strResolution);
+}
+
+BOOL CAGConfig::SetSolution(int nResolution)
+{
+	CString strResolution;
+
+	strResolution.Format(_T("%d"), nResolution);
+
+	return ::WritePrivateProfileString(_T("VideoConfig"), _T("SolutionIndex"), strResolution, wFile.c_str());
+}
+
+BOOL CAGConfig::SetPPTSolution(int nResolution)
+{
+	CString strResolution;
+
+	strResolution.Format(_T("%d"), nResolution);
+
+	return ::WritePrivateProfileString(_T("VideoConfig"), _T("PPTSolutionIndex"), strResolution, wFile.c_str());
+}
+int CAGConfig::GetPPTSolution()
+{
+	CString strResolution;
+
+	::GetPrivateProfileString(_T("VideoConfig"), _T("PPTSolutionIndex"), _T("1"), strResolution.GetBuffer(MAX_PATH), MAX_PATH, wFile.c_str());
+
+	strResolution.ReleaseBuffer();
+
+	return _ttoi(strResolution);
 }
 
 /*
@@ -121,25 +166,7 @@ BOOL CAGConfig::SetMaxRate(int nMaxRate)
 
 
 
-int CAGConfig::GetSolution()
-{
-    CString strResolution;
 
-    ::GetPrivateProfileString(_T("VideoConfig"), _T("SolutionIndex"), _T("1"), strResolution.GetBuffer(MAX_PATH), MAX_PATH, m_szConfigFile);
-
-    strResolution.ReleaseBuffer();
-
-    return _ttoi(strResolution);
-}
-
-BOOL CAGConfig::SetSolution(int nResolution)
-{
-    CString strResolution;
-
-    strResolution.Format(_T("%d"), nResolution);
-
-    return ::WritePrivateProfileString(_T("VideoConfig"), _T("SolutionIndex"), strResolution, m_szConfigFile);
-}
 // 
 // BOOL CAGConfig::EnableAutoSave(BOOL bEnable)
 // {

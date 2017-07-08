@@ -87,9 +87,9 @@ int   CDeviceManager::TestCurrentAudioInputDev()
 int  CDeviceManager::TestCurrentAudioOutDev( const char *auidoFile)
 {
 		if (m_agPlayout.IsTesting()) {
-			return	m_agPlayout.TestPlaybackDevice(auidoFile,FALSE);
+			return	m_agPlayout.TestPlaybackDevice(auidoFile, m_hMsgWnd,FALSE);
 		} else {
-			return	m_agPlayout.TestPlaybackDevice(auidoFile,TRUE);
+			return	m_agPlayout.TestPlaybackDevice(auidoFile, m_hMsgWnd,TRUE);
 		}
 }
 int CDeviceManager::StartTestNetWork(HWND hwnd)

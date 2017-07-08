@@ -66,7 +66,7 @@ BEGIN_MESSAGE_MAP(CSimplistAgoral_WinSDKDlg, CDialogEx)
 	ON_WM_HSCROLL()
 
 	ON_BN_CLICKED(IDC_BUTTON_NETWORK, &CSimplistAgoral_WinSDKDlg::OnBnClickedButtonNetwork)
-	ON_BN_CLICKED(IDC_BUTTON_JOIN2, &CSimplistAgoral_WinSDKDlg::OnBnClickedButtonJoin2)
+	ON_BN_CLICKED(IDC_BUTTON_JOIN2, &CSimplistAgoral_WinSDKDlg::OnBnClickedButtonClose2)
 	ON_BN_CLICKED(IDC_BUTTON_LEAVE2, &CSimplistAgoral_WinSDKDlg::OnBnClickedButtonLeave2)
 	ON_BN_CLICKED(ID_BUTTON_PREVIEW2, &CSimplistAgoral_WinSDKDlg::OnBnClickedButtonPreview2)
 	ON_CBN_SELCHANGE(IDC_COMBOX_VINPUT2, &CSimplistAgoral_WinSDKDlg::OnCbnSelchangeComboxVinput2)
@@ -74,6 +74,8 @@ BEGIN_MESSAGE_MAP(CSimplistAgoral_WinSDKDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_CLOSE, &CSimplistAgoral_WinSDKDlg::OnBnClickedButtonClose)
 	ON_STN_DBLCLK(IDC_STATIC_LOCAL2, &CSimplistAgoral_WinSDKDlg::OnStnClickedStaticLocal2)
 	ON_CBN_SELCHANGE(IDC_COMBO_RESULOTION, &CSimplistAgoral_WinSDKDlg::OnCbnSelchangeComboResulotion)
+	ON_CBN_SELCHANGE(IDC_COMBO_RESULOTION_PPT, &CSimplistAgoral_WinSDKDlg::OnCbnSelchangeComboResulotionPpt)
+	ON_BN_CLICKED(IDC_BUTTON_OPEN2, &CSimplistAgoral_WinSDKDlg::OnBnClickedButtonOpen2)
 END_MESSAGE_MAP()
 
 void getClientType(){
@@ -184,11 +186,21 @@ void CSimplistAgoral_WinSDKDlg::InitRescombox()
 	for (int nIndex = 0; nIndex < count; nIndex++) {
 		m_cmbVideoRes->InsertString(nIndex, m_szProfileDes[nIndex]);
 		m_cmbVideoRes->SetItemData(nIndex, (DWORD_PTR)m_nProfileValue[nIndex]);
+
+		
+		m_cmbVideoPPTRes->InsertString(nIndex, m_szProfileDes[nIndex]);
+		m_cmbVideoPPTRes->SetItemData(nIndex, (DWORD_PTR)m_nProfileValue[nIndex]);
 	}
 
-//	int resIndex  = m_agConfig.GetSolution();
-	//m_agConfig.EnableAutoSave(TRUE);
-	//m_agConfig.SetSolution(m_cmbVideoRes->GetCurSel());
+
+	if (m_agConfig == NULL) {
+		m_agConfig = new CAGConfig;
+	}
+	int resIndex  = m_agConfig->GetSolution();
+	m_cmbVideoRes->SetCurSel(resIndex);
+
+	int resPPTIndex = m_agConfig->GetPPTSolution();
+	m_cmbVideoPPTRes->SetCurSel(resPPTIndex);
 }
 
 BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
@@ -225,6 +237,7 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 	m_pAgroObject->SetMsgObserver(this);
 
 	m_cmbVideoRes = (CComboBox*)GetDlgItem(IDC_COMBO_RESULOTION);
+	m_cmbVideoPPTRes = (CComboBox*)GetDlgItem(IDC_COMBO_RESULOTION_PPT);
 
 	std::string appPath = CAgoralUtils::getAppPath();
 	appPath += "//agorl.log";
@@ -280,6 +293,7 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 	m_sliderInVolume.SetPos(m_deviceManager->GetCurrentInputVolume());
 	m_sliderOutVolume.SetPos(m_deviceManager->GetCurrentInputVolume());
 
+	//m_agConfig = new CAGConfig;
 	InitRescombox();
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE	
 }
@@ -461,43 +475,49 @@ HCURSOR CSimplistAgoral_WinSDKDlg::OnQueryDragIcon()
 void CSimplistAgoral_WinSDKDlg::OnBnClickedJoin()
 {
 	UserType userType;
-	
 	userType.index = 0;
-
 	if (g_clientType == 1) {
 		userType.role = ROLE_STUDENT;
 	} else {
 		userType.role = ROLE_TEACHER_MAIN;
 	}
+	int profile = m_cmbVideoRes->GetItemData(m_cmbVideoRes->GetCurSel());
+	m_pAgroObject->JoinChannel("w", userType.userId, profile);
+	printf("join channel");
+}
 
-	m_pAgroObject->JoinChannel("w", userType.userId, BASE_120);
-
+void CSimplistAgoral_WinSDKDlg::OnBnClickedButtonOpen2()
+{
 	if (g_clientType != 1) {// 老师端
 		std::string appPath = CAgoralUtils::getAppPath();
-		appPath += "//Teacher2Screen.exe";
-
+		appPath += "//x.exe";
 		int i = m_cmbVideoDev2->GetCurSel();
-		char buf[10];
-		sprintf_s(buf, 10,"%d", i);
-
+		int profile = m_cmbVideoPPTRes->GetItemData(m_cmbVideoPPTRes->GetCurSel());
+#define  BUF_LEN   100
+		char buf[BUF_LEN];
+		sprintf_s(buf, BUF_LEN, "%d %d", i, profile);
 		std::string title = buf;
 		::ShellExecute(NULL, L"open", CAgoralUtils::StringToWString(appPath).c_str(), CAgoralUtils::StringToWString(title).c_str(), NULL, SW_SHOWNORMAL);
 	}
-
-	printf("join channel");
 }
+
+
+void CSimplistAgoral_WinSDKDlg::OnBnClickedButtonClose2()
+{
+	CAgoraObject	*lpAgoraObject = CAgoraObject::GetAgoraObject();
+	lpAgoraObject->LeaveCahnnel();
+	OnBnClickedButtonLeave2();
+
+	CDialogEx::OnCancel();
+
+}
+
 
 
 void CSimplistAgoral_WinSDKDlg::OnBnClickedLeave()
 {
 	CAgoraObject	*lpAgoraObject = CAgoraObject::GetAgoraObject();
 	lpAgoraObject->LeaveCahnnel();
-	//#32770 (Dialog)
-	//Teacher2Screen
-	HWND hTeacher2Wnd = ::FindWindow(NULL, L"Teacher2Screen");//
-
-	printf("cur handle = %08X\n", hTeacher2Wnd);
-	::PostMessage(hTeacher2Wnd, WM_SEND_TEACHER2, CLOSE_CLIENT, 0);
 
 	printf("leave channel");
 
@@ -758,15 +778,15 @@ void CSimplistAgoral_WinSDKDlg::OnBnClickedButtonNetwork()
 }
 
 
-void CSimplistAgoral_WinSDKDlg::OnBnClickedButtonJoin2()
-{
-	
-}
 
 
 void CSimplistAgoral_WinSDKDlg::OnBnClickedButtonLeave2()
 {
-	
+	//#32770 (Dialog)
+	//Teacher2Screen
+	HWND hTeacher2Wnd = ::FindWindow(NULL, L"Teacher2Screen");//
+	printf("cur handle = %08X\n", hTeacher2Wnd);
+	::PostMessage(hTeacher2Wnd, WM_SEND_TEACHER2, CLOSE_CLIENT, 0);
 }
 
 
@@ -799,11 +819,11 @@ void CSimplistAgoral_WinSDKDlg::OnBnClickedCancel()
 
 void CSimplistAgoral_WinSDKDlg::OnBnClickedButtonClose()
 {
-	//m_pAgroObject->LeaveChanel();
-	//CDialogEx::OnCancel();
+	m_pAgroObject->LeaveChanel();
+	CDialogEx::OnCancel();
 
-	CStatic *local2Ctrl = (CStatic*)GetDlgItem(IDC_STATIC_LOCAL2);
-	local2Ctrl->Invalidate(TRUE);
+//	CStatic *local2Ctrl = (CStatic*)GetDlgItem(IDC_STATIC_LOCAL2);
+	//local2Ctrl->Invalidate(TRUE);
 }
 
 
@@ -833,22 +853,35 @@ void CSimplistAgoral_WinSDKDlg::OnStnClickedStaticLocal2()
 
 		rectTeacher2.right = rectTeacher2.left + w;
 		rectTeacher2.bottom = rectTeacher2.top + h;
-
-
 	}
 
 	if (rectSelf.Width() != rectParent.Width()) {
 		///
-		local2Ctrl->SetWindowPos(this, 0, 0, rectParent.Width(), rectParent.Height(), SWP_NOZORDER);
+		::SetWindowPos(local2Ctrl->GetSafeHwnd(), NULL, 0, 0, rectParent.Width(), rectParent.Height(), SWP_NOZORDER );
+		::SetActiveWindow(local2Ctrl->GetSafeHwnd());
+		Invalidate(FALSE);
+		HideChildWnd(FALSE);
+		
 	} else {
 		int nHeight = GetSystemMetrics(SM_CYCAPTION);
-		//local2Ctrl->SetWindowPos(NULL, rectTeacher2.left, rectTeacher2.top - nHeight, rectTeacher2.Width(), rectTeacher2.Height(), 0);
-		::SetWindowPos(local2Ctrl->GetSafeHwnd(), m_hWnd, rectTeacher2.left, rectTeacher2.top, rectTeacher2.Width(), rectTeacher2.Height(), SWP_NOZORDER);
+		::SetWindowPos(local2Ctrl->GetSafeHwnd(), HWND_TOPMOST, rectTeacher2.left, rectTeacher2.top, rectTeacher2.Width(), rectTeacher2.Height(), SWP_NOZORDER);
+		::SetActiveWindow(m_hWnd);
+		HideChildWnd(TRUE);
 	
 	}
 
 	printf("onclicked \n");
 }
+
+void CSimplistAgoral_WinSDKDlg::HideChildWnd(BOOL show)
+{
+	CStatic *loca1 = (CStatic*)GetDlgItem(IDC_STATIC_LOCAL);
+	loca1->ShowWindow(show);
+
+	CStatic *loca13 = (CStatic*)GetDlgItem(IDC_STATIC_REMOTE);
+	loca13->ShowWindow(show);
+}
+
 
 
 LRESULT CSimplistAgoral_WinSDKDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
@@ -892,5 +925,25 @@ void CSimplistAgoral_WinSDKDlg::OnUserOffline(unsigned int userId)
 
 void CSimplistAgoral_WinSDKDlg::OnCbnSelchangeComboResulotion()
 {
+	if (m_agConfig == NULL) {
+		m_agConfig = new CAGConfig;
+	}
+
+	int index  = m_cmbVideoRes->GetCurSel();
+	m_agConfig->SetSolution(index);
+}
+
+
+void CSimplistAgoral_WinSDKDlg::OnCbnSelchangeComboResulotionPpt()
+{
+		if (m_agConfig == NULL) {
+			m_agConfig = new CAGConfig;
+		}
+
+
+		int index = m_cmbVideoPPTRes->GetCurSel();
+		m_agConfig->SetPPTSolution(index);
 	
 }
+
+

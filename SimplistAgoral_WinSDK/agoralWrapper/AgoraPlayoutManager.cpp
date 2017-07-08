@@ -2,6 +2,7 @@
 #include "AgoraPlayoutManager.h"
 #include "AGResourceVisitor.h"
 #include "AgoralUtils.h"
+#include "AgoraObject.h"
 
 CAgoraPlayoutManager::CAgoraPlayoutManager()
 	: m_ptrDeviceManager(NULL)
@@ -26,6 +27,8 @@ BOOL CAgoraPlayoutManager::Create(IRtcEngine *lpRtcEngine)
 		delete m_ptrDeviceManager;
 		m_ptrDeviceManager = NULL;
 	}
+
+	m_pRtcEngin = lpRtcEngine;
 
 	return m_lpCollection != NULL ? TRUE : FALSE;
 }
@@ -114,11 +117,20 @@ BOOL CAgoraPlayoutManager::SetCurDevice(const char * lpDeviceID)
 	return nRet == 0 ? TRUE : FALSE;
 }
 
-int   CAgoraPlayoutManager::TestPlaybackDevice(const char *fileName, BOOL bTestOn)
+int   CAgoraPlayoutManager::TestPlaybackDevice(const char *fileName, HWND hMsgWnd, BOOL bTestOn)
 {
 	int ret = 0;
 	if (bTestOn && !m_bTestingOn) {
+
+
+		// 没有作用, 艹
+		RtcEngineParameters rep(*m_pRtcEngin);
+		rep.enableAudioVolumeIndication(1000, 10);
+
+		CAgoraObject::GetAgoraObject()->SetMsgHandlerWnd(hMsgWnd);
+
 		ret = (*m_ptrDeviceManager)->startPlaybackDeviceTest(fileName);
+
 	} if (!bTestOn && m_bTestingOn){
 	ret  = (*m_ptrDeviceManager)->stopPlaybackDeviceTest();
 

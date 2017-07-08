@@ -7,7 +7,7 @@
 #include "agoralWrapper/AgoralWrapper.h"
 #include "agoralWrapper/DeviceManager.h"
 #include "AGSliderCtrl.h"
-#include "agoralWrapper/AGConfig.h"
+#include "agoralWrapper/AGConfig/AGConfig.h"
 
 
 // CSimplistAgoral_WinSDKDlg ¶Ô»°¿ò
@@ -35,6 +35,7 @@ protected:
 
 	void InitRescombox();
 
+	void HideChildWnd(BOOL show);
 	HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
@@ -52,6 +53,7 @@ protected:
 	CComboBox  *m_cmbVideoDev2;
 
 	CComboBox  *m_cmbVideoRes;
+	CComboBox  *m_cmbVideoPPTRes;
 
 	std::string  m_strInputAudDevId;
 	std::string  m_strOutputAudDevId;
@@ -100,7 +102,7 @@ public:
 	void UpdateAinDev(int devState);
 
 	void UpdateVideoDev(int devState);
-	afx_msg void OnBnClickedButtonJoin2();
+	afx_msg void OnBnClickedButtonClose2();
 	afx_msg void OnBnClickedButtonLeave2();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnBnClickedButtonPreview2();
@@ -127,5 +129,7 @@ public:
 
 	afx_msg void OnCbnSelchangeComboResulotion();
 
-	CAGConfig		m_agConfig;
+	CAGConfig		*m_agConfig;
+	afx_msg void OnCbnSelchangeComboResulotionPpt();
+	afx_msg void OnBnClickedButtonOpen2();
 };
