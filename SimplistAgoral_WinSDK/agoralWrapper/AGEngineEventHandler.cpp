@@ -204,8 +204,9 @@ void CAGEngineEventHandler::onLastmileQuality(int quality)
 
 	lpData->quality = quality;
 
-	if (m_hMainWnd != NULL)
+	if (m_hMainWnd != NULL) {
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_LASTMILE_QUALITY), (WPARAM)lpData, 0);
+	}
 
 	LogMessage(__FUNCTION__);
 
@@ -213,6 +214,14 @@ void CAGEngineEventHandler::onLastmileQuality(int quality)
 void CAGEngineEventHandler::onNetworkQuality(uid_t uid, int txQuality, int rxQuality)
 { 
 
+	LPAGE_LASTMILE_QUALITY lpData = new AGE_LASTMILE_QUALITY;
+
+	lpData->quality = txQuality;
+
+	if (m_hMainWnd != NULL) {
+		::PostMessage(m_hMainWnd, WM_MSGID(EID_NETWORK_QULITY), (WPARAM)lpData, 0);
+		///::PostMessage(m_hMainWnd, WM_USER + 6666, (WPARAM)lpData, 0);
+	}
 	LogMessage(__FUNCTION__);
 }
 

@@ -251,13 +251,15 @@ typedef struct _AGE_STREAM_MESSAGE
 
 #define EID_STREAM_MESSAGE                  0x00000021
 
-typedef union _UserType {
+#define EID_NETWORK_QULITY                  0x00000111
+
+typedef union _UserInfo {
 	struct {
 		unsigned short int role;
 		unsigned short int index;   //当前role ,登录用户序号.
 	};
 	UINT32    userId;
-}UserType;
+}UserInfo;
 
 #define  ROLE_TEACHER_MAIN       1    
 #define  ROLE_TEACHER_CAMERA2    2  /* 教师两个摄像头的时候 ,需要在登录一个用户此时设为 2*/

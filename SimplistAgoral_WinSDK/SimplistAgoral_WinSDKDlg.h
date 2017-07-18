@@ -46,6 +46,8 @@ protected:
 	void  onAudioDeviceChange(const void *wParam);
 	void  onVideoDeviceChange(const void *wParam);
 
+	void AgoralMsgHandle(DWORD msgId, WPARAM wParam);
+
 	CComboBox  *m_cmbInputAudDev;
 	CComboBox  *m_cmbOutputAudDev;
 

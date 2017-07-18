@@ -24,7 +24,7 @@ void CDeviceManager::InitManager(const char *logPath)
 	m_agCamera.Create(m_lpRtcEngine);
 
 
-	CAgoraObject::GetAgoraObject()->SetLogFilePath(logPath);
+///	CAgoraObject::GetAgoraObject()->SetLogFilePath(logPath);
 
 	ObtainDeviceList();
 }
@@ -94,7 +94,7 @@ int  CDeviceManager::TestCurrentAudioOutDev( const char *auidoFile)
 }
 int CDeviceManager::StartTestNetWork(HWND hwnd)
 {
-	CAgoraObject::GetAgoraObject()->SetMsgHandlerWnd(hwnd);
+	CAgoraObject::GetAgoraObject()->SetMsgHandlerWnd(m_hMsgWnd);
 	return m_lpRtcEngine->enableLastmileTest();
 }
 
@@ -132,31 +132,30 @@ BOOL  CDeviceManager::TestCurrentVideoDev(HWND hwnd)
 }
 
 
-void CDeviceManager::MsgHandle(DWORD msgId, WPARAM wParam)
-{
-
-	if (m_pObserver != NULL)
-	{
-		switch (msgId) {
-		case WM_MSGID(EID_AUDIO_VOLUME_INDICATION):
-			m_pObserver->onAudioVolumIndication((void*)wParam);
-			break;
-		case WM_MSGID(EID_LASTMILE_QUALITY):
-			//m_lpRtcEngine->disableLastmileTest();
-			m_pObserver->onLastmileQuality((void*)wParam);
-			break;
-		case WM_MSGID(EID_AUDIO_DEVICE_STATE_CHANGED):
-			m_pObserver->onAudioDeviceChange((void*)wParam);
-			break;
-		case WM_MSGID(EID_VIDEO_DEVICE_STATE_CHANGED):
-			m_pObserver->onVideoDeviceChange((void*)wParam);
-			break;
-			default:
-				break;
-		}
-		
-	}
-}
+// void CDeviceManager::MsgHandle(DWORD msgId, WPARAM wParam)
+// {
+// 
+// 	if (m_pObserver != NULL)
+// 	{
+// 		switch (msgId) {
+// 		case WM_MSGID(EID_AUDIO_VOLUME_INDICATION):
+// 			m_pObserver->onAudioVolumIndication((void*)wParam);
+// 			break;
+// 		case WM_MSGID(EID_LASTMILE_QUALITY):
+// 			m_pObserver->onLastmileQuality((void*)wParam);
+// 			break;
+// 		case WM_MSGID(EID_AUDIO_DEVICE_STATE_CHANGED):
+// 			m_pObserver->onAudioDeviceChange((void*)wParam);
+// 			break;
+// 		case WM_MSGID(EID_VIDEO_DEVICE_STATE_CHANGED):
+// 			m_pObserver->onVideoDeviceChange((void*)wParam);
+// 			break;
+// 			default:
+// 				break;
+// 		}
+// 		
+// 	}
+// }
 
 UINT  CDeviceManager::GetCurrentInputVolume()
 {

@@ -239,7 +239,7 @@ void CAgoralWrapper::MsgHandle(DWORD msgId, WPARAM wParam)
 	case WM_MSGID(EID_CONNECTION_LOST):
 		onLostConnect(msgId, wParam);
 		break;
-	case WM_MSGID(EID_LASTMILE_QUALITY): //网络质量
+	case WM_MSGID(EID_NETWORK_QULITY): //频道内网络质量
 		onNetWorkQuality(msgId, wParam);
 		break;
 	case WM_MSGID(EID_STREAM_MESSAGE):
@@ -257,7 +257,7 @@ void CAgoralWrapper::MsgHandle(DWORD msgId, WPARAM wParam)
 
 void CAgoralWrapper::BindVideoWnd(AGVIDEO_WNDINFO *videoInfo)
 {
-	UserType userType;
+	UserInfo userType;
 	userType.userId = videoInfo->nUID;
 	if (userType.role == ROLE_TEACHER_CAMERA2) {
 		videoInfo->hHwnd = m_localCamera2Wnd;

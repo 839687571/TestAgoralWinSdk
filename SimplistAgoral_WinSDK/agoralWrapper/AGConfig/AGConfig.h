@@ -23,6 +23,8 @@ public:
 // 	BOOL EnableAutoSave(BOOL bEnable);
 // 	BOOL IsAutoSaveEnabled();
 // 
+
+
     BOOL SetSolution(int nIndex);
     int GetSolution();
 

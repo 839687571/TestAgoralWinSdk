@@ -246,7 +246,6 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 	m_deviceManager = new CDeviceManager;
 	printf("new CDeviceManager; \n");
 	m_deviceManager->InitManager(appPath.c_str());
-	m_deviceManager->SetCurrentObserver(this);
 	m_deviceManager->SetMsgHandleWnd(m_hWnd);
 
 	std::vector<DevicesInfo> &audioInput = m_deviceManager->GetAudioInputDeviceLists();
@@ -474,7 +473,7 @@ HCURSOR CSimplistAgoral_WinSDKDlg::OnQueryDragIcon()
 
 void CSimplistAgoral_WinSDKDlg::OnBnClickedJoin()
 {
-	UserType userType;
+	UserInfo userType;
 	userType.index = 0;
 	if (g_clientType == 1) {
 		userType.role = ROLE_STUDENT;
@@ -537,14 +536,37 @@ BOOL CSimplistAgoral_WinSDKDlg::PreTranslateMessage(MSG* pMsg)
 		m_pAgroObject->MsgHandle(pMsg->message, pMsg->wParam);
 	}
 	if (m_deviceManager != NULL) {
-		m_deviceManager->MsgHandle(pMsg->message, pMsg->wParam);
+		AgoralMsgHandle(pMsg->message, pMsg->wParam);
 	}
+
+	if (pMsg->message == WM_KEYDOWN   &&   pMsg->wParam == VK_ESCAPE)     return   TRUE;
+	if (pMsg->message == WM_KEYDOWN   &&   pMsg->wParam == VK_RETURN)   return   TRUE;
 
 	
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
 
+void CSimplistAgoral_WinSDKDlg::AgoralMsgHandle(DWORD msgId, WPARAM wParam)
+{
+	switch (msgId) {
+	case WM_MSGID(EID_AUDIO_VOLUME_INDICATION):
+		onAudioVolumIndication((void*)wParam);
+		break;
+	case WM_MSGID(EID_LASTMILE_QUALITY):
+		onLastmileQuality((void*)wParam);
+		break;
+	case WM_MSGID(EID_AUDIO_DEVICE_STATE_CHANGED):
+		//onAudioDeviceChange((void*)wParam);
+		break;
+	case WM_MSGID(EID_VIDEO_DEVICE_STATE_CHANGED):
+		///onVideoDeviceChange((void*)wParam);
+		break;
+	default:
+		break;
+	}
+
+}
 
 void CSimplistAgoral_WinSDKDlg::OnBnClickedCheck()
 {
@@ -896,7 +918,7 @@ void CSimplistAgoral_WinSDKDlg::OnUserOffline(unsigned int userId)
 {
 //	throw std::logic_error("The method or operation is not implemented.");
 
-	UserType userType;
+	UserInfo userType;
 	userType.userId = userId;
 	if (g_clientType == CLIENT_TYPE_STUDENT) {//
 		if (userType.role == ROLE_STUDENT) {

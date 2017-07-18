@@ -29,6 +29,8 @@ CAGConfig::~CAGConfig()
 
 int CAGConfig::GetSolution()
 {
+
+#ifdef _MFC_
 	CString strResolution;
 
 	::GetPrivateProfileString(_T("VideoConfig"), _T("SolutionIndex"), _T("1"), strResolution.GetBuffer(MAX_PATH), MAX_PATH, wFile.c_str());
@@ -36,27 +38,39 @@ int CAGConfig::GetSolution()
 	strResolution.ReleaseBuffer();
 
 	return _ttoi(strResolution);
+#else 
+	return 0;
+#endif
 }
 
 BOOL CAGConfig::SetSolution(int nResolution)
 {
+#ifdef _MFC_
 	CString strResolution;
 
 	strResolution.Format(_T("%d"), nResolution);
 
 	return ::WritePrivateProfileString(_T("VideoConfig"), _T("SolutionIndex"), strResolution, wFile.c_str());
+#else 
+	return TRUE;
+#endif
 }
 
 BOOL CAGConfig::SetPPTSolution(int nResolution)
 {
+#ifdef _MFC_
 	CString strResolution;
 
 	strResolution.Format(_T("%d"), nResolution);
 
 	return ::WritePrivateProfileString(_T("VideoConfig"), _T("PPTSolutionIndex"), strResolution, wFile.c_str());
+#else 
+	return TRUE;
+#endif
 }
 int CAGConfig::GetPPTSolution()
 {
+#ifdef _MFC_
 	CString strResolution;
 
 	::GetPrivateProfileString(_T("VideoConfig"), _T("PPTSolutionIndex"), _T("1"), strResolution.GetBuffer(MAX_PATH), MAX_PATH, wFile.c_str());
@@ -64,6 +78,9 @@ int CAGConfig::GetPPTSolution()
 	strResolution.ReleaseBuffer();
 
 	return _ttoi(strResolution);
+#else 
+	return 0;
+#endif
 }
 
 /*

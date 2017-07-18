@@ -25,10 +25,10 @@ public:
 	CDeviceManager();
 	~CDeviceManager();
 
-	void SetCurrentObserver(IDeviceMsgObserver  *observer)
-	{
-		m_pObserver = observer;
-	}
+// 	void SetCurrentObserver(IDeviceMsgObserver  *observer)
+// 	{
+// 		m_pObserver = observer;
+// 	}
 
 	void SetMsgHandleWnd(HWND hwnd)
 	{
