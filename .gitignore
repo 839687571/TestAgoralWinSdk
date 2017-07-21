@@ -1,0 +1,16 @@
+/SimplistAgoral_WinSDK/stdafx.h
+
+/Debug/*.log
+/Debug/*.exe
+/Debug/*.ilk
+/Debug/*.pdb
+/Release/*.log
+/Release/*.exe
+/Release/*.ilk
+/Release/*.pdb
+
+/SimplistAgoral_WinSDK/Debug
+/SimplistAgoral_WinSDK/Release
+
+/Teacher2Screen/Debug
+/Teacher2Screen/Release
