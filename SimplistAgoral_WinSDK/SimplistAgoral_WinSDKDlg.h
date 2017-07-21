@@ -47,6 +47,7 @@ protected:
 	void  onVideoDeviceChange(const void *wParam);
 
 	void onLeaveChannel(const void*wParam);
+	void 	onVideoStoped(const void *wParam);
 
 	void AgoralMsgHandle(DWORD msgId, WPARAM wParam);
 

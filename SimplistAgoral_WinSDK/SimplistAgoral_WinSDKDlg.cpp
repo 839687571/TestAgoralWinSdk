@@ -464,6 +464,11 @@ void CSimplistAgoral_WinSDKDlg::onLeaveChannel(const void*wParam)
 {
 
 }
+void CSimplistAgoral_WinSDKDlg::onVideoStoped( const void *wParam)
+{
+	OnUserOffline(0);
+}
+
 
 void CSimplistAgoral_WinSDKDlg::OnPaint()
 {
@@ -556,6 +561,8 @@ BOOL CSimplistAgoral_WinSDKDlg::PreTranslateMessage(MSG* pMsg)
 }
 
 
+
+
 void CSimplistAgoral_WinSDKDlg::AgoralMsgHandle(DWORD msgId, WPARAM wParam)
 {
 	switch (msgId) {
@@ -571,6 +578,8 @@ void CSimplistAgoral_WinSDKDlg::AgoralMsgHandle(DWORD msgId, WPARAM wParam)
 	case WM_MSGID(EID_VIDEO_DEVICE_STATE_CHANGED):
 		///onVideoDeviceChange((void*)wParam);
 		break;
+	case WM_MSGID(EID_VIDEO_STOPPED):
+		onVideoStoped((void*)wParam);
 	default:
 		break;
 	}

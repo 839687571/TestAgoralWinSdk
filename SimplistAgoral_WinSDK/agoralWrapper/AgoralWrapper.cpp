@@ -17,7 +17,8 @@ IRtcEngine	 *CAgoralWrapper::m_pRtcEngine = NULL;
 CAgoraObject *CAgoralWrapper::m_pAgoraObject = NULL;
 std::string  CAgoralWrapper::m_strAppId = "";
 
-CAgoralWrapper::CAgoralWrapper() 
+CAgoralWrapper::CAgoralWrapper():
+m_pObserver(NULL)
 {
 }
 
