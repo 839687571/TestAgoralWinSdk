@@ -12,6 +12,7 @@
 #include "agoralWrapper/AgoralUtils.h"
 #include <fstream>
 #include <string>
+#include "agoralWrapper/AgoralWrapper.h"
 
 
 #ifdef _DEBUG
@@ -19,10 +20,8 @@
 #endif
 
 
-static int g_clientType = 0;
+static int g_clientType = CLIENT_TYPE_TEACHER;// 老师
 
-#define  CLIENT_STUDENT  0
-#define  CLIENT_TACHER   1
 
 
 #define  SET_DEVICE      1
@@ -76,6 +75,7 @@ BEGIN_MESSAGE_MAP(CSimplistAgoral_WinSDKDlg, CDialogEx)
 	ON_CBN_SELCHANGE(IDC_COMBO_RESULOTION, &CSimplistAgoral_WinSDKDlg::OnCbnSelchangeComboResulotion)
 	ON_CBN_SELCHANGE(IDC_COMBO_RESULOTION_PPT, &CSimplistAgoral_WinSDKDlg::OnCbnSelchangeComboResulotionPpt)
 	ON_BN_CLICKED(IDC_BUTTON_OPEN2, &CSimplistAgoral_WinSDKDlg::OnBnClickedButtonOpen2)
+	ON_BN_CLICKED(IDC_CHECK_ISTEACHER, &CSimplistAgoral_WinSDKDlg::OnBnClickedCheckIsteacher)
 END_MESSAGE_MAP()
 
 void getClientType(){
@@ -98,7 +98,7 @@ void getClientType(){
 
 	std::string type = buf;
 	if (type == "1") {
-		g_clientType = 1;  // 当前是 学生端.
+		//g_clientType = 1;  // 当前是 学生端.
 		printf("student client\n");
 	} else {
 		printf("teacher client\n");
@@ -210,7 +210,7 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
-	getClientType();
+	//getClientType();
 
 	CEdit  * chanelEdit = (CEdit *)GetDlgItem(IDC_EDIT_CHANNEL);
 	chanelEdit->SetWindowTextW(_T("w"));
@@ -233,7 +233,6 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 	m_pAgroObject->SetLocalCamera2Hwnd(local2Ctrl->GetSafeHwnd());
 	m_pAgroObject->SetRemoetHwnd((HWND)remoteCtrl->GetSafeHwnd());
 	m_pAgroObject->SetMainHWND(m_hWnd);
-	m_pAgroObject->SetClientType(g_clientType);
 	m_pAgroObject->SetMsgObserver(this);
 
 	m_cmbVideoRes = (CComboBox*)GetDlgItem(IDC_COMBO_RESULOTION);
@@ -290,10 +289,13 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 
 
 	m_sliderInVolume.SetPos(m_deviceManager->GetCurrentInputVolume());
-	m_sliderOutVolume.SetPos(m_deviceManager->GetCurrentInputVolume());
+	m_sliderOutVolume.SetPos(m_deviceManager->GetCurrentOutputVolume());
 
-	//m_agConfig = new CAGConfig;
 	InitRescombox();
+
+	CButton *btn = (CButton*)GetDlgItem(IDC_CHECK_ISTEACHER);
+	btn->SetCheck(TRUE);
+
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE	
 }
 
@@ -304,7 +306,7 @@ void CSimplistAgoral_WinSDKDlg::onAudioVolumIndication(const void *param)
 	m_silderVolIndicate->SetPos(lpData->totalVolume);
 
 
-	std::string devid = m_deviceManager->GetCurrentUseAudioInputDevId();
+	std::string devid = m_deviceManager->GetCurrentUseMicDevId();
 
 	printf("\n vol = %d number =%d devid  = %s\n", lpData->totalVolume, lpData->speakerNumber, devid.c_str());
 	delete lpData;
@@ -458,6 +460,10 @@ void  CSimplistAgoral_WinSDKDlg::onVideoDeviceChange(const void *wParam)
 	m_deviceManager->UpdateDeviceList();
 }
 
+void CSimplistAgoral_WinSDKDlg::onLeaveChannel(const void*wParam)
+{
+
+}
 
 void CSimplistAgoral_WinSDKDlg::OnPaint()
 {
@@ -475,26 +481,29 @@ void CSimplistAgoral_WinSDKDlg::OnBnClickedJoin()
 {
 	UserInfo userType;
 	userType.index = 0;
-	if (g_clientType == 1) {
+	if (g_clientType == CLIENT_TYPE_STUDENT) {
 		userType.role = ROLE_STUDENT;
 	} else {
 		userType.role = ROLE_TEACHER_MAIN;
 	}
 	int profile = m_cmbVideoRes->GetItemData(m_cmbVideoRes->GetCurSel());
+	m_pAgroObject->SetClientType(g_clientType);
 	m_pAgroObject->JoinChannel("w", userType.userId, profile);
 	printf("join channel");
 }
 
 void CSimplistAgoral_WinSDKDlg::OnBnClickedButtonOpen2()
 {
-	if (g_clientType != 1) {// 老师端
+	if (g_clientType == CLIENT_TYPE_TEACHER) {// 老师端
 		std::string appPath = CAgoralUtils::getAppPath();
 		appPath += "//x.exe";
 		int i = m_cmbVideoDev2->GetCurSel();
 		int profile = m_cmbVideoPPTRes->GetItemData(m_cmbVideoPPTRes->GetCurSel());
+
+		BOOL show = ((CButton*)GetDlgItem(IDC_CHECK_SHOWTEACHER2))->GetCheck();
 #define  BUF_LEN   100
 		char buf[BUF_LEN];
-		sprintf_s(buf, BUF_LEN, "%d %d", i, profile);
+		sprintf_s(buf, BUF_LEN, "%d %d %d", i, profile, show);
 		std::string title = buf;
 		::ShellExecute(NULL, L"open", CAgoralUtils::StringToWString(appPath).c_str(), CAgoralUtils::StringToWString(title).c_str(), NULL, SW_SHOWNORMAL);
 	}
@@ -639,6 +648,12 @@ void CSimplistAgoral_WinSDKDlg::OnCbnSelchangeComboAinput()
 	printf("set cur dev id  = %s\n", info.deviceId.c_str());
 	m_deviceManager->SetCurrentAudioInputDev(info.deviceId.c_str());
 	m_strInputAudDevId = info.deviceId;
+
+	UINT vol =  m_deviceManager->GetCurrentInputVolume();
+	 m_sliderInVolume.SetPos(m_deviceManager->GetCurrentInputVolume());
+
+	printf("set volum success = %d\n", vol);
+
 }
 
 
@@ -796,7 +811,19 @@ afx_msg void CSimplistAgoral_WinSDKDlg::OnHScroll(
 
 void CSimplistAgoral_WinSDKDlg::OnBnClickedButtonNetwork()
 {
-	m_deviceManager->StartTestNetWork(m_hWnd);
+
+	CButton *btn = (CButton *)GetDlgItem(IDC_BUTTON_NETWORK);
+	CStringW text;
+	btn->GetWindowTextW(text);
+
+	if (text == L"停止测试") {
+		btn->SetWindowText(_T("开始测试"));
+		m_deviceManager->StopTestNetWork();
+	} else {
+		btn->SetWindowTextW(L"停止测试");
+		m_deviceManager->StartTestNetWork(m_hWnd);
+	}
+
 }
 
 
@@ -909,38 +936,18 @@ void CSimplistAgoral_WinSDKDlg::HideChildWnd(BOOL show)
 LRESULT CSimplistAgoral_WinSDKDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	LRESULT ret = __super::WindowProc(message, wParam, lParam);
-
-
 	return ret;
 }
 
 void CSimplistAgoral_WinSDKDlg::OnUserOffline(unsigned int userId)
 {
-//	throw std::logic_error("The method or operation is not implemented.");
-
-	UserInfo userType;
-	userType.userId = userId;
-	if (g_clientType == CLIENT_TYPE_STUDENT) {//
-		if (userType.role == ROLE_STUDENT) {
-			CStatic * ctrl = (CStatic*)GetDlgItem(IDC_STATIC_REMOTE);
-			ctrl->Invalidate(TRUE);
-		} else if(userType.role == ROLE_TEACHER_MAIN){
-			CStatic * ctrl = (CStatic*)GetDlgItem(IDC_STATIC_LOCAL);
-			ctrl->Invalidate(TRUE);
-		}
-
-	} else if (g_clientType == CLIENT_TYPE_TEACHER) {
-		if (userType.role == ROLE_TEACHER_MAIN) {
-			CStatic * ctrl = (CStatic*)GetDlgItem(IDC_STATIC_LOCAL);
-			ctrl->Invalidate(TRUE);
-		} else if (userType.role == ROLE_STUDENT) {
-			CStatic * ctrl = (CStatic*)GetDlgItem(IDC_STATIC_REMOTE);
-			ctrl->Invalidate(TRUE);
-		} else if (userType.role == ROLE_TEACHER_CAMERA2) {
-			CStatic * ctrl = (CStatic*)GetDlgItem(IDC_STATIC_LOCAL2);
-			ctrl->Invalidate(TRUE);
-		}
-
+	{
+		CStatic * ctrl = (CStatic*)GetDlgItem(IDC_STATIC_REMOTE);
+		ctrl->Invalidate(TRUE);
+		ctrl = (CStatic*)GetDlgItem(IDC_STATIC_LOCAL);
+		ctrl->Invalidate(TRUE);
+		ctrl = (CStatic*)GetDlgItem(IDC_STATIC_LOCAL2);
+		ctrl->Invalidate(TRUE);
 	}
 }
 
@@ -962,10 +969,23 @@ void CSimplistAgoral_WinSDKDlg::OnCbnSelchangeComboResulotionPpt()
 			m_agConfig = new CAGConfig;
 		}
 
-
 		int index = m_cmbVideoPPTRes->GetCurSel();
 		m_agConfig->SetPPTSolution(index);
 	
 }
 
 
+
+
+void CSimplistAgoral_WinSDKDlg::OnBnClickedCheckIsteacher()
+{
+	CButton *btn = (CButton*)GetDlgItem(IDC_CHECK_ISTEACHER);
+	if (!btn->GetCheck()) {
+		g_clientType = CLIENT_TYPE_STUDENT;
+	//	btn->SetCheck(FALSE);
+	} else {
+		g_clientType = CLIENT_TYPE_TEACHER;
+		//btn->SetCheck(TRUE);
+	}
+	
+}

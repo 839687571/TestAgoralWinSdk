@@ -208,6 +208,7 @@ void CAGEngineEventHandler::onLastmileQuality(int quality)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_LASTMILE_QUALITY), (WPARAM)lpData, 0);
 	}
 
+	printf("quality = %d\n", quality);
 	LogMessage(__FUNCTION__);
 
 }

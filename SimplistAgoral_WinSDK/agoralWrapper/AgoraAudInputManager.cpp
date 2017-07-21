@@ -135,11 +135,9 @@ BOOL CAgoraAudInputManager::GetDevice(UINT nIndex, std::string &rDeviceName, std
 std::string CAgoraAudInputManager::GetCurDeviceID()
 {
 	std::string 		str;
-	CHAR		szDeviceID[agora::rtc::MAX_DEVICE_ID_LENGTH];
-
-	WCHAR    wszDeviceId[agora::rtc::MAX_DEVICE_ID_LENGTH];
+	CHAR		szDeviceID[agora::rtc::MAX_DEVICE_ID_LENGTH] = { 0 };
 	
-	if (*m_ptrDeviceManager != NULL)
+	if (m_ptrDeviceManager != NULL  && *m_ptrDeviceManager != NULL)
 		(*m_ptrDeviceManager)->getRecordingDevice(szDeviceID);
 
 	char ansiDevId[MAX_DEVICE_ID_LENGTH];

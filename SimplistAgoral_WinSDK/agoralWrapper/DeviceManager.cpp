@@ -117,10 +117,19 @@ BOOL CDeviceManager::SetCurrentAudioOutputDev(const char *devId)
 	return m_agPlayout.SetCurDevice(devId);
 }
 
-std::string  CDeviceManager::GetCurrentUseAudioInputDevId()
+std::string  CDeviceManager::GetCurrentUseMicDevId()
 {
 	return m_agAudioin.GetCurDeviceID();
 }
+std::string  CDeviceManager::GetCurrentUseSpeakerDevId()
+{
+	return m_agPlayout.GetCurDeviceID();
+}
+std::string  CDeviceManager::GetCurrentUseCameraDevId()
+{
+	return m_agCamera.GetCurDeviceID();
+}
+
 
 BOOL  CDeviceManager::TestCurrentVideoDev(HWND hwnd)
 {

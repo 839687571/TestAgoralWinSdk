@@ -46,6 +46,8 @@ protected:
 	void  onAudioDeviceChange(const void *wParam);
 	void  onVideoDeviceChange(const void *wParam);
 
+	void onLeaveChannel(const void*wParam);
+
 	void AgoralMsgHandle(DWORD msgId, WPARAM wParam);
 
 	CComboBox  *m_cmbInputAudDev;
@@ -134,4 +136,5 @@ public:
 	CAGConfig		*m_agConfig;
 	afx_msg void OnCbnSelchangeComboResulotionPpt();
 	afx_msg void OnBnClickedButtonOpen2();
+	afx_msg void OnBnClickedCheckIsteacher();
 };

@@ -63,7 +63,9 @@ public:
 	BOOL SetCurrentAudioOutputDev(const char *devId);
 
 
-	std::string  GetCurrentUseAudioInputDevId();
+	std::string  GetCurrentUseMicDevId();
+	std::string  GetCurrentUseSpeakerDevId();
+	std::string  GetCurrentUseCameraDevId();
 
 	BOOL MuteLocalVideo(BOOL mute);
 
@@ -92,7 +94,7 @@ public:
 	  测试 音视频设备的过程中 ,引擎通过消息形式返回上传,
 	  因此需要添加 消息处理函数.
 	*/
-	void MsgHandle(DWORD msgId, WPARAM wParam);
+	///void MsgHandle(DWORD msgId, WPARAM wParam);
 
 private:
 	IDeviceMsgObserver      *m_pObserver;

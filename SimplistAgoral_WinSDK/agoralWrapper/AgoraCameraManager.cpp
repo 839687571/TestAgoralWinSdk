@@ -57,7 +57,7 @@ UINT CAgoraCameraManager::GetDeviceCount()
 std::string CAgoraCameraManager::GetCurDeviceID()
 {
 	std::string 		str;
-	CHAR		szDeviceID[MAX_DEVICE_ID_LENGTH];
+	CHAR		szDeviceID[MAX_DEVICE_ID_LENGTH] = { 0 };
 
 	memset(szDeviceID, 0x00, MAX_DEVICE_ID_LENGTH);
 	if (m_ptrDeviceManager != NULL && *m_ptrDeviceManager != NULL)

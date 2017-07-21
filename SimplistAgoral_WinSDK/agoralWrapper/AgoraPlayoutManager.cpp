@@ -97,9 +97,11 @@ BOOL CAgoraPlayoutManager::GetDevice(UINT nIndex, std::string &rDeviceName, std:
 std::string CAgoraPlayoutManager::GetCurDeviceID()
 {
 	std::string		str;
-	CHAR		szDeviceID[MAX_DEVICE_ID_LENGTH];
+	CHAR		szDeviceID[MAX_DEVICE_ID_LENGTH] = { 0 };
 	
-	(*m_ptrDeviceManager)->getPlaybackDevice(szDeviceID);
+	if (m_ptrDeviceManager != NULL && (*m_ptrDeviceManager != NULL)) {
+		(*m_ptrDeviceManager)->getPlaybackDevice(szDeviceID);
+	}
 
 	char ansiDevId[MAX_DEVICE_ID_LENGTH];
 	CAgoralUtils::Convert(szDeviceID, ansiDevId, CP_UTF8, CP_ACP);

@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="agoralSdk">
+      <UniqueIdentifier>{dfd0868e-dc25-45a6-9a41-2bca6c4195b7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Teacher2Screen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Teacher2ScreenDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SimplistAgoral_WinSDK\agoralWrapper\AGEngineEventHandler.h">
+      <Filter>agoralSdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SimplistAgoral_WinSDK\agoralWrapper\AGEventDef.h">
+      <Filter>agoralSdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SimplistAgoral_WinSDK\agoralWrapper\AGMessage.h">
+      <Filter>agoralSdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SimplistAgoral_WinSDK\agoralWrapper\AgoraAudInputManager.h">
+      <Filter>agoralSdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SimplistAgoral_WinSDK\agoralWrapper\AgoraCameraManager.h">
+      <Filter>agoralSdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SimplistAgoral_WinSDK\agoralWrapper\AgoralUtils.h">
+      <Filter>agoralSdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SimplistAgoral_WinSDK\agoralWrapper\AgoralWrapper.h">
+      <Filter>agoralSdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SimplistAgoral_WinSDK\agoralWrapper\AgoraObject.h">
+      <Filter>agoralSdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SimplistAgoral_WinSDK\agoralWrapper\AgoraPlayoutManager.h">
+      <Filter>agoralSdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SimplistAgoral_WinSDK\agoralWrapper\AGResourceVisitor.h">
+      <Filter>agoralSdk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SimplistAgoral_WinSDK\agoralWrapper\DeviceManager.h">
+      <Filter>agoralSdk</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Teacher2Screen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Teacher2ScreenDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SimplistAgoral_WinSDK\agoralWrapper\AGEngineEventHandler.cpp">
+      <Filter>agoralSdk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SimplistAgoral_WinSDK\agoralWrapper\AgoraAudInputManager.cpp">
+      <Filter>agoralSdk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SimplistAgoral_WinSDK\agoralWrapper\AgoraCameraManager.cpp">
+      <Filter>agoralSdk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SimplistAgoral_WinSDK\agoralWrapper\AgoralUtils.cpp">
+      <Filter>agoralSdk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SimplistAgoral_WinSDK\agoralWrapper\AgoralWrapper.cpp">
+      <Filter>agoralSdk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SimplistAgoral_WinSDK\agoralWrapper\AgoraObject.cpp">
+      <Filter>agoralSdk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SimplistAgoral_WinSDK\agoralWrapper\AgoraPlayoutManager.cpp">
+      <Filter>agoralSdk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SimplistAgoral_WinSDK\agoralWrapper\AGResourceVisitor.cpp">
+      <Filter>agoralSdk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SimplistAgoral_WinSDK\agoralWrapper\DeviceManager.cpp">
+      <Filter>agoralSdk</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Teacher2Screen.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\Teacher2Screen.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\Teacher2Screen.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
