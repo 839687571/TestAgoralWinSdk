@@ -16,6 +16,9 @@
     <Filter Include="agoralSdk">
       <UniqueIdentifier>{dfd0868e-dc25-45a6-9a41-2bca6c4195b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="comutil">
+      <UniqueIdentifier>{28549d5b-5f26-49e5-969b-c49b53d672c1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -69,6 +72,9 @@
     <ClInclude Include="..\SimplistAgoral_WinSDK\agoralWrapper\DeviceManager.h">
       <Filter>agoralSdk</Filter>
     </ClInclude>
+    <ClInclude Include="..\SimplistAgoral_WinSDK\ComUtil\BugTrapWrapper.h">
+      <Filter>comutil</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Teacher2Screen.cpp">
@@ -106,6 +112,9 @@
     </ClCompile>
     <ClCompile Include="..\SimplistAgoral_WinSDK\agoralWrapper\DeviceManager.cpp">
       <Filter>agoralSdk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\SimplistAgoral_WinSDK\ComUtil\BugTrapWrapper.cpp">
+      <Filter>comutil</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

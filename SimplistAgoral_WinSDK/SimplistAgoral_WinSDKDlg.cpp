@@ -229,9 +229,9 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 
 	printf("new CAgoralWrapper; \n");
 	m_pAgroObject = new CAgoralWrapper;
-	m_pAgroObject->SetLocalHwnd((HWND)localCtrl->GetSafeHwnd());
-	m_pAgroObject->SetLocalCamera2Hwnd(local2Ctrl->GetSafeHwnd());
-	m_pAgroObject->SetRemoetHwnd((HWND)remoteCtrl->GetSafeHwnd());
+	m_pAgroObject->SetTopWnd((HWND)localCtrl->GetSafeHwnd());
+	m_pAgroObject->SetBottomWnd (local2Ctrl->GetSafeHwnd());
+	m_pAgroObject->SetLocalCamera2Hwnd((HWND)remoteCtrl->GetSafeHwnd());
 	m_pAgroObject->SetMainHWND(m_hWnd);
 	m_pAgroObject->SetMsgObserver(this);
 
@@ -242,7 +242,7 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 	appPath += "//agorl.log";
 	m_pAgroObject->InitAgoral(appPath.c_str());
 
-	m_deviceManager = new CDeviceManager;
+	m_deviceManager = CDeviceManager::GetInstance();
 	printf("new CDeviceManager; \n");
 	m_deviceManager->InitManager(appPath.c_str());
 	m_deviceManager->SetMsgHandleWnd(m_hWnd);
@@ -363,6 +363,7 @@ void CSimplistAgoral_WinSDKDlg::UpdateAoutDev(int devState)
 
 		m_cmbOutputAudDev->InsertString(m_cmbOutputAudDev->GetCount(), CString(info.deviceName.c_str()));
 		///m_cmbOutputAudDev->SetCurSel(0);
+		printf("insert device = %s\n", info.deviceName.c_str());
 	}
 
 
@@ -453,7 +454,52 @@ void CSimplistAgoral_WinSDKDlg::UpdateAinDev(int devState)
 void CSimplistAgoral_WinSDKDlg::UpdateVideoDev(int devState)
 {
 
+	m_cmbVideoDev->ResetContent();
+
+	std::vector<DevicesInfo> &videoInput = m_deviceManager->GetVideoDeviceLists();
+	for (std::vector<DevicesInfo>::iterator iter = videoInput.begin();
+		iter != videoInput.end(); iter++) {
+		DevicesInfo info = *iter;
+		m_cmbVideoDev->InsertString(m_cmbVideoDev->GetCount(), CString(info.deviceName.c_str()));
+	}
+
+	if (devState == 2
+		|| devState == 4
+		|| devState == 8) { //remove 
+
+		BOOL aoutUpdate = TRUE;
+
+		for (std::vector<DevicesInfo>::iterator iter = videoInput.begin();
+			iter != videoInput.end(); iter++) {
+			DevicesInfo info = *iter;
+			if (info.deviceId == m_strVideoDevId) {
+				aoutUpdate = FALSE;
+			}
+		}
+
+		if (aoutUpdate) {
+			if (videoInput.size() > 0) {
+				DevicesInfo info = videoInput[0];
+				m_deviceManager->SetCurrentVidoeInputDev(info.deviceId.c_str());
+				m_strVideoDevId = info.deviceId;
+			} else {
+				m_strVideoDevId.clear();
+			}
+		}
+
+	} else { // add 
+		if (m_strInputAudDevId.empty()) {
+			if (videoInput.size() > 0) {
+				DevicesInfo info = videoInput[0];
+				m_deviceManager->SetCurrentVidoeInputDev(info.deviceId.c_str());
+				m_strInputAudDevId = info.deviceId;
+			}
+		}
+
+	}
 }
+
+
 
 void  CSimplistAgoral_WinSDKDlg::onVideoDeviceChange(const void *wParam)
 {
@@ -494,7 +540,8 @@ void CSimplistAgoral_WinSDKDlg::OnBnClickedJoin()
 	int profile = m_cmbVideoRes->GetItemData(m_cmbVideoRes->GetCurSel());
 	m_pAgroObject->SetClientType(g_clientType);
 	m_pAgroObject->JoinChannel("w", userType.userId, profile);
-	printf("join channel");
+	LogMessage ("join channel");
+	LogMessage(__FUNCTION__);
 }
 
 void CSimplistAgoral_WinSDKDlg::OnBnClickedButtonOpen2()
@@ -543,7 +590,6 @@ BOOL CSimplistAgoral_WinSDKDlg::PreTranslateMessage(MSG* pMsg)
 
 
 	if (pMsg->message == WM_CLOSE) {
-		//
 		printf("wmclosse\n");
 	}
 	if (m_pAgroObject != NULL) {
@@ -552,6 +598,7 @@ BOOL CSimplistAgoral_WinSDKDlg::PreTranslateMessage(MSG* pMsg)
 	if (m_deviceManager != NULL) {
 		AgoralMsgHandle(pMsg->message, pMsg->wParam);
 	}
+
 
 	if (pMsg->message == WM_KEYDOWN   &&   pMsg->wParam == VK_ESCAPE)     return   TRUE;
 	if (pMsg->message == WM_KEYDOWN   &&   pMsg->wParam == VK_RETURN)   return   TRUE;
@@ -573,10 +620,10 @@ void CSimplistAgoral_WinSDKDlg::AgoralMsgHandle(DWORD msgId, WPARAM wParam)
 		onLastmileQuality((void*)wParam);
 		break;
 	case WM_MSGID(EID_AUDIO_DEVICE_STATE_CHANGED):
-		//onAudioDeviceChange((void*)wParam);
+		onAudioDeviceChange((void*)wParam);
 		break;
 	case WM_MSGID(EID_VIDEO_DEVICE_STATE_CHANGED):
-		///onVideoDeviceChange((void*)wParam);
+		onVideoDeviceChange((void*)wParam);
 		break;
 	case WM_MSGID(EID_VIDEO_STOPPED):
 		onVideoStoped((void*)wParam);

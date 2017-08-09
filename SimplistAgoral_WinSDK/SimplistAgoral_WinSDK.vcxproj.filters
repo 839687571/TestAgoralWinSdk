@@ -22,6 +22,9 @@
     <Filter Include="Source Files\AGClass">
       <UniqueIdentifier>{185ecb37-0706-4d1e-a207-f70fbec6a158}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Comutil">
+      <UniqueIdentifier>{f93cb3b7-49ff-4d06-8534-07d13ac2d1e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -84,6 +87,9 @@
     <ClInclude Include="agoralWrapper\AgoralUtils.h">
       <Filter>Source Files\AGClass</Filter>
     </ClInclude>
+    <ClInclude Include="ComUtil\BugTrapWrapper.h">
+      <Filter>Comutil</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -130,6 +136,9 @@
     </ClCompile>
     <ClCompile Include="SimplistAgoral_WinSDKDlg.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ComUtil\BugTrapWrapper.cpp">
+      <Filter>Comutil</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -10,7 +10,7 @@
 using namespace agora::rtc;
 static void LogMessage(char *msg)
 {
-  OutputDebugStringA(msg);
+ /// OutputDebugStringA(msg);
 }
 
 class AgoraAudioFrameObserver : public agora::media::IAudioFrameObserver
@@ -79,7 +79,7 @@ static AgoraVideoFrameObserver s_videoFrameObserver;
 int load_preprocessing_plugin(IRtcEngine* engine)
 {
   agora::util::AutoPtr<agora::media::IMediaEngine> mediaEngine;
-  mediaEngine.queryInterface(*engine, AGORA_IID_MEDIA_ENGINE);
+  mediaEngine.queryInterface(engine, AGORA_IID_MEDIA_ENGINE);
   if (mediaEngine)
   {
     mediaEngine->registerAudioFrameObserver(&s_audioFrameObserver);
@@ -91,7 +91,7 @@ int load_preprocessing_plugin(IRtcEngine* engine)
 int unload_preprocessing_plugin(IRtcEngine* engine)
 {
   agora::util::AutoPtr<agora::media::IMediaEngine> mediaEngine;
-  mediaEngine.queryInterface(*engine, AGORA_IID_MEDIA_ENGINE);
+  mediaEngine.queryInterface(engine, AGORA_IID_MEDIA_ENGINE);
   if (mediaEngine)
   {
     mediaEngine->registerAudioFrameObserver(NULL);

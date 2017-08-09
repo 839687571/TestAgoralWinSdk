@@ -36,10 +36,11 @@ std::string CAgoraObject::GetSDKVersion()
 	return strEngineVer;
 }
 
+
 IRtcEngine *CAgoraObject::GetEngine()
 {
 	if(m_lpAgoraEngine == NULL)
-		m_lpAgoraEngine = (IRtcEngine *)createAgoraRtcEngine();
+		m_lpAgoraEngine = createAgoraRtcEngine();
 
 	return m_lpAgoraEngine;
 }
@@ -173,16 +174,32 @@ BOOL CAgoraObject::SetLogFilePath(const char * lpLogPath)
 	return ret == 0 ? TRUE : FALSE;
 }
 
-BOOL CAgoraObject::JoinChannel(const char * lpChannelName, UINT nUID)
+BOOL CAgoraObject::JoinChannel(const char * lpChannelName, UINT nUID, const char * lpDynamicKey)
 {
 	int nRet = 0;
+	
+	char * lpStreamInfo = "{\"owner\":true,\"width\":640,\"height\":480,\"bitrate\":500}";
 
-//	m_lpAgoraEngine->setVideoProfile(VIDEO_PROFILE_720P);
-	nRet = m_lpAgoraEngine->joinChannel(NULL, lpChannelName, NULL, nUID);
+	nRet = m_lpAgoraEngine->joinChannel(lpDynamicKey, lpChannelName, lpStreamInfo, nUID);
 
 	if (nRet == 0)
 		m_strChannelName = lpChannelName;
-	
+
+	return nRet == 0 ? TRUE : FALSE;
+}
+// BOOL CAgoraObject::JoinChannel(const char * lpChannelName, UINT nUID)
+// {
+// 	return JoinChannel(NULL, lpChannelName, nUID);
+// }
+BOOL  CAgoraObject::JoinChannel(const  char *channelKey, const char * lpChannelName, UINT nUID)
+{
+	int nRet = 0;
+
+	nRet = m_lpAgoraEngine->joinChannel(channelKey, lpChannelName, NULL, nUID);
+
+	if (nRet == 0)
+		m_strChannelName = lpChannelName;
+
 	return nRet == 0 ? TRUE : FALSE;
 }
 
@@ -190,6 +207,7 @@ BOOL CAgoraObject::LeaveCahnnel()
 {
 	m_lpAgoraEngine->stopPreview();
 	int nRet = m_lpAgoraEngine->leaveChannel();
+
 
 	return nRet == 0 ? TRUE : FALSE;
 }
@@ -231,15 +249,27 @@ BOOL CAgoraObject::IsVideoEnabled()
 	return m_bVideoEnable;
 }
 
-BOOL CAgoraObject::EnableScreenCapture(HWND hWnd, BOOL bEnable)
+BOOL CAgoraObject::EnableScreenCapture(HWND hWnd, int nCapFPS, LPCRECT lpCapRect, BOOL bEnable)
 {
 	ASSERT(m_lpAgoraEngine != NULL);
 
 	int ret = 0;
 	RtcEngineParameters rep(*m_lpAgoraEngine);
 
-	if (bEnable)
-		ret = rep.startScreenCapture(hWnd);
+	Rect rcCap;
+
+	if (bEnable) {
+		if (lpCapRect == NULL)
+			ret = rep.startScreenCapture(hWnd, nCapFPS, NULL);
+		else {
+			rcCap.left = lpCapRect->left;
+			rcCap.right = lpCapRect->right;
+			rcCap.top = lpCapRect->top;
+			rcCap.bottom = lpCapRect->bottom;
+
+			ret = rep.startScreenCapture(hWnd, nCapFPS, &rcCap);
+		}
+	}
 	else
 		ret = rep.stopScreenCapture();
 
@@ -302,7 +332,7 @@ BOOL CAgoraObject::EnableAudioRecording(BOOL bEnable, LPCTSTR lpFilePath)
 #ifdef UNICODE
 		CHAR szFilePath[MAX_PATH];
 		::WideCharToMultiByte(CP_ACP, 0, lpFilePath, -1, szFilePath, MAX_PATH, NULL, NULL);
-		ret = rep.startAudioRecording(szFilePath);
+		ret = rep.startAudioRecording(szFilePath, AUDIO_RECORDING_QUALITY_HIGH);
 #else
 		ret = rep.startAudioRecording(lpFilePath);
 #endif
@@ -313,7 +343,7 @@ BOOL CAgoraObject::EnableAudioRecording(BOOL bEnable, LPCTSTR lpFilePath)
 	return ret == 0 ? TRUE : FALSE;
 }
 
-BOOL CAgoraObject::EnableNetworkTest(BOOL bEnable)
+BOOL CAgoraObject::EnableLastmileTest(BOOL bEnable)
 {
 	int ret = 0;
 
@@ -395,7 +425,7 @@ BOOL CAgoraObject::SetEncryptionSecret(const char * lpKey, int nEncryptType)
 
 BOOL CAgoraObject::EnableLocalRender(BOOL bEnable)
 {
-    int nRet = 0;
+	int nRet = 0;
 
 /*    if (bEnable)
         nRet = m_lpAgoraEngine->setParameters("{\"che.video.local.render\":true}");
@@ -403,7 +433,9 @@ BOOL CAgoraObject::EnableLocalRender(BOOL bEnable)
         nRet = m_lpAgoraEngine->setParameters("{\"che.video.local.render\":false}");
 */
     return nRet == 0 ? TRUE : FALSE;
+
 }
+
 
 int CAgoraObject::CreateMessageStream()
 {
@@ -427,6 +459,8 @@ BOOL CAgoraObject::SendChatMessage(int nStreamID, const char * lpChatMessage)
 
     return nRet == 0 ? TRUE : FALSE;
 }
+
+
 
 
 BOOL CAgoraObject::EnableWhiteboardVer(BOOL bEnable)

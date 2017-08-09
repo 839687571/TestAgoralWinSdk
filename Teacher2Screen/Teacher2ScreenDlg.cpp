@@ -90,7 +90,7 @@ BOOL CTeacher2ScreenDlg::OnInitDialog()
 
 	m_pAgroObject = new CAgoralWrapper;
 	m_pAgroObject->SetLocalCamera2Hwnd(s_Display->GetSafeHwnd());
-	m_pAgroObject->SetRemoetHwnd(NULL);
+	m_pAgroObject->SetBottomWnd(NULL);
 	m_pAgroObject->SetMainHWND(m_hWnd);
 	m_pAgroObject->SetAudioEnabled(FALSE);
 	m_pAgroObject->SetClientType(3);
@@ -99,7 +99,7 @@ BOOL CTeacher2ScreenDlg::OnInitDialog()
 	appPath += "//agorl2.log";
 	m_pAgroObject->InitAgoral(appPath.c_str());
 
-	m_deviceManager = new CDeviceManager;
+	m_deviceManager = CDeviceManager::GetInstance();
 	m_deviceManager->InitManager(appPath.c_str());
 	m_deviceManager->SetMsgHandleWnd(m_hWnd);
 

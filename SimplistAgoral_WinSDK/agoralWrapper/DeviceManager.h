@@ -21,14 +21,22 @@ typedef struct _DevicesInfo {
 }DevicesInfo;
 
 class CDeviceManager {
-public:
 	CDeviceManager();
+private:
+	static CDeviceManager* m_pInstance;
+public:
+
 	~CDeviceManager();
 
 // 	void SetCurrentObserver(IDeviceMsgObserver  *observer)
 // 	{
 // 		m_pObserver = observer;
 // 	}
+
+	static CDeviceManager* GetInstance();
+	void  InitManager(const char *logPath);
+	void UnitManager();
+
 
 	void SetMsgHandleWnd(HWND hwnd)
 	{
@@ -39,10 +47,9 @@ public:
 	std::vector<DevicesInfo>  &GetAudioInputDeviceLists();
 	std::vector<DevicesInfo>  &GetAudioOutputDeviceLists();
 
-	void  InitManager(const char *logPath);
+
 
 	void UpdateDeviceList();
-
 	void ObtainDeviceList();
 
 	UINT  GetCurrentInputVolume();
@@ -94,7 +101,7 @@ public:
 	  测试 音视频设备的过程中 ,引擎通过消息形式返回上传,
 	  因此需要添加 消息处理函数.
 	*/
-	///void MsgHandle(DWORD msgId, WPARAM wParam);
+	void MsgHandle(DWORD msgId, WPARAM wParam);
 
 private:
 	IDeviceMsgObserver      *m_pObserver;

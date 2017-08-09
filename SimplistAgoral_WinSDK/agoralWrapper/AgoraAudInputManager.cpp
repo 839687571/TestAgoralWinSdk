@@ -5,7 +5,7 @@
 #include "AgoraObject.h"
 #include <assert.h>
 #include "AgoralUtils.h"
-
+#include "../ComUtil/BugTrapWrapper.h"
 
 CAgoraAudInputManager::CAgoraAudInputManager()
 	: m_ptrDeviceManager(NULL)
@@ -23,15 +23,16 @@ CAgoraAudInputManager::~CAgoraAudInputManager()
 
 BOOL CAgoraAudInputManager::Create(agora::rtc::IRtcEngine *lpRtcEngine)
 {
-	//m_lpRtcEngine = lpRtcEngine;
-	m_ptrDeviceManager = new agora::rtc::AAudioDeviceManager(*lpRtcEngine);
-	if (m_ptrDeviceManager->get() == NULL)
+	m_ptrDeviceManager = new AAudioDeviceManager(lpRtcEngine);
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL){
 		return FALSE;
+	}
 
 	m_lpCollection = (*m_ptrDeviceManager)->enumerateRecordingDevices();
 	if (m_lpCollection == NULL) {
 		delete m_ptrDeviceManager;
 		m_ptrDeviceManager = NULL;
+		BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" create Mic device manager failed");
 	}
 
 	

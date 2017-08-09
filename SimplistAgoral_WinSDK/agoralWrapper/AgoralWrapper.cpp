@@ -3,22 +3,16 @@
 
 #pragma comment( lib, "agorartc.lib")
 
-void LogMessage(char *msg)
-{
-	if (msg == NULL) return;
-	OutputDebugStringA(msg);
 
-	printf(msg);
-	printf("\n");
-}
+extern void LogMessage(char *msg);
 
+#define  FREE_PTR(ptr){if (ptr != NULL){delete ptr;ptr = NULL;}}
 
 IRtcEngine	 *CAgoralWrapper::m_pRtcEngine = NULL;
 CAgoraObject *CAgoralWrapper::m_pAgoraObject = NULL;
 std::string  CAgoralWrapper::m_strAppId = "";
 
-CAgoralWrapper::CAgoralWrapper():
-m_pObserver(NULL)
+CAgoralWrapper::CAgoralWrapper() :m_pObserver(NULL)
 {
 }
 
@@ -60,11 +54,12 @@ void CAgoralWrapper::InitAgoral(const char *logFile)
 
 }
 
-void CAgoralWrapper::JoinChannel(const char * channelName, INT32 uid, int solution)
+BOOL CAgoralWrapper::JoinChannel(const char * channelName, INT32 uid, int solution)
 {
 	IRtcEngine		*lpRtcEngine = CAgoraObject::GetEngine();
 	CAgoraObject	*lpAgoraObject = CAgoraObject::GetAgoraObject();
 
+	BOOL ret = FALSE;
 	//m_nVideoSolution = BASE_120; //480P	40	640x480	15	500
 	//应在调用 enableVideo 后设置视频属性。
 	//应在调用 joinChannel / startPreview 前设置视频属性。
@@ -75,12 +70,27 @@ void CAgoralWrapper::JoinChannel(const char * channelName, INT32 uid, int soluti
 	lpRtcEngine->startPreview();
 
 	lpAgoraObject->SetEncryptionSecret("", 0);// USE DEFAULT encryption
-	lpAgoraObject->JoinChannel(channelName,uid);
+	ret = lpAgoraObject->JoinChannel(channelName, uid);
 	lpAgoraObject->SetMsgHandlerWnd(m_mMainHwnd);
 
 	// 创建数据流(createDataStream)
-	m_nStreamID = CAgoraObject::GetAgoraObject()->CreateMessageStream();
+	//m_nStreamID = CAgoraObject::GetAgoraObject()->CreateMessageStream();
 	///lpAgoraObject->EnableNetworkTest(TRUE);
+	return ret;
+}
+BOOL CAgoralWrapper::JoinChannel(const char* channelKey, const char *channelName, INT32 uid, int solution)
+{
+	IRtcEngine		*lpRtcEngine = CAgoraObject::GetEngine();
+	CAgoraObject	*lpAgoraObject = CAgoraObject::GetAgoraObject();
+
+	BOOL ret = FALSE;
+	lpRtcEngine->setVideoProfile((VIDEO_PROFILE_TYPE)solution, FALSE);
+	lpRtcEngine->startPreview();
+
+	lpAgoraObject->SetEncryptionSecret("", 0);// USE DEFAULT encryption
+	ret = lpAgoraObject->JoinChannel(channelKey,channelName, uid);
+	lpAgoraObject->SetMsgHandlerWnd(m_mMainHwnd);
+	return ret;
 }
 void CAgoralWrapper::LeaveChanel()
 {
@@ -94,17 +104,17 @@ void CAgoralWrapper::onUserJoinedMsg(DWORD msgId, WPARAM wParam)
 
 
 
-	AGVIDEO_WNDINFO  videoInfo;
-	videoInfo.nUID = lpData->uid;
+//	AGVIDEO_WNDINFO  videoInfo;
+//	videoInfo.nUID = lpData->uid;
 
-	m_vecJoinedUsers.push_back(videoInfo);
+//	m_vecJoinedUsers.push_back(videoInfo);
 	///if (m_vecJoinedUsers.size() == 1) 
 	{  
-		BindVideoWnd(&videoInfo);
+		BindVideoWnd( lpData->uid,false);
 	}
 
 	char buf[512];
-	sprintf_s(buf, "==============================role = %d Joined the channel ", videoInfo.nUID);
+	sprintf_s(buf, "==============================role = %d Joined the channel ", lpData->uid);
 	LogMessage(buf);
 
 
@@ -131,6 +141,12 @@ void CAgoralWrapper::onUserOfflineMsg(DWORD msgId, WPARAM wParam)
 	}
 	delete lpData;
 }
+void  CAgoralWrapper::onUserMuteAudio(DWORD msgId, WPARAM wParam)
+{
+	LPAGE_USER_MUTE_AUDIO lpData = (LPAGE_USER_MUTE_AUDIO)wParam;
+	FREE_PTR(lpData);
+
+}
 void CAgoralWrapper::onUserLeaveChannel(DWORD msgId, WPARAM wParam)
 {
 	PAGE_LEAVE_CHANNEL lpData = (PAGE_LEAVE_CHANNEL)wParam;
@@ -145,6 +161,76 @@ void CAgoralWrapper::onUserLeaveChannel(DWORD msgId, WPARAM wParam)
 
 	delete lpData;
 }
+void CAgoralWrapper::onErrorMsg(DWORD msgId, WPARAM wParam)
+{
+	LPAGE_ERROR lpData = (LPAGE_ERROR)wParam;
+	if (lpData->msg != NULL) {
+		//delete lpData->msg;
+		char buf[512];
+		sprintf_s(buf, "======Agoral onErrorMsg = %d  ", lpData->err);
+		
+
+	}
+
+	delete lpData;
+
+}
+
+void  CAgoralWrapper::onAudioQulity(DWORD msgId, WPARAM wParam)
+{
+	LPAGE_AUDIO_QUALITY lpData = (LPAGE_AUDIO_QUALITY)wParam;
+	delete lpData;
+}
+
+void CAgoralWrapper::onAudioVolumeIndication(DWORD msgId, WPARAM wParam)
+{
+	LPAGE_AUDIO_VOLUME_INDICATION lpData = (LPAGE_AUDIO_VOLUME_INDICATION)wParam;
+	if (lpData->speakers != NULL) {
+		delete []lpData->speakers;
+	}
+	delete lpData;
+}
+
+
+void CAgoralWrapper::onMediaEnginEvent(DWORD msgId, WPARAM wParam)
+{
+	LPAGE_MEDIA_ENGINE_EVENT lpData = (LPAGE_MEDIA_ENGINE_EVENT)wParam;
+	FREE_PTR(lpData);
+}
+
+void CAgoralWrapper::onAudioDevStateChanged(DWORD msgId, WPARAM wParam)
+{
+	LPAGE_AUDIO_DEVICE_STATE_CHANGED lpData = (LPAGE_AUDIO_DEVICE_STATE_CHANGED)wParam;
+	FREE_PTR(lpData);
+}
+
+void CAgoralWrapper::onVideoDevStateChanged(DWORD msgId, WPARAM wParam)
+{
+	LPAGE_VIDEO_DEVICE_STATE_CHANGED lpData = (LPAGE_VIDEO_DEVICE_STATE_CHANGED)wParam;
+	FREE_PTR(lpData);
+}
+
+void CAgoralWrapper::onLastmileQuality(DWORD msgId, WPARAM wParam)
+{
+	LPAGE_LASTMILE_QUALITY lpData = (LPAGE_LASTMILE_QUALITY)wParam;
+	FREE_PTR(lpData);
+}
+
+
+
+void CAgoralWrapper::onNetWorkQuality(DWORD msgId, WPARAM wParam)
+{
+	PAGE_LASTMILE_QUALITY pData = (PAGE_LASTMILE_QUALITY)wParam;
+	if (m_pObserver) {
+		m_pObserver->OnNetWorkQuality(pData->quality);
+	}
+	char buf[512];
+	sprintf_s(buf, "=== net work qulity  = %d", pData->quality);
+	LogMessage(buf);
+
+	delete pData;
+}
+
 
 void CAgoralWrapper::onStatisticRemoteVideoInfo(DWORD msgId, WPARAM wParam)
 {
@@ -173,10 +259,17 @@ void CAgoralWrapper::onHostJoinSuccess(DWORD msgId, WPARAM wParam)
 
 	AGVIDEO_WNDINFO  videoInfo;
 	videoInfo.nUID = lpData->uid;
-	BindVideoWnd(&videoInfo);
+	BindVideoWnd(lpData->uid,true);
 
 	LogMessage(buf);
+
+	//1delete lpData->channel;
 	delete lpData;
+}
+void CAgoralWrapper::onRejoinSuccess(DWORD msgId, WPARAM wParam)
+{
+	PAGE_REJOINCHANNEL_SUCCESS pData = (PAGE_REJOINCHANNEL_SUCCESS)wParam;
+	delete pData;
 }
 void CAgoralWrapper::onStatisticLocalVideoInfo(DWORD msgId, WPARAM wParam)
 {
@@ -189,6 +282,8 @@ void CAgoralWrapper::onStatisticLocalVideoInfo(DWORD msgId, WPARAM wParam)
 	delete lpData;
 }
 
+
+
 void CAgoralWrapper::onLostConnect(DWORD msgId, WPARAM wParam)
 {
 	char buf[512];
@@ -197,15 +292,6 @@ void CAgoralWrapper::onLostConnect(DWORD msgId, WPARAM wParam)
 }
 
 
-void CAgoralWrapper::onNetWorkQuality(DWORD msgId, WPARAM wParam)
-{
-	PAGE_LASTMILE_QUALITY pData = (PAGE_LASTMILE_QUALITY)wParam;
-	char buf[512];
-	sprintf_s(buf, "=== net work qulity  = %d", pData->quality);
-	LogMessage(buf);
-
-	delete pData;
-}
 
 void CAgoralWrapper::onGetUserSendMessage(DWORD msgId, WPARAM wParam)
 {
@@ -219,99 +305,137 @@ void CAgoralWrapper::onGetUserSendMessage(DWORD msgId, WPARAM wParam)
 	delete lpData;
 }
 
-void CAgoralWrapper::MsgHandle(DWORD msgId, WPARAM wParam)
+/*
+
+
+
+
+void onAudioQulity(DWORD msgId, WPARAM wParam);
+void onAudioVolumeIndication(DWORD msgId, WPARAM wParam);
+
+void onLeaveChannel(DWORD msgId, WPARAM wParam);
+void onMediaEnginEvent(DWORD msgId, WPARAM wParam);
+
+void onAudioDevStateChanged(DWORD msgId, WPARAM wParam);
+void onVideoDevStateChanged(DWORD msgId, WPARAM wParam);
+void onLastmileQuality(DWORD msgId, WPARAM);
+void onNetWorkQuality(DWORD msgId, WPARAM wParam);
+
+
+void onStatisticRemoteVideoInfo(DWORD msgId, WPARAM wParam);
+void onStatisticLocalVideoInfo(DWORD msgId, WPARAM wParam);
+
+void onLostConnect(DWORD msgId, WPARAM wParam);
+void onGetUserSendMessage(DWORD msgId, WPARAM wParam);
+*/
+BOOL CAgoralWrapper::MsgHandle(DWORD msgId, WPARAM wParam)
 {
 	switch (msgId) {
 	case  WM_MSGID(EID_JOINCHANNEL_SUCCESS):
 		onHostJoinSuccess(msgId, wParam);
+		return TRUE;
+		break;
+	case WM_MSGID(EID_REJOINCHANNEL_SUCCESS):
+		onRejoinSuccess(msgId, wParam);
+		return TRUE;
+		break;
+	case WM_MSGID(EID_ERROR):
+		onErrorMsg(msgId, wParam);
+		return TRUE;
 		break;
 	case  WM_MSGID(EID_USER_JOINED):
 		onUserJoinedMsg(msgId, wParam);
+		return TRUE;
 		break;
 	case WM_MSGID(EID_USER_OFFLINE):
 		onUserOfflineMsg(msgId, wParam);
+		return TRUE;
 		break;
 	case WM_MSGID(EID_REMOTE_VIDEO_STAT):
 		onStatisticRemoteVideoInfo(msgId, wParam);
+		return TRUE;
 		break;
-	case WM_MSGID(EID_LOCAL_VIDEO_STAT):
-		onStatisticLocalVideoInfo(msgId, wParam);
-		break;
+// 	case WM_MSGID(EID_LOCAL_VIDEO_STAT):
+// 		onStatisticLocalVideoInfo(msgId, wParam); 
+// 		return TRUE;
+// 		break;
 	case WM_MSGID(EID_CONNECTION_LOST):
 		onLostConnect(msgId, wParam);
+		return TRUE;
 		break;
 	case WM_MSGID(EID_NETWORK_QULITY): //频道内网络质量
 		onNetWorkQuality(msgId, wParam);
+		return TRUE;
 		break;
 	case WM_MSGID(EID_STREAM_MESSAGE):
 		onGetUserSendMessage(msgId, wParam);
+		return TRUE;
 		break;
 	case WM_MSGID(EID_LEAVE_CHANNEL):
 		onUserLeaveChannel(msgId, wParam);
-	//case WM_MSGID(EID_JOINCHANNEL_SUCCESS):
-	//	onGetUserSendMessage(msgId, wParam);
+		return TRUE;
 		break;
+// 	case WM_MSGID(EID_AUDIO_VOLUME_INDICATION):
+// 		onAudioVolumeIndication(msgId, wParam);
+// 		return TRUE;
+		break;
+	case  WM_MSGID(EID_MEDIA_ENGINE_EVENT):
+		onMediaEnginEvent(msgId, wParam);
+		return TRUE;
+		break;
+// 	case WM_MSGID(EID_AUDIO_DEVICE_STATE_CHANGED):
+// 		onAudioDevStateChanged(msgId, wParam);
+// 		return TRUE;
+// 		break;
+// 	case WM_MSGID(EID_VIDEO_DEVICE_STATE_CHANGED):
+// 		onVideoDevStateChanged(msgId, wParam);
+// 		return TRUE;
+// 		break;
+// 	case WM_MSGID(EID_LASTMILE_QUALITY):
+// 		onLastmileQuality(msgId, wParam);
+// 		return TRUE;
+// 		break;
+
 	default:
 		break;
 	}
+	return FALSE;
 }
 
-void CAgoralWrapper::BindVideoWnd(AGVIDEO_WNDINFO *videoInfo)
+void CAgoralWrapper::BindVideoWnd(unsigned int uid, bool host)
 {
-	UserInfo userType;
-	userType.userId = videoInfo->nUID;
-	if (userType.role == ROLE_TEACHER_CAMERA2) {
-		videoInfo->hHwnd = m_localCamera2Wnd;
-	} else if (userType.role == ROLE_TEACHER_MAIN) {
-		videoInfo->hHwnd = m_TeacherVideoWnd;
-	} else if (userType.role == ROLE_STUDENT) {
-		videoInfo->hHwnd = m_remoteVideoWnd;
-	}
-
-	if (videoInfo->hHwnd == NULL) return;
-	///assert(videoInfo->hHwnd != NULL);
-
-	if (m_nClientType == CLIENT_TYPE_STUDENT) {//
-		if (userType.role == ROLE_STUDENT) {
+	if (m_nClientType == CLIENT_TYPE_STUDENT) {
+		if (host) {
+			HWND  displayWnd = m_topVideoWnd;
 			VideoCanvas canvas;
-			canvas.renderMode = RENDER_MODE_FIT;
-			canvas.uid = videoInfo->nUID;
-			canvas.view = videoInfo->hHwnd;
+			canvas.uid = uid;
+			canvas.view = displayWnd;
+			canvas.renderMode = RENDER_MODE_TYPE::RENDER_MODE_FIT;
 			CAgoraObject::GetEngine()->setupLocalVideo(canvas);
 		} else {
-			if (userType.role == ROLE_TEACHER_CAMERA2) {
-			///	CAgoraObject::GetAgoraObject()->setRemoteVideoStreamType(userType.userId, REMOTE_VIDEO_STREAM_HIGH);
-			}
+			HWND  displayWnd = m_bottoomVideoWnd;
 			VideoCanvas canvas;
-			canvas.renderMode = RENDER_MODE_FIT;
-			canvas.uid = videoInfo->nUID;
-			canvas.view = videoInfo->hHwnd;
-			CAgoraObject::GetEngine()->setupRemoteVideo(canvas);
-		}
-		
-	} else if (m_nClientType == CLIENT_TYPE_TEACHER) {
-		if (userType.role == ROLE_TEACHER_MAIN) {
-			VideoCanvas canvas;
-			canvas.renderMode = RENDER_MODE_FIT;
-			canvas.uid = videoInfo->nUID;
-			canvas.view = videoInfo->hHwnd;
-			CAgoraObject::GetEngine()->setupLocalVideo(canvas);
-		} else {
-			VideoCanvas canvas;
-			canvas.uid = videoInfo->nUID;
-			canvas.view = videoInfo->hHwnd;;
+			canvas.uid = uid;
+			canvas.view = displayWnd;
 			canvas.renderMode = RENDER_MODE_TYPE::RENDER_MODE_FIT;
 			CAgoraObject::GetEngine()->setupRemoteVideo(canvas);
 		}
-
-	} else if (m_nClientType == CLIENT_TYPE_TEACHER_CAMERA2) {
-		if (userType.role == ROLE_TEACHER_CAMERA2) {
+	} else if (m_nClientType == CLIENT_TYPE_TEACHER) {
+		if (host) {
+			HWND  displayWnd = m_bottoomVideoWnd ;
 			VideoCanvas canvas;
-			canvas.renderMode = RENDER_MODE_FIT;
-			canvas.uid = videoInfo->nUID;
-			canvas.view = videoInfo->hHwnd;
+			canvas.uid = uid;
+			canvas.view = displayWnd;
+			canvas.renderMode = RENDER_MODE_TYPE::RENDER_MODE_FIT;
 			CAgoraObject::GetEngine()->setupLocalVideo(canvas);
-		}// 其他的不显示.
+		} else {
+			HWND  displayWnd = m_topVideoWnd;
+			VideoCanvas canvas;
+			canvas.uid = uid;
+			canvas.view = displayWnd;
+			canvas.renderMode = RENDER_MODE_TYPE::RENDER_MODE_FIT;
+			CAgoraObject::GetEngine()->setupRemoteVideo(canvas);
+		}
 	}
 
 }

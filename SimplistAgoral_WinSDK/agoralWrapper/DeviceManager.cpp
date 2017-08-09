@@ -2,6 +2,11 @@
 #include "DeviceManager.h"
 #include "AgoraObject.h"
 #include "AGEventDef.h"
+#include "../ComUtil/BugTrapWrapper.h"
+
+#define CUR_MODULE L"DEVICEMGR"
+
+CDeviceManager* CDeviceManager::m_pInstance = new CDeviceManager;
 
 CDeviceManager::CDeviceManager():
 m_lpRtcEngine(NULL)
@@ -10,6 +15,16 @@ m_lpRtcEngine(NULL)
 
 
 CDeviceManager::~CDeviceManager()
+{
+	
+}
+
+CDeviceManager* CDeviceManager::GetInstance()
+{
+	return m_pInstance;
+}
+
+void CDeviceManager::UnitManager()
 {
 	m_agPlayout.Close();
 	m_agAudioin.Close();
@@ -22,9 +37,6 @@ void CDeviceManager::InitManager(const char *logPath)
 	m_agPlayout.Create(m_lpRtcEngine);
 	m_agAudioin.Create(m_lpRtcEngine);
 	m_agCamera.Create(m_lpRtcEngine);
-
-
-///	CAgoraObject::GetAgoraObject()->SetLogFilePath(logPath);
 
 	ObtainDeviceList();
 }
@@ -52,6 +64,9 @@ void CDeviceManager::ObtainDeviceList()
 		info.deviceId = strDeviceID;
 		m_audioOutputDevList.push_back(info);
 
+		BugTrapWrapper::GetQQLogger()->AppendF(BTLL_INFO, CUR_MODULE, L"Obtain Speaker name = %s,id= %s", CComUtil::AnsiToUnicode(strDeviceName.c_str()).c_str(),
+			CComUtil::AnsiToUnicode(strDeviceID.c_str()).c_str());
+
 	}
 
 	for (UINT nIndex = 0; nIndex < m_agAudioin.GetDeviceCount(); nIndex++) {
@@ -61,6 +76,8 @@ void CDeviceManager::ObtainDeviceList()
 		info.deviceName = strDeviceName;
 		info.deviceId = strDeviceID;
 		m_audioInputDevList.push_back(info);
+		BugTrapWrapper::GetQQLogger()->AppendF(BTLL_INFO, CUR_MODULE, L"Obtain Mic name = %s,id= %s", CComUtil::AnsiToUnicode(strDeviceName.c_str()).c_str(),
+			CComUtil::AnsiToUnicode(strDeviceID.c_str()).c_str());
 	}
 
 
@@ -72,6 +89,8 @@ void CDeviceManager::ObtainDeviceList()
 		info.deviceId = strDeviceID;
 
 		m_videoDevList.push_back(info);
+		BugTrapWrapper::GetQQLogger()->AppendF(BTLL_INFO, CUR_MODULE, L"Obtain Camera name = %s,id= %s", CComUtil::AnsiToUnicode(strDeviceName.c_str()).c_str(),
+			CComUtil::AnsiToUnicode(strDeviceID.c_str()).c_str());
 	}
 }
 
@@ -184,6 +203,8 @@ BOOL  CDeviceManager::SetCurrentInputVolume(UINT volume)
 		CAgoraObject::GetAgoraObject()->MuteLocalAudio(FALSE);
 	}
 	return m_agAudioin.SetVolume(volume);
+
+	BugTrapWrapper::GetQQLogger()->AppendF(BTLL_INFO, CUR_MODULE, L"%s", CComUtil::AnsiToUnicode(__FUNCTION__).c_str());
 }
 BOOL  CDeviceManager::SetCurrentOutputVolume(UINT volume)
 {

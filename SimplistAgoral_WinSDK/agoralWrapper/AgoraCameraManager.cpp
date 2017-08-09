@@ -2,6 +2,7 @@
 #include "AgoraCameraManager.h"
 #include "AgoraObject.h"
 #include "AgoralUtils.h"
+#include "../ComUtil/BugTrapWrapper.h"
 
 CAgoraCameraManager::CAgoraCameraManager()
 	: m_ptrDeviceManager(NULL)
@@ -18,16 +19,16 @@ CAgoraCameraManager::~CAgoraCameraManager()
 
 BOOL CAgoraCameraManager::Create(IRtcEngine *lpRtcEngine)
 {
-//	lpRtcEngine->enableVideo();
 
-	m_ptrDeviceManager = new AVideoDeviceManager(*lpRtcEngine);
-	if (m_ptrDeviceManager->get() == NULL)
+	m_ptrDeviceManager = new AVideoDeviceManager(lpRtcEngine);
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL)
 		return FALSE;
 
 	m_lpCollection = (*m_ptrDeviceManager)->enumerateVideoDevices();
 	if (m_lpCollection == NULL) {
 		delete m_ptrDeviceManager;
 		m_ptrDeviceManager = NULL;
+		BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" create Camera  device manager failed");
 	}
 
 	return m_lpCollection != NULL ? TRUE : FALSE;
@@ -57,6 +58,9 @@ UINT CAgoraCameraManager::GetDeviceCount()
 std::string CAgoraCameraManager::GetCurDeviceID()
 {
 	std::string 		str;
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL)
+		return str;
+		
 	CHAR		szDeviceID[MAX_DEVICE_ID_LENGTH] = { 0 };
 
 	memset(szDeviceID, 0x00, MAX_DEVICE_ID_LENGTH);

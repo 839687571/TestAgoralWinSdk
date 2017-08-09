@@ -18,12 +18,12 @@
 
 */
 
-
 extern void LogMessage(char *msg);
 
 
 interface  IAgoralObjectMsgMsgObserver {
 	virtual void OnUserOffline(unsigned int userId ) {}
+	virtual void OnNetWorkQuality(unsigned int level) {};
 };
 
 
@@ -119,16 +119,18 @@ public:
 
 	void InitAgoral(const char * logFile);
 
-	void JoinChannel(const char * channelName,INT32 uid,int solution);
+	BOOL JoinChannel(const char * channelName,INT32 uid,int solution);
+	BOOL JoinChannel(const char* channelKey, const char *channelName, INT32 uid, int solution);
+
 	void LeaveChanel();
-	void BindVideoWnd(AGVIDEO_WNDINFO *videoInfo);
+	void BindVideoWnd(unsigned int uid,bool host);
 
 	void SetMainHWND(HWND hwnd){
 		m_mMainHwnd = hwnd;
 	}
 
-	void SetLocalHwnd(HWND hwnd){
-		m_TeacherVideoWnd = hwnd;
+	void SetBottomWnd(HWND hwnd){
+		m_bottoomVideoWnd = hwnd;
 	}
 	
 	void SetLocalCamera2Hwnd(HWND hwnd)
@@ -136,8 +138,8 @@ public:
 		m_localCamera2Wnd = hwnd;
 	}
 
-	void SetRemoetHwnd(HWND hwnd){
-		m_remoteVideoWnd = hwnd;
+	void SetTopWnd(HWND hwnd){
+		m_topVideoWnd = hwnd;
 	}
 
 	void SetClientType(int type)
@@ -145,7 +147,7 @@ public:
 		m_nClientType = type;
 	}
 	// 处理引擎回调消息.
-	void MsgHandle(DWORD msgId, WPARAM wParam);
+	BOOL MsgHandle(DWORD msgId, WPARAM wParam);
 
 	void SetMsgObserver(IAgoralObjectMsgMsgObserver *observer)
 	{
@@ -166,24 +168,46 @@ public:
 private:
 
 	void onUserJoinedMsg(DWORD msgId, WPARAM wParam);
-
 	void onUserOfflineMsg(DWORD msgId, WPARAM wParam);
+	void onUserMuteAudio(DWORD msgId, WPARAM wParam);
+
+	void onRejoinSuccess(DWORD msgId, WPARAM wParam);
 
 	void onHostJoinSuccess(DWORD msgId, WPARAM wParam);
 	void onUserLeaveChannel(DWORD msgId, WPARAM wParam);
+
+	void onErrorMsg(DWORD msgId, WPARAM wParam);
+	void onAudioQulity(DWORD msgId, WPARAM wParam);
+	void onAudioVolumeIndication(DWORD msgId, WPARAM wParam);
+
+	///void onLeaveChannel(DWORD msgId, WPARAM wParam);
+	void onMediaEnginEvent(DWORD msgId, WPARAM wParam);
+
+	void onAudioDevStateChanged(DWORD msgId, WPARAM wParam);
+	void onVideoDevStateChanged(DWORD msgId, WPARAM wParam);
+	void onLastmileQuality(DWORD msgId, WPARAM);
+	/*
+	QUALITY_UNKNOWN( = 0)
+	QUALITY_EXCELLENT(1)
+	QUALITY_GOOD(2)
+	QUALITY_POOR(3)
+	QUALITY_BAD(4)
+	QUALITY_VBAD(5)
+	QUALITY_DOWN(6)
+	*/
+	void onNetWorkQuality(DWORD msgId, WPARAM wParam);
 
 
 	void onStatisticRemoteVideoInfo(DWORD msgId, WPARAM wParam);
 	void onStatisticLocalVideoInfo(DWORD msgId, WPARAM wParam);
 
 	void onLostConnect(DWORD msgId, WPARAM wParam);
-	void onNetWorkQuality(DWORD msgId, WPARAM wParam);
-
 	void onGetUserSendMessage(DWORD msgId, WPARAM wParam);
-	HWND  m_TeacherVideoWnd; /* 老师视频 */
+
+	HWND  m_bottoomVideoWnd; /* 老师视频 */
 	HWND  m_localCamera2Wnd; /*教师2的摄像头*/
 
-	HWND  m_remoteVideoWnd; /* 远端视频视频 -- 在 老师端  看到学生视频 为远程视频*/
+	HWND  m_topVideoWnd; /* 远端视频视频 -- 在 老师端  看到学生视频 为远程视频*/
 
 
 	HWND  m_mMainHwnd;

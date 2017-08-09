@@ -3,6 +3,7 @@
 #include "AGResourceVisitor.h"
 #include "AgoralUtils.h"
 #include "AgoraObject.h"
+#include "../ComUtil/BugTrapWrapper.h"
 
 CAgoraPlayoutManager::CAgoraPlayoutManager()
 	: m_ptrDeviceManager(NULL)
@@ -18,14 +19,15 @@ CAgoraPlayoutManager::~CAgoraPlayoutManager()
 
 BOOL CAgoraPlayoutManager::Create(IRtcEngine *lpRtcEngine)
 {
-	m_ptrDeviceManager = new AAudioDeviceManager(*lpRtcEngine);
-	if (m_ptrDeviceManager->get() == NULL)
+	m_ptrDeviceManager = new AAudioDeviceManager(lpRtcEngine);
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL)
 		return FALSE;
 
 	m_lpCollection = (*m_ptrDeviceManager)->enumeratePlaybackDevices();
 	if (m_lpCollection == NULL) {
 		delete m_ptrDeviceManager;
 		m_ptrDeviceManager = NULL;
+		BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" create Speaker device manager failed");
 	}
 
 	m_pRtcEngin = lpRtcEngine;
@@ -50,6 +52,8 @@ UINT CAgoraPlayoutManager::GetVolume()
 {
 	int nVol = 0;
 
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL)
+		return 0;
 	(*m_ptrDeviceManager)->getPlaybackDeviceVolume(&nVol);
 
 	return (UINT)nVol;
@@ -57,6 +61,8 @@ UINT CAgoraPlayoutManager::GetVolume()
 
 BOOL CAgoraPlayoutManager::SetVolume(UINT nVol)
 {
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL)
+		return 0;
 	int nRet = (*m_ptrDeviceManager)->setPlaybackDeviceVolume((int)nVol);
 
 	return nRet == 0 ? TRUE : FALSE;
@@ -64,6 +70,8 @@ BOOL CAgoraPlayoutManager::SetVolume(UINT nVol)
 
 UINT CAgoraPlayoutManager::GetDeviceCount()
 {
+	if (m_lpCollection == NULL)
+		return 0;
 	return (UINT)m_lpCollection->getCount();
 }
 
@@ -99,9 +107,10 @@ std::string CAgoraPlayoutManager::GetCurDeviceID()
 	std::string		str;
 	CHAR		szDeviceID[MAX_DEVICE_ID_LENGTH] = { 0 };
 	
-	if (m_ptrDeviceManager != NULL && (*m_ptrDeviceManager != NULL)) {
-		(*m_ptrDeviceManager)->getPlaybackDevice(szDeviceID);
-	}
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL)
+		return str;
+	(*m_ptrDeviceManager)->getPlaybackDevice(szDeviceID);
+
 
 	char ansiDevId[MAX_DEVICE_ID_LENGTH];
 	CAgoralUtils::Convert(szDeviceID, ansiDevId, CP_UTF8, CP_ACP);
@@ -114,6 +123,8 @@ std::string CAgoraPlayoutManager::GetCurDeviceID()
 BOOL CAgoraPlayoutManager::SetCurDevice(const char * lpDeviceID)
 {
 
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL)
+		return FALSE;
 	int nRet = (*m_ptrDeviceManager)->setPlaybackDevice(lpDeviceID);
 
 	return nRet == 0 ? TRUE : FALSE;
@@ -121,6 +132,9 @@ BOOL CAgoraPlayoutManager::SetCurDevice(const char * lpDeviceID)
 
 int   CAgoraPlayoutManager::TestPlaybackDevice(const char *fileName, HWND hMsgWnd, BOOL bTestOn)
 {
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL)
+		return -1;
+
 	int ret = 0;
 	if (bTestOn && !m_bTestingOn) {
 
@@ -148,6 +162,8 @@ int   CAgoraPlayoutManager::TestPlaybackDevice(const char *fileName, HWND hMsgWn
 void CAgoraPlayoutManager::TestPlaybackDevice(UINT nWavID, BOOL bTestOn)
 {
 	TCHAR	szWavPath[MAX_PATH];
+		if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL)
+		return;
 
 	::GetModuleFileName(NULL, szWavPath, MAX_PATH);
 	LPTSTR lpLastSlash = (LPTSTR)_tcsrchr(szWavPath, _T('\\')) + 1;
