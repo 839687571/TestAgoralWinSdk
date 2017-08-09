@@ -162,6 +162,7 @@ BOOL CAgoraObject::GetVideoTestFlag()
 BOOL CAgoraObject::SetLogFilePath(const char * lpLogPath)
 {
 	assert(m_lpAgoraEngine != NULL);
+	if (lpLogPath == NULL) return FALSE;
 
 	if (!m_logFileName.empty()) return FALSE;
 

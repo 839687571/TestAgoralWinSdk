@@ -94,7 +94,7 @@ public:
 		return m_agPlayout.IsTesting();
 	}
 
-	int StartTestNetWork(HWND hwnd);
+	int StartTestNetWork();
 
 	int  StopTestNetWork();
 	/*

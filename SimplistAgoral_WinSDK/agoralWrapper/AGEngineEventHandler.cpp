@@ -337,26 +337,29 @@ void CAGEngineEventHandler::onStreamMessage(uid_t uid, int streamId, const char*
 
 void CAGEngineEventHandler::onApiCallExecuted(const char* api, int error)
 {
-//	LPAGE_APICALL_EXECUTED lpData = new AGE_APICALL_EXECUTED;
+	LPAGE_APICALL_EXECUTED lpData = new AGE_APICALL_EXECUTED;
 //
-//	strcpy_s(lpData->api, 128, api);
-//	lpData->error = error;
+	strcpy_s(lpData->api, 128, api);
+	lpData->error = error;
 //
-//	if (m_hMainWnd != NULL)
-//		::PostMessage(m_hMainWnd, WM_MSGID(EID_APICALL_EXECUTED), (WPARAM)lpData, 0);
+	if (m_hMainWnd != NULL)
+		::PostMessage(m_hMainWnd, WM_MSGID(EID_APICALL_EXECUTED), (WPARAM)lpData, 0);
 
 	LogMessage(__FUNCTION__);
+	LogMessage(lpData->api);
+
+	delete lpData;
 }
 
 void CAGEngineEventHandler::onLocalVideoStats(const LocalVideoStats& stats)
 {
-//	LPAGE_LOCAL_VIDEO_STAT lpData = new AGE_LOCAL_VIDEO_STAT;
-//
-//	lpData->sentBitrate = stats.sentBitrate;
-//	lpData->sentFrameRate = stats.sentFrameRate;
-//
-//	if(m_hMainWnd != NULL)
-//		::PostMessage(m_hMainWnd, WM_MSGID(EID_LOCAL_VIDEO_STAT), (WPARAM)lpData, 0);
+	LPAGE_LOCAL_VIDEO_STAT lpData = new AGE_LOCAL_VIDEO_STAT;
+
+	lpData->sentBitrate = stats.sentBitrate;
+	lpData->sentFrameRate = stats.sentFrameRate;
+
+	if(m_hMainWnd != NULL)
+		::PostMessage(m_hMainWnd, WM_MSGID(EID_LOCAL_VIDEO_STAT), (WPARAM)lpData, 0);
 
 	LogMessage(__FUNCTION__);
 
@@ -364,18 +367,18 @@ void CAGEngineEventHandler::onLocalVideoStats(const LocalVideoStats& stats)
 
 void CAGEngineEventHandler::onRemoteVideoStats(const RemoteVideoStats& stats)
 {
-//	LPAGE_REMOTE_VIDEO_STAT lpData = new AGE_REMOTE_VIDEO_STAT;
-//
-//	lpData->uid = stats.uid;
-//	lpData->delay = stats.delay;
-//	lpData->width = stats.width;
-//	lpData->height = stats.height;
-//	lpData->receivedFrameRate = stats.receivedFrameRate;
-//	lpData->receivedBitrate = stats.receivedBitrate;
-//	lpData->receivedFrameRate = stats.receivedFrameRate;
-//
-//	if(m_hMainWnd != NULL)
-//		::PostMessage(m_hMainWnd, WM_MSGID(EID_REMOTE_VIDEO_STAT), (WPARAM)lpData, 0);
+	LPAGE_REMOTE_VIDEO_STAT lpData = new AGE_REMOTE_VIDEO_STAT;
+
+	lpData->uid = stats.uid;
+	lpData->delay = stats.delay;
+	lpData->width = stats.width;
+	lpData->height = stats.height;
+	lpData->receivedFrameRate = stats.receivedFrameRate;
+	lpData->receivedBitrate = stats.receivedBitrate;
+	lpData->receivedFrameRate = stats.receivedFrameRate;
+
+	if(m_hMainWnd != NULL)
+		::PostMessage(m_hMainWnd, WM_MSGID(EID_REMOTE_VIDEO_STAT), (WPARAM)lpData, 0);
 
 	LogMessage(__FUNCTION__);
 }
@@ -413,8 +416,8 @@ void CAGEngineEventHandler::onConnectionInterrupted()
 
 void CAGEngineEventHandler::onUserEnableVideo(uid_t uid, bool enabled)
 {
-//	if (m_hMainWnd != NULL)
-//		::PostMessage(m_hMainWnd, WM_MSGID(EID_CONNECTION_LOST), 0, 0);
+	if (m_hMainWnd != NULL)
+		::PostMessage(m_hMainWnd, WM_MSGID(EID_CONNECTION_LOST), 0, 0);
 
 }
 
@@ -435,10 +438,10 @@ void CAGEngineEventHandler::onStopRecordingService(int error)
 void CAGEngineEventHandler::onRefreshRecordingServiceStatus(int status)
 {
 
-//	LPAGE_RCDSRV_STATUS lpData = new AGE_RCDSRV_STATUS;
-//
-//	lpData->status = status;
-//
-//	if (m_hMainWnd != NULL)
-//		::PostMessage(m_hMainWnd, WM_MSGID(EID_REFREASH_RCDSRV), (WPARAM)lpData, 0);
+	LPAGE_RCDSRV_STATUS lpData = new AGE_RCDSRV_STATUS;
+
+	lpData->status = status;
+
+	if (m_hMainWnd != NULL)
+		::PostMessage(m_hMainWnd, WM_MSGID(EID_REFREASH_RCDSRV), (WPARAM)lpData, 0);
 }

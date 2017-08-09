@@ -7,6 +7,11 @@
 #define CUR_MODULE L"DEVICEMGR"
 
 CDeviceManager* CDeviceManager::m_pInstance = new CDeviceManager;
+#define  CHECK_RTCENGIN {\
+if (m_lpRtcEngine == NULL) {\
+	return -1;\
+}\
+}
 
 CDeviceManager::CDeviceManager():
 m_lpRtcEngine(NULL)
@@ -111,14 +116,16 @@ int  CDeviceManager::TestCurrentAudioOutDev( const char *auidoFile)
 			return	m_agPlayout.TestPlaybackDevice(auidoFile, m_hMsgWnd,TRUE);
 		}
 }
-int CDeviceManager::StartTestNetWork(HWND hwnd)
+int CDeviceManager::StartTestNetWork()
 {
-	CAgoraObject::GetAgoraObject()->SetMsgHandlerWnd(m_hMsgWnd);
+	CHECK_RTCENGIN
+//	CAgoraObject::GetAgoraObject()->SetMsgHandlerWnd(m_hMsgWnd);
 	return m_lpRtcEngine->enableLastmileTest();
 }
 
 int  CDeviceManager::StopTestNetWork()
 {
+	CHECK_RTCENGIN
 	return m_lpRtcEngine->disableLastmileTest();
 }
 
@@ -152,6 +159,7 @@ std::string  CDeviceManager::GetCurrentUseCameraDevId()
 
 BOOL  CDeviceManager::TestCurrentVideoDev(HWND hwnd)
 {
+	CHECK_RTCENGIN
 	if (m_agCamera.IsTesting()) {
 		return m_agCamera.TestCameraDevice(NULL, FALSE);
 	} else {
@@ -197,6 +205,7 @@ UINT  CDeviceManager::GetCurrentOutputVolume()
 
 BOOL  CDeviceManager::SetCurrentInputVolume(UINT volume)
 {
+	CHECK_RTCENGIN
 	if (volume == 0) {
 		return CAgoraObject::GetAgoraObject()->MuteLocalAudio(TRUE);
 	} else {
@@ -213,6 +222,7 @@ BOOL  CDeviceManager::SetCurrentOutputVolume(UINT volume)
 
 BOOL CDeviceManager::MuteLocalVideo(BOOL mute)
 {
+	CHECK_RTCENGIN
 	return CAgoraObject::GetAgoraObject()->MuteLocalVideo(mute);
 }
 

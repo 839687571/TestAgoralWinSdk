@@ -127,6 +127,7 @@ public:
 
 	void SetMainHWND(HWND hwnd){
 		m_mMainHwnd = hwnd;
+		m_pAgoraObject->SetMsgHandlerWnd(m_mMainHwnd);
 	}
 
 	void SetBottomWnd(HWND hwnd){
@@ -162,6 +163,10 @@ public:
 		else {
 			lpRtcEngine->enableAudio();
 		}
+	}
+	BOOL SetVideoEnabled(BOOL enable)
+	{
+		return  m_pAgoraObject->EnableVideo(enable);
 	}
 
 	BOOL  SendChatMessage(const char *msg);
