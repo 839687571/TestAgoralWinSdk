@@ -50,7 +50,7 @@ void CAgoralWrapper::InitAgoral(const char *logFile)
 
 	m_pAgoraObject->SetLogFilePath(logFile);
 	///m_pAgoraObject->EnableNetworkTest(TRUE);
-
+//	m_pAgoraObject->SetMsgHandlerWnd(m_mMainHwnd);
 
 }
 
@@ -96,19 +96,18 @@ void CAgoralWrapper::LeaveChanel()
 {
 	CAgoraObject	*lpAgoraObject = CAgoraObject::GetAgoraObject();
 	lpAgoraObject->LeaveCahnnel();
+
+	if (m_bottoomVideoWnd != NULL) {
+		::ShowWindow(m_bottoomVideoWnd, SW_HIDE);
+	}
+	if (m_topVideoWnd != NULL) {
+		::ShowWindow(m_topVideoWnd, SW_HIDE);
+	}
 }
 void CAgoralWrapper::onUserJoinedMsg(DWORD msgId, WPARAM wParam)
 {
 	LPAGE_USER_JOINED lpData = (LPAGE_USER_JOINED)wParam;
 
-
-
-
-//	AGVIDEO_WNDINFO  videoInfo;
-//	videoInfo.nUID = lpData->uid;
-
-//	m_vecJoinedUsers.push_back(videoInfo);
-	///if (m_vecJoinedUsers.size() == 1) 
 	{  
 		BindVideoWnd( lpData->uid,false);
 	}
@@ -128,9 +127,21 @@ void CAgoralWrapper::onUserOfflineMsg(DWORD msgId, WPARAM wParam)
 	sprintf_s(buf, "==============================%d user leave the channel   ", lpData->uid);
 	LogMessage(buf);
 
-	for (std::vector<AGVIDEO_WNDINFO>::iterator iter = m_vecJoinedUsers.begin();
+	for (auto iter = m_vecJoinedUsers.begin();
 		iter != m_vecJoinedUsers.end(); iter++) {
-		if (((AGVIDEO_WNDINFO)(*iter)).nUID == lpData->uid) {
+		AGVIDEO_WNDINFO info = *iter;
+		if (info.nUID == lpData->uid) {
+			bool  bInUse = false;
+			for (auto iter2 = m_vecJoinedUsers.begin(); iter2 != m_vecJoinedUsers.end(); iter2++) {
+				AGVIDEO_WNDINFO info2 = *iter2;
+				if (info2.nUID != lpData->uid&&info2.hHwnd==info.hHwnd) {
+					bInUse = true;
+				}
+			}
+			
+			if (!bInUse) {
+				::ShowWindow(info.hHwnd, SW_HIDE);
+			}
 			m_vecJoinedUsers.erase(iter);
 			break;
 		}
@@ -355,10 +366,10 @@ BOOL CAgoralWrapper::MsgHandle(DWORD msgId, WPARAM wParam)
 		onStatisticRemoteVideoInfo(msgId, wParam);
 		return TRUE;
 		break;
-// 	case WM_MSGID(EID_LOCAL_VIDEO_STAT):
-// 		onStatisticLocalVideoInfo(msgId, wParam); 
-// 		return TRUE;
-// 		break;
+	case WM_MSGID(EID_LOCAL_VIDEO_STAT):
+		onStatisticLocalVideoInfo(msgId, wParam); 
+		return TRUE;
+		break;
 	case WM_MSGID(EID_CONNECTION_LOST):
 		onLostConnect(msgId, wParam);
 		return TRUE;
@@ -375,26 +386,26 @@ BOOL CAgoralWrapper::MsgHandle(DWORD msgId, WPARAM wParam)
 		onUserLeaveChannel(msgId, wParam);
 		return TRUE;
 		break;
-// 	case WM_MSGID(EID_AUDIO_VOLUME_INDICATION):
-// 		onAudioVolumeIndication(msgId, wParam);
-// 		return TRUE;
+	case WM_MSGID(EID_AUDIO_VOLUME_INDICATION):
+		onAudioVolumeIndication(msgId, wParam);
+		return TRUE;
 		break;
 	case  WM_MSGID(EID_MEDIA_ENGINE_EVENT):
 		onMediaEnginEvent(msgId, wParam);
 		return TRUE;
 		break;
-// 	case WM_MSGID(EID_AUDIO_DEVICE_STATE_CHANGED):
-// 		onAudioDevStateChanged(msgId, wParam);
-// 		return TRUE;
-// 		break;
-// 	case WM_MSGID(EID_VIDEO_DEVICE_STATE_CHANGED):
-// 		onVideoDevStateChanged(msgId, wParam);
-// 		return TRUE;
-// 		break;
-// 	case WM_MSGID(EID_LASTMILE_QUALITY):
-// 		onLastmileQuality(msgId, wParam);
-// 		return TRUE;
-// 		break;
+	case WM_MSGID(EID_AUDIO_DEVICE_STATE_CHANGED):
+		onAudioDevStateChanged(msgId, wParam);
+		return TRUE;
+		break;
+	case WM_MSGID(EID_VIDEO_DEVICE_STATE_CHANGED):
+		onVideoDevStateChanged(msgId, wParam);
+		return TRUE;
+		break;
+	case WM_MSGID(EID_LASTMILE_QUALITY):
+		onLastmileQuality(msgId, wParam);
+		return TRUE;
+		break;
 
 	default:
 		break;
@@ -404,16 +415,17 @@ BOOL CAgoralWrapper::MsgHandle(DWORD msgId, WPARAM wParam)
 
 void CAgoralWrapper::BindVideoWnd(unsigned int uid, bool host)
 {
+	HWND  displayWnd = NULL;
 	if (m_nClientType == CLIENT_TYPE_STUDENT) {
 		if (host) {
-			HWND  displayWnd = m_topVideoWnd;
+			  displayWnd = m_topVideoWnd;
 			VideoCanvas canvas;
 			canvas.uid = uid;
 			canvas.view = displayWnd;
 			canvas.renderMode = RENDER_MODE_TYPE::RENDER_MODE_FIT;
 			CAgoraObject::GetEngine()->setupLocalVideo(canvas);
 		} else {
-			HWND  displayWnd = m_bottoomVideoWnd;
+			  displayWnd = m_bottoomVideoWnd;
 			VideoCanvas canvas;
 			canvas.uid = uid;
 			canvas.view = displayWnd;
@@ -422,14 +434,14 @@ void CAgoralWrapper::BindVideoWnd(unsigned int uid, bool host)
 		}
 	} else if (m_nClientType == CLIENT_TYPE_TEACHER) {
 		if (host) {
-			HWND  displayWnd = m_bottoomVideoWnd ;
+			  displayWnd = m_bottoomVideoWnd ;
 			VideoCanvas canvas;
 			canvas.uid = uid;
 			canvas.view = displayWnd;
 			canvas.renderMode = RENDER_MODE_TYPE::RENDER_MODE_FIT;
 			CAgoraObject::GetEngine()->setupLocalVideo(canvas);
 		} else {
-			HWND  displayWnd = m_topVideoWnd;
+			  displayWnd = m_topVideoWnd;
 			VideoCanvas canvas;
 			canvas.uid = uid;
 			canvas.view = displayWnd;
@@ -437,6 +449,15 @@ void CAgoralWrapper::BindVideoWnd(unsigned int uid, bool host)
 			CAgoraObject::GetEngine()->setupRemoteVideo(canvas);
 		}
 	}
+	if (displayWnd != NULL) {
+		::ShowWindow(displayWnd, SW_SHOW);
+		AGVIDEO_WNDINFO info;
+		info.hHwnd = displayWnd;
+		info.nUID = uid;
+		m_vecJoinedUsers.push_back(info);
+	}
+
+
 
 }
 

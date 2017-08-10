@@ -348,7 +348,7 @@ void CAGEngineEventHandler::onApiCallExecuted(const char* api, int error)
 	LogMessage(__FUNCTION__);
 	LogMessage(lpData->api);
 
-	delete lpData;
+//	delete lpData;
 }
 
 void CAGEngineEventHandler::onLocalVideoStats(const LocalVideoStats& stats)

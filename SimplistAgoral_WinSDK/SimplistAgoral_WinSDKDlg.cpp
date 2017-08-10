@@ -218,6 +218,9 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 	CStatic * localCtrl = (CStatic*)GetDlgItem(IDC_STATIC_LOCAL);
 	CStatic *local2Ctrl = (CStatic*)GetDlgItem(IDC_STATIC_LOCAL2);
 	CStatic * remoteCtrl = (CStatic*)GetDlgItem(IDC_STATIC_REMOTE);
+	::ShowWindow(localCtrl->GetSafeHwnd(), SW_HIDE);
+	::ShowWindow(local2Ctrl->GetSafeHwnd(), SW_HIDE);
+
 
 	m_cmbInputAudDev = (CComboBox*)GetDlgItem(IDC_COMBO_AINPUT);
 	m_cmbOutputAudDev = (CComboBox*)GetDlgItem(IDC_COMBOX_AOUT);
@@ -577,9 +580,10 @@ void CSimplistAgoral_WinSDKDlg::OnBnClickedButtonClose2()
 
 void CSimplistAgoral_WinSDKDlg::OnBnClickedLeave()
 {
-	CAgoraObject	*lpAgoraObject = CAgoraObject::GetAgoraObject();
-	lpAgoraObject->LeaveCahnnel();
+	//CAgoraObject	*lpAgoraObject = CAgoraObject::GetAgoraObject();
+	//lpAgoraObject->LeaveCahnnel();
 
+	m_pAgroObject->LeaveChanel();
 	printf("leave channel");
 
 }

@@ -24,6 +24,7 @@ extern void LogMessage(char *msg);
 interface  IAgoralObjectMsgMsgObserver {
 	virtual void OnUserOffline(unsigned int userId ) {}
 	virtual void OnNetWorkQuality(unsigned int level) {};
+	virtual void OnHostJoinSuccess(unsigned int userId) {};
 };
 
 

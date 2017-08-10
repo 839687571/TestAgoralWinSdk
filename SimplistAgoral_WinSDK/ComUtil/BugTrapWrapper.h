@@ -137,19 +137,7 @@ private:
 	static QQTrace m_qqLogger;
 };
 
-/**  Ê¹ÓÃÊµÀý
-	QQTrace *pQQLoger = BugTrapWrapper::GetQQLogger();
-	pQQLoger->Append(L"STRSTR");
-	pQQLoger->Append(BTLL_INFO,L"STRSTR");
-	pQQLoger->Append(BTLL_INFO,L"module",L"STRSTR");
 
-	int k = 0;
-	WCHAR *p = L"pppppp";
-	pQQLoger->AppendF(L"str %d %s sss", k,p);
-	pQQLoger->AppendF(L"MODULE",L"str %d %s sss", k,p);
-	pQQLoger->AppendF(BTLL_INFO, L"str %d %s sss", k, p);
-	pQQLoger->AppendF(BTLL_INFO, L"module", L"str %d  %s sss", k, p);
-*/
 
 #define  LEN  1024
 
