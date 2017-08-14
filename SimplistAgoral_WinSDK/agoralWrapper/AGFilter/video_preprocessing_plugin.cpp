@@ -78,24 +78,22 @@ static AgoraVideoFrameObserver s_videoFrameObserver;
 
 int load_preprocessing_plugin(IRtcEngine* engine)
 {
-  agora::util::AutoPtr<agora::media::IMediaEngine> mediaEngine;
-  mediaEngine.queryInterface(engine, AGORA_IID_MEDIA_ENGINE);
-  if (mediaEngine)
-  {
-    mediaEngine->registerAudioFrameObserver(&s_audioFrameObserver);
-    mediaEngine->registerVideoFrameObserver(&s_videoFrameObserver);
-  }
+	agora::util::AutoPtr<agora::media::IMediaEngine> mediaEngine;
+	mediaEngine.queryInterface(engine, AGORA_IID_MEDIA_ENGINE);
+	if (mediaEngine) {
+		mediaEngine->registerAudioFrameObserver(&s_audioFrameObserver);
+		mediaEngine->registerVideoFrameObserver(&s_videoFrameObserver);
+	}
   return 0;
 }
 
 int unload_preprocessing_plugin(IRtcEngine* engine)
 {
-  agora::util::AutoPtr<agora::media::IMediaEngine> mediaEngine;
-  mediaEngine.queryInterface(engine, AGORA_IID_MEDIA_ENGINE);
-  if (mediaEngine)
-  {
-    mediaEngine->registerAudioFrameObserver(NULL);
-    mediaEngine->registerVideoFrameObserver(NULL);
-  }
+	agora::util::AutoPtr<agora::media::IMediaEngine> mediaEngine;
+	mediaEngine.queryInterface(engine, AGORA_IID_MEDIA_ENGINE);
+	if (mediaEngine) {
+		mediaEngine->registerAudioFrameObserver(NULL);
+		mediaEngine->registerVideoFrameObserver(NULL);
+	}
   return 0;
 }

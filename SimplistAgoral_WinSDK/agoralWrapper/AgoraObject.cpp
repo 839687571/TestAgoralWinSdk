@@ -257,7 +257,7 @@ BOOL CAgoraObject::EnableScreenCapture(HWND hWnd, int nCapFPS, LPCRECT lpCapRect
 	int ret = 0;
 	RtcEngineParameters rep(*m_lpAgoraEngine);
 
-	Rect rcCap;
+	agora::rtc::Rect rcCap;
 
 	if (bEnable) {
 		if (lpCapRect == NULL)

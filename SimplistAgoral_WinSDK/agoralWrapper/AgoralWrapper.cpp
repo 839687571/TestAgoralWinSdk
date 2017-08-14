@@ -12,7 +12,9 @@ IRtcEngine	 *CAgoralWrapper::m_pRtcEngine = NULL;
 CAgoraObject *CAgoralWrapper::m_pAgoraObject = NULL;
 std::string  CAgoralWrapper::m_strAppId = "";
 
-CAgoralWrapper::CAgoralWrapper() :m_pObserver(NULL)
+CAgoralWrapper::CAgoralWrapper() :m_pObserver(NULL), m_iHostId(0)
+, m_hLocalWnd(NULL)
+, m_hRemoteWnd(NULL)
 {
 }
 
@@ -31,13 +33,11 @@ void CAgoralWrapper::GlobalInit(const char *app_id)
 		m_pAgoraObject = CAgoraObject::GetAgoraObject(app_id);
 	}
 
-	//m_pAgoraObject->EnableVideo(TRUE);
 }
 
 void CAgoralWrapper::GlobalUinit()
 {
 	CAgoraObject::CloseAgoraObject();
-
 	m_pAgoraObject = NULL;
 	m_pAgoraObject = NULL;
 }
@@ -45,9 +45,7 @@ void CAgoralWrapper::GlobalUinit()
 
 void CAgoralWrapper::InitAgoral(const char *logFile)
 {
-
 	GlobalInit(m_strAppId.c_str());
-
 	m_pAgoraObject->SetLogFilePath(logFile);
 	///m_pAgoraObject->EnableNetworkTest(TRUE);
 //	m_pAgoraObject->SetMsgHandlerWnd(m_mMainHwnd);
@@ -155,6 +153,9 @@ void CAgoralWrapper::onUserOfflineMsg(DWORD msgId, WPARAM wParam)
 void  CAgoralWrapper::onUserMuteAudio(DWORD msgId, WPARAM wParam)
 {
 	LPAGE_USER_MUTE_AUDIO lpData = (LPAGE_USER_MUTE_AUDIO)wParam;
+	if (m_pObserver != NULL) {
+		m_pObserver->OnUserMuteAudio(lpData->uid,lpData->muted);
+	}
 	FREE_PTR(lpData);
 
 }
@@ -179,8 +180,12 @@ void CAgoralWrapper::onErrorMsg(DWORD msgId, WPARAM wParam)
 		//delete lpData->msg;
 		char buf[512];
 		sprintf_s(buf, "======Agoral onErrorMsg = %d  ", lpData->err);
-		
 
+		LogMessage(buf);
+	}
+
+	if (m_pObserver) {
+		m_pObserver->OnError(lpData->err, lpData->msg);
 	}
 
 	delete lpData;
@@ -196,6 +201,9 @@ void  CAgoralWrapper::onAudioQulity(DWORD msgId, WPARAM wParam)
 void CAgoralWrapper::onAudioVolumeIndication(DWORD msgId, WPARAM wParam)
 {
 	LPAGE_AUDIO_VOLUME_INDICATION lpData = (LPAGE_AUDIO_VOLUME_INDICATION)wParam;
+	if (m_pObserver) {
+		m_pObserver->OnAuidoVolumeIndication(lpData->speakerNumber,lpData->totalVolume);
+	}
 	if (lpData->speakers != NULL) {
 		delete []lpData->speakers;
 	}
@@ -212,18 +220,27 @@ void CAgoralWrapper::onMediaEnginEvent(DWORD msgId, WPARAM wParam)
 void CAgoralWrapper::onAudioDevStateChanged(DWORD msgId, WPARAM wParam)
 {
 	LPAGE_AUDIO_DEVICE_STATE_CHANGED lpData = (LPAGE_AUDIO_DEVICE_STATE_CHANGED)wParam;
+	if (m_pObserver) {
+		m_pObserver->OnAudioDevChange();
+	}
 	FREE_PTR(lpData);
 }
 
 void CAgoralWrapper::onVideoDevStateChanged(DWORD msgId, WPARAM wParam)
 {
 	LPAGE_VIDEO_DEVICE_STATE_CHANGED lpData = (LPAGE_VIDEO_DEVICE_STATE_CHANGED)wParam;
+	if (m_pObserver) {
+		m_pObserver->OnVideoDevChange();
+	}
 	FREE_PTR(lpData);
 }
 
 void CAgoralWrapper::onLastmileQuality(DWORD msgId, WPARAM wParam)
 {
 	LPAGE_LASTMILE_QUALITY lpData = (LPAGE_LASTMILE_QUALITY)wParam;
+	if (m_pObserver) {
+		m_pObserver->OnLastmileQuality(lpData->quality);
+	}
 	FREE_PTR(lpData);
 }
 
@@ -231,17 +248,67 @@ void CAgoralWrapper::onLastmileQuality(DWORD msgId, WPARAM wParam)
 
 void CAgoralWrapper::onNetWorkQuality(DWORD msgId, WPARAM wParam)
 {
-	PAGE_LASTMILE_QUALITY pData = (PAGE_LASTMILE_QUALITY)wParam;
+	PAGE_NETWORK_QUALITY pData = (PAGE_NETWORK_QUALITY)wParam;
 	if (m_pObserver) {
-		m_pObserver->OnNetWorkQuality(pData->quality);
+		m_pObserver->OnNetWorkQuality(pData->uid,pData->txQuality,pData->rxQuality);
 	}
-	char buf[512];
-	sprintf_s(buf, "=== net work qulity  = %d", pData->quality);
-	LogMessage(buf);
 
 	delete pData;
 }
 
+void CAgoralWrapper::onFirstLocalVideoFrame(DWORD msgId, WPARAM wParam)
+{
+	LPAGE_FIRST_LOCAL_VIDEO_FRAME lpData = new AGE_FIRST_LOCAL_VIDEO_FRAME;
+	if (m_pObserver) {
+		m_pObserver->OnLocalVideframeShow(lpData->elapsed);
+	}
+	if (m_hLocalWnd != NULL) {
+		::ShowWindow(m_hLocalWnd, SW_SHOW);
+	}
+
+	delete lpData;
+}
+
+void CAgoralWrapper::onFirstRemoteVideoDecoded(DWORD msgId, WPARAM wParam)
+{
+	LPAGE_FIRST_REMOTE_VIDEO_DECODED lpData = new AGE_FIRST_REMOTE_VIDEO_DECODED;
+
+	delete lpData;
+}
+void CAgoralWrapper::onFirstRemoteVideoShow(DWORD msgId, WPARAM wParam)
+{
+	LPAGE_FIRST_REMOTE_VIDEO_FRAME lpData = new AGE_FIRST_REMOTE_VIDEO_FRAME;
+	if (m_pObserver) {
+		m_pObserver->OnFirstRemoteVidoeFrameShow(lpData->uid, lpData->elapsed);
+	}
+
+	if (m_hRemoteWnd != NULL) {
+		::ShowWindow(m_hRemoteWnd, SW_SHOW);
+	}
+	delete lpData;
+}
+void CAgoralWrapper::onUserMuteAuido(DWORD msgId, WPARAM wParam)
+{
+	LPAGE_USER_MUTE_VIDEO lpData = new AGE_USER_MUTE_VIDEO;
+	delete lpData;
+}
+
+void CAgoralWrapper::onUserMuteVideo(DWORD msgId, WPARAM wParam)
+{
+	throw std::logic_error("The method or operation is not implemented.");
+}
+void CAgoralWrapper::onApiCalled(DWORD msgId, WPARAM wParam)
+{
+	LPAGE_APICALL_EXECUTED lpData = new AGE_APICALL_EXECUTED;
+	delete lpData;
+}
+
+void CAgoralWrapper::onVideoStoped(DWORD msgId, WPARAM wParam)
+{
+	if (m_pObserver) {
+		m_pObserver->OnVideoStoped();
+	}
+}
 
 void CAgoralWrapper::onStatisticRemoteVideoInfo(DWORD msgId, WPARAM wParam)
 {
@@ -271,6 +338,7 @@ void CAgoralWrapper::onHostJoinSuccess(DWORD msgId, WPARAM wParam)
 	AGVIDEO_WNDINFO  videoInfo;
 	videoInfo.nUID = lpData->uid;
 	BindVideoWnd(lpData->uid,true);
+	m_iHostId = lpData->uid;
 
 	LogMessage(buf);
 
@@ -303,12 +371,9 @@ void CAgoralWrapper::onLostConnect(DWORD msgId, WPARAM wParam)
 }
 
 
-
 void CAgoralWrapper::onGetUserSendMessage(DWORD msgId, WPARAM wParam)
 {
 	LPAGE_STREAM_MESSAGE lpData = new AGE_STREAM_MESSAGE;
-
-
 	char buf[512];
 	sprintf_s(buf, "=== receive user = %d send msg %s ", lpData->uid,lpData->data);
 	LogMessage(buf);
@@ -316,29 +381,6 @@ void CAgoralWrapper::onGetUserSendMessage(DWORD msgId, WPARAM wParam)
 	delete lpData;
 }
 
-/*
-
-
-
-
-void onAudioQulity(DWORD msgId, WPARAM wParam);
-void onAudioVolumeIndication(DWORD msgId, WPARAM wParam);
-
-void onLeaveChannel(DWORD msgId, WPARAM wParam);
-void onMediaEnginEvent(DWORD msgId, WPARAM wParam);
-
-void onAudioDevStateChanged(DWORD msgId, WPARAM wParam);
-void onVideoDevStateChanged(DWORD msgId, WPARAM wParam);
-void onLastmileQuality(DWORD msgId, WPARAM);
-void onNetWorkQuality(DWORD msgId, WPARAM wParam);
-
-
-void onStatisticRemoteVideoInfo(DWORD msgId, WPARAM wParam);
-void onStatisticLocalVideoInfo(DWORD msgId, WPARAM wParam);
-
-void onLostConnect(DWORD msgId, WPARAM wParam);
-void onGetUserSendMessage(DWORD msgId, WPARAM wParam);
-*/
 BOOL CAgoralWrapper::MsgHandle(DWORD msgId, WPARAM wParam)
 {
 	switch (msgId) {
@@ -354,6 +396,28 @@ BOOL CAgoralWrapper::MsgHandle(DWORD msgId, WPARAM wParam)
 		onErrorMsg(msgId, wParam);
 		return TRUE;
 		break;
+
+	case WM_MSGID(EID_LASTMILE_QUALITY):
+		onLastmileQuality(msgId, wParam);
+		return TRUE;
+		break;
+	case WM_MSGID(EID_NETWORK_QULITY): //频道内网络质量
+		onNetWorkQuality(msgId, wParam);
+		return TRUE;
+		break;
+	case WM_MSGID(EID_FIRST_LOCAL_VIDEO_FRAME):
+		onFirstLocalVideoFrame(msgId, wParam);
+		return TRUE;
+		break;
+	case WM_MSGID(EID_FIRST_REMOTE_VIDEO_DECODED):
+		onFirstRemoteVideoDecoded(msgId, wParam);
+		return TRUE;
+		break;
+	case  WM_MSGID(EID_FIRST_REMOTE_VIDEO_FRAME):
+		onFirstRemoteVideoShow(msgId, wParam);
+		return TRUE;
+		break;
+
 	case  WM_MSGID(EID_USER_JOINED):
 		onUserJoinedMsg(msgId, wParam);
 		return TRUE;
@@ -362,26 +426,39 @@ BOOL CAgoralWrapper::MsgHandle(DWORD msgId, WPARAM wParam)
 		onUserOfflineMsg(msgId, wParam);
 		return TRUE;
 		break;
-	case WM_MSGID(EID_REMOTE_VIDEO_STAT):
-		onStatisticRemoteVideoInfo(msgId, wParam);
+	case WM_MSGID(EID_USER_MUTE_AUDIO):
+		onUserMuteAuido(msgId,wParam);
 		return TRUE;
 		break;
-	case WM_MSGID(EID_LOCAL_VIDEO_STAT):
-		onStatisticLocalVideoInfo(msgId, wParam); 
-		return TRUE;
-		break;
-	case WM_MSGID(EID_CONNECTION_LOST):
-		onLostConnect(msgId, wParam);
-		return TRUE;
-		break;
-	case WM_MSGID(EID_NETWORK_QULITY): //频道内网络质量
-		onNetWorkQuality(msgId, wParam);
+	case WM_MSGID(EID_USER_MUTE_VIDEO):
+		onUserMuteVideo(msgId, wParam);
 		return TRUE;
 		break;
 	case WM_MSGID(EID_STREAM_MESSAGE):
 		onGetUserSendMessage(msgId, wParam);
 		return TRUE;
 		break;
+	case WM_MSGID(EID_APICALL_EXECUTED):
+		onApiCalled(msgId, wParam);
+		return TRUE;
+		break;
+	case WM_MSGID(EID_LOCAL_VIDEO_STAT):
+		onStatisticLocalVideoInfo(msgId, wParam);
+		return TRUE;
+		break;
+	case WM_MSGID(EID_REMOTE_VIDEO_STAT):
+		onStatisticRemoteVideoInfo(msgId, wParam);
+		return TRUE;
+		break;
+	case WM_MSGID(EID_VIDEO_STOPPED):
+		onVideoStoped(msgId, wParam);
+		return TRUE;
+		break;
+	case WM_MSGID(EID_CONNECTION_LOST):
+		onLostConnect(msgId, wParam);
+		return TRUE;
+		break;
+
 	case WM_MSGID(EID_LEAVE_CHANNEL):
 		onUserLeaveChannel(msgId, wParam);
 		return TRUE;
@@ -402,10 +479,7 @@ BOOL CAgoralWrapper::MsgHandle(DWORD msgId, WPARAM wParam)
 		onVideoDevStateChanged(msgId, wParam);
 		return TRUE;
 		break;
-	case WM_MSGID(EID_LASTMILE_QUALITY):
-		onLastmileQuality(msgId, wParam);
-		return TRUE;
-		break;
+
 
 	default:
 		break;
@@ -418,12 +492,13 @@ void CAgoralWrapper::BindVideoWnd(unsigned int uid, bool host)
 	HWND  displayWnd = NULL;
 	if (m_nClientType == CLIENT_TYPE_STUDENT) {
 		if (host) {
-			  displayWnd = m_topVideoWnd;
+			displayWnd = m_topVideoWnd;
 			VideoCanvas canvas;
 			canvas.uid = uid;
 			canvas.view = displayWnd;
 			canvas.renderMode = RENDER_MODE_TYPE::RENDER_MODE_FIT;
 			CAgoraObject::GetEngine()->setupLocalVideo(canvas);
+			m_hLocalWnd = displayWnd;
 		} else {
 			  displayWnd = m_bottoomVideoWnd;
 			VideoCanvas canvas;
@@ -431,6 +506,8 @@ void CAgoralWrapper::BindVideoWnd(unsigned int uid, bool host)
 			canvas.view = displayWnd;
 			canvas.renderMode = RENDER_MODE_TYPE::RENDER_MODE_FIT;
 			CAgoraObject::GetEngine()->setupRemoteVideo(canvas);
+			m_hRemoteWnd = displayWnd;
+
 		}
 	} else if (m_nClientType == CLIENT_TYPE_TEACHER) {
 		if (host) {
@@ -440,6 +517,7 @@ void CAgoralWrapper::BindVideoWnd(unsigned int uid, bool host)
 			canvas.view = displayWnd;
 			canvas.renderMode = RENDER_MODE_TYPE::RENDER_MODE_FIT;
 			CAgoraObject::GetEngine()->setupLocalVideo(canvas);
+			m_hLocalWnd = displayWnd;
 		} else {
 			  displayWnd = m_topVideoWnd;
 			VideoCanvas canvas;
@@ -447,18 +525,15 @@ void CAgoralWrapper::BindVideoWnd(unsigned int uid, bool host)
 			canvas.view = displayWnd;
 			canvas.renderMode = RENDER_MODE_TYPE::RENDER_MODE_FIT;
 			CAgoraObject::GetEngine()->setupRemoteVideo(canvas);
+			m_hRemoteWnd = displayWnd;
 		}
 	}
 	if (displayWnd != NULL) {
-		::ShowWindow(displayWnd, SW_SHOW);
 		AGVIDEO_WNDINFO info;
 		info.hHwnd = displayWnd;
 		info.nUID = uid;
 		m_vecJoinedUsers.push_back(info);
 	}
-
-
-
 }
 
 BOOL  CAgoralWrapper::SendChatMessage(const char *msg)
@@ -467,6 +542,11 @@ BOOL  CAgoralWrapper::SendChatMessage(const char *msg)
 		return FALSE;
 	return CAgoraObject::GetAgoraObject()->SendChatMessage(m_nStreamID, msg);
 }
+
+
+
+
+
 
 
 

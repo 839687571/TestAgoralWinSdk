@@ -251,6 +251,14 @@ typedef struct _AGE_STREAM_MESSAGE
 
 #define EID_STREAM_MESSAGE                  0x00000021
 
+typedef struct _AGE_NETWORK_QUALITY
+{
+	int uid;
+	int txQuality;
+	int rxQuality;
+
+} AGE_NETWORK_QUALITY, *PAGE_NETWORK_QUALITY, *LPAGE_NETWORK_QUALITY;
+
 #define EID_NETWORK_QULITY                  0x00000111
 
 typedef union _UserInfo {

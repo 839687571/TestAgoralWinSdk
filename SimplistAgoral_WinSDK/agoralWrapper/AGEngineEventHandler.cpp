@@ -97,15 +97,15 @@ void CAGEngineEventHandler::onError(int err, const char* msg)
 
 void CAGEngineEventHandler::onAudioQuality(uid_t uid, int quality, unsigned short delay, unsigned short lost)
 {
-//	LPAGE_AUDIO_QUALITY lpData = new AGE_AUDIO_QUALITY;
-//
-//	lpData->uid = uid;
-//	lpData->quality = quality;
-//	lpData->delay = delay;
-//	lpData->lost = lost;
-//
-//	if(m_hMainWnd != NULL)
-//		::PostMessage(m_hMainWnd, WM_MSGID(EID_AUDIO_QUALITY), (WPARAM)lpData, 0);
+	LPAGE_AUDIO_QUALITY lpData = new AGE_AUDIO_QUALITY;
+
+	lpData->uid = uid;
+	lpData->quality = quality;
+	lpData->delay = delay;
+	lpData->lost = lost;
+
+	if(m_hMainWnd != NULL)
+		::PostMessage(m_hMainWnd, WM_MSGID(EID_AUDIO_QUALITY), (WPARAM)lpData, 0);
 
 	LogMessage(__FUNCTION__);
 }
@@ -227,42 +227,42 @@ void CAGEngineEventHandler::onNetworkQuality(uid_t uid, int txQuality, int rxQua
 
 void CAGEngineEventHandler::onFirstLocalVideoFrame(int width, int height, int elapsed)
 {
-//	LPAGE_FIRST_LOCAL_VIDEO_FRAME lpData = new AGE_FIRST_LOCAL_VIDEO_FRAME;
-//
-//	lpData->width = width;
-//	lpData->height = height;
-//	lpData->elapsed = elapsed;
-//
-//	if(m_hMainWnd != NULL)
-//		::PostMessage(m_hMainWnd, WM_MSGID(EID_FIRST_LOCAL_VIDEO_FRAME), (WPARAM)lpData, 0);
+	LPAGE_FIRST_LOCAL_VIDEO_FRAME lpData = new AGE_FIRST_LOCAL_VIDEO_FRAME;
+
+	lpData->width = width;
+	lpData->height = height;
+	lpData->elapsed = elapsed;
+
+	if(m_hMainWnd != NULL)
+		::PostMessage(m_hMainWnd, WM_MSGID(EID_FIRST_LOCAL_VIDEO_FRAME), (WPARAM)lpData, 0);
 	LogMessage(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onFirstRemoteVideoDecoded(uid_t uid, int width, int height, int elapsed)
 {
-//	LPAGE_FIRST_REMOTE_VIDEO_DECODED lpData = new AGE_FIRST_REMOTE_VIDEO_DECODED;
-//
-//	lpData->uid = uid;
-//	lpData->width = width;
-//	lpData->height = height;
-//	lpData->elapsed = elapsed;
-//
-//	if(m_hMainWnd != NULL)
-//		::PostMessage(m_hMainWnd, WM_MSGID(EID_FIRST_REMOTE_VIDEO_DECODED), (WPARAM)lpData, 0);
+	LPAGE_FIRST_REMOTE_VIDEO_DECODED lpData = new AGE_FIRST_REMOTE_VIDEO_DECODED;
+
+	lpData->uid = uid;
+	lpData->width = width;
+	lpData->height = height;
+	lpData->elapsed = elapsed;
+
+	if(m_hMainWnd != NULL)
+		::PostMessage(m_hMainWnd, WM_MSGID(EID_FIRST_REMOTE_VIDEO_DECODED), (WPARAM)lpData, 0);
 	LogMessage(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onFirstRemoteVideoFrame(uid_t uid, int width, int height, int elapsed)
 {
-//	LPAGE_FIRST_REMOTE_VIDEO_FRAME lpData = new AGE_FIRST_REMOTE_VIDEO_FRAME;
-//
-//	lpData->uid = uid;
-//	lpData->width = width;
-//	lpData->height = height;
-//	lpData->elapsed = elapsed;
-//
-//	if(m_hMainWnd != NULL)
-//		::PostMessage(m_hMainWnd, WM_MSGID(EID_FIRST_REMOTE_VIDEO_FRAME), (WPARAM)lpData, 0);
+	LPAGE_FIRST_REMOTE_VIDEO_FRAME lpData = new AGE_FIRST_REMOTE_VIDEO_FRAME;
+
+	lpData->uid = uid;
+	lpData->width = width;
+	lpData->height = height;
+	lpData->elapsed = elapsed;
+
+	if(m_hMainWnd != NULL)
+		::PostMessage(m_hMainWnd, WM_MSGID(EID_FIRST_REMOTE_VIDEO_FRAME), (WPARAM)lpData, 0);
 	LogMessage(__FUNCTION__);
 }
 
@@ -293,13 +293,13 @@ void CAGEngineEventHandler::onUserOffline(uid_t uid, USER_OFFLINE_REASON_TYPE re
 
 void CAGEngineEventHandler::onUserMuteAudio(uid_t uid, bool muted)
 {
-//	LPAGE_USER_MUTE_AUDIO lpData = new AGE_USER_MUTE_AUDIO;
-//
-//	lpData->uid = uid;
-//	lpData->muted = muted;
-//
-//	if(m_hMainWnd != NULL)
-//		::PostMessage(m_hMainWnd, WM_MSGID(EID_USER_MUTE_AUDIO), (WPARAM)lpData, 0);
+	LPAGE_USER_MUTE_AUDIO lpData = new AGE_USER_MUTE_AUDIO;
+
+	lpData->uid = uid;
+	lpData->muted = muted;
+
+	if(m_hMainWnd != NULL)
+		::PostMessage(m_hMainWnd, WM_MSGID(EID_USER_MUTE_AUDIO), (WPARAM)lpData, 0);
 
 	LogMessage(__FUNCTION__);
 
@@ -307,29 +307,29 @@ void CAGEngineEventHandler::onUserMuteAudio(uid_t uid, bool muted)
 
 void CAGEngineEventHandler::onUserMuteVideo(uid_t uid, bool muted)
 {
-//	LPAGE_USER_MUTE_VIDEO lpData = new AGE_USER_MUTE_VIDEO;
-//
-//	lpData->uid = uid;
-//	lpData->muted = muted;
-//
-//	if(m_hMainWnd != NULL)
-//		::PostMessage(m_hMainWnd, WM_MSGID(EID_USER_MUTE_VIDEO), (WPARAM)lpData, 0);
+	LPAGE_USER_MUTE_VIDEO lpData = new AGE_USER_MUTE_VIDEO;
+
+	lpData->uid = uid;
+	lpData->muted = muted;
+
+	if(m_hMainWnd != NULL)
+		::PostMessage(m_hMainWnd, WM_MSGID(EID_USER_MUTE_VIDEO), (WPARAM)lpData, 0);
 	LogMessage(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onStreamMessage(uid_t uid, int streamId, const char* data, size_t length)
 {
-//    LPAGE_STREAM_MESSAGE lpData = new AGE_STREAM_MESSAGE;
-//
-//    lpData->uid = uid;
-//    lpData->streamId = streamId;
-//    lpData->data = new char[length];
-//    lpData->length = length;
-//
-//    memcpy_s(lpData->data, length, data, length);
-//
-//    if (m_hMainWnd != NULL)
-//        ::PostMessage(m_hMainWnd, WM_MSGID(EID_STREAM_MESSAGE), (WPARAM)lpData, 0);
+   LPAGE_STREAM_MESSAGE lpData = new AGE_STREAM_MESSAGE;
+
+   lpData->uid = uid;
+   lpData->streamId = streamId;
+   lpData->data = new char[length];
+   lpData->length = length;
+
+   memcpy_s(lpData->data, length, data, length);
+
+   if (m_hMainWnd != NULL)
+       ::PostMessage(m_hMainWnd, WM_MSGID(EID_STREAM_MESSAGE), (WPARAM)lpData, 0);
 
 	LogMessage(__FUNCTION__);
 
@@ -348,7 +348,6 @@ void CAGEngineEventHandler::onApiCallExecuted(const char* api, int error)
 	LogMessage(__FUNCTION__);
 	LogMessage(lpData->api);
 
-//	delete lpData;
 }
 
 void CAGEngineEventHandler::onLocalVideoStats(const LocalVideoStats& stats)
@@ -405,6 +404,7 @@ void CAGEngineEventHandler::onConnectionLost()
 {
 	if(m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_CONNECTION_LOST), 0, 0);
+	LogMessage(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onConnectionInterrupted()
@@ -418,21 +418,21 @@ void CAGEngineEventHandler::onUserEnableVideo(uid_t uid, bool enabled)
 {
 	if (m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_CONNECTION_LOST), 0, 0);
-
+	LogMessage(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onStartRecordingService(int error)
 {
 	if (m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_START_RCDSRV), 0, 0);
-
+	LogMessage(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onStopRecordingService(int error)
 {
 	if (m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_STOP_RCDSRV), 0, 0);
-
+	LogMessage(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onRefreshRecordingServiceStatus(int status)
@@ -444,4 +444,5 @@ void CAGEngineEventHandler::onRefreshRecordingServiceStatus(int status)
 
 	if (m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_REFREASH_RCDSRV), (WPARAM)lpData, 0);
+	LogMessage(__FUNCTION__);
 }

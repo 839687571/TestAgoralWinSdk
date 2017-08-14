@@ -8,7 +8,7 @@
 #include <vector>
 
 
-//call 方式集成SDK, stundent 显示内容到老师端
+//通信方式集成SDK, stundent 显示内容到老师端
 
 // setChannelProfile  可以设置 模式:
 /*
@@ -20,11 +20,31 @@
 
 extern void LogMessage(char *msg);
 
+#define  VIRTUAL_IMPLE  {}
 
 interface  IAgoralObjectMsgMsgObserver {
-	virtual void OnUserOffline(unsigned int userId ) {}
-	virtual void OnNetWorkQuality(unsigned int level) {};
-	virtual void OnHostJoinSuccess(unsigned int userId) {};
+	    virtual void OnError(unsigned int err, const char *msg) VIRTUAL_IMPLE
+		virtual void OnAuidoVolumeIndication(unsigned int uId, int volume) VIRTUAL_IMPLE
+		virtual void OnAudioDevChange() VIRTUAL_IMPLE
+		virtual void OnVideoDevChange() VIRTUAL_IMPLE
+		virtual void OnLastmileQuality(int quality) VIRTUAL_IMPLE
+		virtual void OnNetWorkQuality(int uid, int txQuality /*上行*/, int rxQuality/*下行*/) VIRTUAL_IMPLE
+
+		virtual void OnLocalVideframeShow(unsigned int elapsed) VIRTUAL_IMPLE
+		virtual void OnFirstRemoteVidoeFrameShow(unsigned uid, unsigned elapsed) VIRTUAL_IMPLE
+
+		virtual void OnUserJoined(unsigned int uid, int elapsed)VIRTUAL_IMPLE
+		virtual void OnUserOffline(unsigned int userId)VIRTUAL_IMPLE
+
+		virtual void OnUserMuteAudio(unsigned int uid, bool muted) VIRTUAL_IMPLE
+		virtual void OnUserMuteVideo(unsigned int uid, bool muted) VIRTUAL_IMPLE
+
+		virtual void OnLocalVideoStats(const LocalVideoStats& stats) VIRTUAL_IMPLE
+		virtual void OnRemoteVideoStats(const RemoteVideoStats& stats) VIRTUAL_IMPLE
+
+		virtual void OnHostJoinSuccess(unsigned int userId) VIRTUAL_IMPLE
+
+		virtual void OnVideoStoped() VIRTUAL_IMPLE
 };
 
 
@@ -202,13 +222,18 @@ private:
 	QUALITY_DOWN(6)
 	*/
 	void onNetWorkQuality(DWORD msgId, WPARAM wParam);
-
-
 	void onStatisticRemoteVideoInfo(DWORD msgId, WPARAM wParam);
 	void onStatisticLocalVideoInfo(DWORD msgId, WPARAM wParam);
 
 	void onLostConnect(DWORD msgId, WPARAM wParam);
 	void onGetUserSendMessage(DWORD msgId, WPARAM wParam);
+	void onFirstLocalVideoFrame(DWORD msgId, WPARAM wParam);
+	void onFirstRemoteVideoDecoded(DWORD msgId, WPARAM wParam);
+	void onFirstRemoteVideoShow(DWORD msgId, WPARAM wParam);
+	void onUserMuteAuido(DWORD msgId, WPARAM wParam);
+	void onUserMuteVideo(DWORD msgId, WPARAM wParam);
+	void onApiCalled(DWORD msgId, WPARAM wParam);
+	void onVideoStoped(DWORD msgId, WPARAM wParam);
 
 	HWND  m_bottoomVideoWnd; /* 老师视频 */
 	HWND  m_localCamera2Wnd; /*教师2的摄像头*/
@@ -235,6 +260,10 @@ private:
 	int  m_nClientType;
 
 	std::vector<AGVIDEO_WNDINFO>   m_vecJoinedUsers;
+	int  m_iHostId;
+
+	HWND  m_hLocalWnd;
+	HWND  m_hRemoteWnd;
 
 	IAgoralObjectMsgMsgObserver  *m_pObserver;
 };
