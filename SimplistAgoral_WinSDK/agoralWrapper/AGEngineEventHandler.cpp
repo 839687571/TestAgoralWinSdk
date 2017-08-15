@@ -13,6 +13,7 @@
 // } while (0)
 
 extern  void LogMessage(char *msg);
+extern  void LogMessageHLevel(char *msg);
 CAGEngineEventHandler::CAGEngineEventHandler(void)
 {
 }
@@ -40,7 +41,7 @@ void CAGEngineEventHandler::onJoinChannelSuccess(const char* channel, uid_t uid,
 	if(m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_JOINCHANNEL_SUCCESS), (WPARAM)lpData, 0);
 
-	LogMessage(__FUNCTION__);
+	LogMessageHLevel(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onReJoinChannelSuccess(const char* channel, uid_t uid, int elapsed)
@@ -56,6 +57,8 @@ void CAGEngineEventHandler::onReJoinChannelSuccess(const char* channel, uid_t ui
 
 	if(m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_REJOINCHANNEL_SUCCESS), (WPARAM)lpData, 0);
+
+	LogMessageHLevel(__FUNCTION__);
 
 }
 
@@ -91,7 +94,7 @@ void CAGEngineEventHandler::onError(int err, const char* msg)
 	if(m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_ERROR), (WPARAM)lpData, 0);
 
-	LogMessage(__FUNCTION__);
+	LogMessageHLevel(__FUNCTION__);
 
 }
 
@@ -134,7 +137,7 @@ void CAGEngineEventHandler::onLeaveChannel(const RtcStats& stat)
 	if(m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_LEAVE_CHANNEL), (WPARAM)lpData, 0);
 
-	LogMessage(__FUNCTION__);
+	LogMessageHLevel(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onRtcStats(const RtcStats& stat)
@@ -173,7 +176,7 @@ void CAGEngineEventHandler::onAudioDeviceStateChanged(const char* deviceId, int 
 
 	if (m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_AUDIO_DEVICE_STATE_CHANGED), (WPARAM)lpData, 0);
-	LogMessage(__FUNCTION__);
+	LogMessageHLevel(__FUNCTION__);
 
 }
 
@@ -192,7 +195,7 @@ void CAGEngineEventHandler::onVideoDeviceStateChanged(const char* deviceId, int 
 	if (m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_VIDEO_DEVICE_STATE_CHANGED), (WPARAM)lpData, 0);
 
-	LogMessage(__FUNCTION__);
+	LogMessageHLevel(__FUNCTION__);
 
 }
 
@@ -214,9 +217,11 @@ void CAGEngineEventHandler::onLastmileQuality(int quality)
 void CAGEngineEventHandler::onNetworkQuality(uid_t uid, int txQuality, int rxQuality)
 { 
 
-	LPAGE_LASTMILE_QUALITY lpData = new AGE_LASTMILE_QUALITY;
+	LPAGE_NETWORK_QUALITY lpData = new AGE_NETWORK_QUALITY;
 
-	lpData->quality = txQuality;
+	lpData->uid = uid;
+	lpData->txQuality = txQuality;
+	lpData->rxQuality = rxQuality;
 
 	if (m_hMainWnd != NULL) {
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_NETWORK_QULITY), (WPARAM)lpData, 0);
@@ -235,7 +240,7 @@ void CAGEngineEventHandler::onFirstLocalVideoFrame(int width, int height, int el
 
 	if(m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_FIRST_LOCAL_VIDEO_FRAME), (WPARAM)lpData, 0);
-	LogMessage(__FUNCTION__);
+	LogMessageHLevel(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onFirstRemoteVideoDecoded(uid_t uid, int width, int height, int elapsed)
@@ -249,7 +254,7 @@ void CAGEngineEventHandler::onFirstRemoteVideoDecoded(uid_t uid, int width, int 
 
 	if(m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_FIRST_REMOTE_VIDEO_DECODED), (WPARAM)lpData, 0);
-	LogMessage(__FUNCTION__);
+	LogMessageHLevel(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onFirstRemoteVideoFrame(uid_t uid, int width, int height, int elapsed)
@@ -263,7 +268,7 @@ void CAGEngineEventHandler::onFirstRemoteVideoFrame(uid_t uid, int width, int he
 
 	if(m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_FIRST_REMOTE_VIDEO_FRAME), (WPARAM)lpData, 0);
-	LogMessage(__FUNCTION__);
+	LogMessageHLevel(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onUserJoined(uid_t uid, int elapsed)
@@ -275,7 +280,7 @@ void CAGEngineEventHandler::onUserJoined(uid_t uid, int elapsed)
 
 	if(m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_USER_JOINED), (WPARAM)lpData, 0);
-	LogMessage(__FUNCTION__);
+	LogMessageHLevel(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onUserOffline(uid_t uid, USER_OFFLINE_REASON_TYPE reason)
@@ -288,7 +293,7 @@ void CAGEngineEventHandler::onUserOffline(uid_t uid, USER_OFFLINE_REASON_TYPE re
 	if(m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_USER_OFFLINE), (WPARAM)lpData, 0);
 
-	LogMessage(__FUNCTION__);
+	LogMessageHLevel(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onUserMuteAudio(uid_t uid, bool muted)
@@ -301,7 +306,7 @@ void CAGEngineEventHandler::onUserMuteAudio(uid_t uid, bool muted)
 	if(m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_USER_MUTE_AUDIO), (WPARAM)lpData, 0);
 
-	LogMessage(__FUNCTION__);
+	LogMessageHLevel(__FUNCTION__);
 
 }
 
@@ -314,7 +319,7 @@ void CAGEngineEventHandler::onUserMuteVideo(uid_t uid, bool muted)
 
 	if(m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_USER_MUTE_VIDEO), (WPARAM)lpData, 0);
-	LogMessage(__FUNCTION__);
+	LogMessageHLevel(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onStreamMessage(uid_t uid, int streamId, const char* data, size_t length)
@@ -397,28 +402,28 @@ void CAGEngineEventHandler::onVideoStopped()
 	if (m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_VIDEO_STOPPED), 0, 0);
 
-	LogMessage(__FUNCTION__);
+	LogMessageHLevel(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onConnectionLost()
 {
 	if(m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_CONNECTION_LOST), 0, 0);
-	LogMessage(__FUNCTION__);
+	LogMessageHLevel(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onConnectionInterrupted()
 {
 	std::string str = ("onConnectionInterrupted");
 
-	LogMessage(__FUNCTION__);
+	LogMessageHLevel(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onUserEnableVideo(uid_t uid, bool enabled)
 {
 	if (m_hMainWnd != NULL)
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_CONNECTION_LOST), 0, 0);
-	LogMessage(__FUNCTION__);
+	LogMessageHLevel(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onStartRecordingService(int error)

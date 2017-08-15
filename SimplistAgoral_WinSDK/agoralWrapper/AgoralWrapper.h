@@ -25,8 +25,8 @@ extern void LogMessage(char *msg);
 interface  IAgoralObjectMsgMsgObserver {
 	    virtual void OnError(unsigned int err, const char *msg) VIRTUAL_IMPLE
 		virtual void OnAuidoVolumeIndication(unsigned int uId, int volume) VIRTUAL_IMPLE
-		virtual void OnAudioDevChange() VIRTUAL_IMPLE
-		virtual void OnVideoDevChange() VIRTUAL_IMPLE
+		virtual void OnAudioDevChange(const char *devId, int devType, int devState) VIRTUAL_IMPLE
+		virtual void OnVideoDevChange(const char *devId, int devType, int devState) VIRTUAL_IMPLE
 		virtual void OnLastmileQuality(int quality) VIRTUAL_IMPLE
 		virtual void OnNetWorkQuality(int uid, int txQuality /*上行*/, int rxQuality/*下行*/) VIRTUAL_IMPLE
 
@@ -170,6 +170,8 @@ public:
 	}
 	// 处理引擎回调消息.
 	BOOL MsgHandle(DWORD msgId, WPARAM wParam);
+
+	BOOL  IsHostUser(unsigned int uid);
 
 	void SetMsgObserver(IAgoralObjectMsgMsgObserver *observer)
 	{

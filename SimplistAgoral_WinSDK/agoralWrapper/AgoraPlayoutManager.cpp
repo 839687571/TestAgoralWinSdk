@@ -20,14 +20,17 @@ CAgoraPlayoutManager::~CAgoraPlayoutManager()
 BOOL CAgoraPlayoutManager::Create(IRtcEngine *lpRtcEngine)
 {
 	m_ptrDeviceManager = new AAudioDeviceManager(lpRtcEngine);
-	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL)
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL) {
+		BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" new AAudioDeviceManager Speaker device manager failed");
 		return FALSE;
+
+	}
 
 	m_lpCollection = (*m_ptrDeviceManager)->enumeratePlaybackDevices();
 	if (m_lpCollection == NULL) {
 		delete m_ptrDeviceManager;
 		m_ptrDeviceManager = NULL;
-		BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" create Speaker device manager failed");
+		BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" enumeratePlaybackDevices Speaker device  failed");
 	}
 
 	m_pRtcEngin = lpRtcEngine;

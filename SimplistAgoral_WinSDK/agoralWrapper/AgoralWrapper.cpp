@@ -5,6 +5,7 @@
 
 
 extern void LogMessage(char *msg);
+extern void LogMessageHLevel(char *msg);
 
 #define  FREE_PTR(ptr){if (ptr != NULL){delete ptr;ptr = NULL;}}
 
@@ -112,7 +113,7 @@ void CAgoralWrapper::onUserJoinedMsg(DWORD msgId, WPARAM wParam)
 
 	char buf[512];
 	sprintf_s(buf, "==============================role = %d Joined the channel ", lpData->uid);
-	LogMessage(buf);
+	LogMessageHLevel(buf);
 
 
 	delete lpData;
@@ -165,7 +166,7 @@ void CAgoralWrapper::onUserLeaveChannel(DWORD msgId, WPARAM wParam)
 
 	char buf[512];
 	sprintf_s(buf, "==============================%d leave the channel because postive ", lpData->rtcStat.users);
-	LogMessage(buf);
+	LogMessageHLevel(buf);
 
 	if (m_pObserver != NULL) {
 		m_pObserver->OnUserOffline(lpData->rtcStat.users);
@@ -181,7 +182,7 @@ void CAgoralWrapper::onErrorMsg(DWORD msgId, WPARAM wParam)
 		char buf[512];
 		sprintf_s(buf, "======Agoral onErrorMsg = %d  ", lpData->err);
 
-		LogMessage(buf);
+		LogMessageHLevel(buf);
 	}
 
 	if (m_pObserver) {
@@ -221,7 +222,7 @@ void CAgoralWrapper::onAudioDevStateChanged(DWORD msgId, WPARAM wParam)
 {
 	LPAGE_AUDIO_DEVICE_STATE_CHANGED lpData = (LPAGE_AUDIO_DEVICE_STATE_CHANGED)wParam;
 	if (m_pObserver) {
-		m_pObserver->OnAudioDevChange();
+		m_pObserver->OnAudioDevChange(lpData->deviceId,lpData->deviceType,lpData->deviceState);
 	}
 	FREE_PTR(lpData);
 }
@@ -230,7 +231,7 @@ void CAgoralWrapper::onVideoDevStateChanged(DWORD msgId, WPARAM wParam)
 {
 	LPAGE_VIDEO_DEVICE_STATE_CHANGED lpData = (LPAGE_VIDEO_DEVICE_STATE_CHANGED)wParam;
 	if (m_pObserver) {
-		m_pObserver->OnVideoDevChange();
+		m_pObserver->OnVideoDevChange(lpData->deviceId, lpData->deviceType, lpData->deviceState);
 	}
 	FREE_PTR(lpData);
 }
@@ -340,7 +341,7 @@ void CAgoralWrapper::onHostJoinSuccess(DWORD msgId, WPARAM wParam)
 	BindVideoWnd(lpData->uid,true);
 	m_iHostId = lpData->uid;
 
-	LogMessage(buf);
+	LogMessageHLevel(buf);
 
 	//1delete lpData->channel;
 	delete lpData;
@@ -367,7 +368,7 @@ void CAgoralWrapper::onLostConnect(DWORD msgId, WPARAM wParam)
 {
 	char buf[512];
 	sprintf_s(buf, "=== host is lost connect ");
-	LogMessage(buf);
+	LogMessageHLevel(buf);
 }
 
 
@@ -542,7 +543,10 @@ BOOL  CAgoralWrapper::SendChatMessage(const char *msg)
 		return FALSE;
 	return CAgoraObject::GetAgoraObject()->SendChatMessage(m_nStreamID, msg);
 }
-
+BOOL  CAgoralWrapper::IsHostUser(unsigned int uid)
+{
+	return m_iHostId == uid;
+}
 
 
 

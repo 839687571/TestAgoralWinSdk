@@ -25,6 +25,7 @@ BOOL CAgoraAudInputManager::Create(agora::rtc::IRtcEngine *lpRtcEngine)
 {
 	m_ptrDeviceManager = new AAudioDeviceManager(lpRtcEngine);
 	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL){
+		BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" new AAudioDeviceManager Mic device  failed");
 		return FALSE;
 	}
 
@@ -32,7 +33,7 @@ BOOL CAgoraAudInputManager::Create(agora::rtc::IRtcEngine *lpRtcEngine)
 	if (m_lpCollection == NULL) {
 		delete m_ptrDeviceManager;
 		m_ptrDeviceManager = NULL;
-		BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" create Mic device manager failed");
+		BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" enumerateRecordingDevices Mic device  failed");
 	}
 
 	

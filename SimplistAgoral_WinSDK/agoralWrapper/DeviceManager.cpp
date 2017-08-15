@@ -7,6 +7,7 @@
 #define CUR_MODULE L"DEVICEMGR"
 
 CDeviceManager* CDeviceManager::m_pInstance = new CDeviceManager;
+
 #define  CHECK_RTCENGIN {\
 if (m_lpRtcEngine == NULL) {\
 	return -1;\
@@ -35,7 +36,7 @@ void CDeviceManager::UnitManager()
 	m_agAudioin.Close();
 	m_agCamera.Close();
 }
-void CDeviceManager::InitManager(const char *logPath)
+void CDeviceManager::InitManager()
 {
 	m_lpRtcEngine = CAgoraObject::GetEngine();
 
@@ -48,17 +49,32 @@ void CDeviceManager::InitManager(const char *logPath)
 
 void CDeviceManager::UpdateDeviceList()
 {
-
-	m_agAudioin.Close();
-	m_agAudioin.Create(m_lpRtcEngine);
-
-	m_audioOutputDevList.clear();
 	m_audioInputDevList.clear();
 	m_videoDevList.clear();
 	ObtainDeviceList();
 }
 
-void CDeviceManager::ObtainDeviceList()
+void  CDeviceManager::UpdateSpeakerList()
+{
+	m_agPlayout.Close();
+	m_agPlayout.Create(m_lpRtcEngine);
+	m_audioOutputDevList.clear();
+
+
+}
+void  CDeviceManager::UpdateMicList()
+{
+	m_agAudioin.Close();
+	m_agAudioin.Create(m_lpRtcEngine);
+
+}
+void  CDeviceManager::UpdateCameraList()
+{
+	m_agCamera.Close();
+	m_agCamera.Create(m_lpRtcEngine);
+}
+
+void CDeviceManager::ObtainSpeakerDevList()
 {
 	for (UINT nIndex = 0; nIndex < m_agPlayout.GetDeviceCount(); nIndex++) {
 		std::string strDeviceName, strDeviceID;
@@ -73,7 +89,9 @@ void CDeviceManager::ObtainDeviceList()
 			CComUtil::AnsiToUnicode(strDeviceID.c_str()).c_str());
 
 	}
-
+}
+void CDeviceManager::ObtainMicDevList()
+{
 	for (UINT nIndex = 0; nIndex < m_agAudioin.GetDeviceCount(); nIndex++) {
 		std::string strDeviceName, strDeviceID;
 		m_agAudioin.GetDevice(nIndex, strDeviceName, strDeviceID);
@@ -85,7 +103,9 @@ void CDeviceManager::ObtainDeviceList()
 			CComUtil::AnsiToUnicode(strDeviceID.c_str()).c_str());
 	}
 
-
+}
+void CDeviceManager::ObtainCameraDevList()
+{
 	for (UINT nIndex = 0; nIndex < m_agCamera.GetDeviceCount(); nIndex++) {
 		std::string strDeviceName, strDeviceID;
 		m_agCamera.GetDevice(nIndex, strDeviceName, strDeviceID);
@@ -97,6 +117,12 @@ void CDeviceManager::ObtainDeviceList()
 		BugTrapWrapper::GetQQLogger()->AppendF(BTLL_INFO, CUR_MODULE, L"Obtain Camera name = %s,id= %s", CComUtil::AnsiToUnicode(strDeviceName.c_str()).c_str(),
 			CComUtil::AnsiToUnicode(strDeviceID.c_str()).c_str());
 	}
+}
+void CDeviceManager::ObtainDeviceList()
+{
+	ObtainSpeakerDevList();
+	ObtainMicDevList();
+	ObtainCameraDevList();
 }
 
 
@@ -119,7 +145,6 @@ int  CDeviceManager::TestCurrentAudioOutDev( const char *auidoFile)
 int CDeviceManager::StartTestNetWork()
 {
 	CHECK_RTCENGIN
-//	CAgoraObject::GetAgoraObject()->SetMsgHandlerWnd(m_hMsgWnd);
 	return m_lpRtcEngine->enableLastmileTest();
 }
 
