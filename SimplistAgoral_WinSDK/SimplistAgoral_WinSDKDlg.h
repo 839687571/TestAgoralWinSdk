@@ -41,15 +41,13 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 
-	void onAudioVolumIndication(const void *param);
-	void  onLastmileQuality(const void *wParam);
-	void  onAudioDeviceChange(const void *wParam);
-	void  onVideoDeviceChange(const void *wParam);
-
-	void onLeaveChannel(const void*wParam);
-	void 	onVideoStoped(const void *wParam);
-
-	void AgoralMsgHandle(DWORD msgId, WPARAM wParam);
+	/** IAgoralObjectMsgMsgObserver --------------------- start*/
+	void  OnAuidoVolumeIndication(unsigned int uId, int volume);
+	void  OnLastmileQuality(int quality);
+	void  OnAudioDevChange(const char *devId, int devType, int devState);
+	void  OnVideoDevChange(const char *devId, int devType, int devState);
+	void  OnVideoStoped();
+	/** IAgoralObjectMsgMsgObserver --------------------- end*/
 
 	CComboBox  *m_cmbInputAudDev;
 	CComboBox  *m_cmbOutputAudDev;

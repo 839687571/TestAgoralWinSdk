@@ -49,9 +49,12 @@ void CDeviceManager::InitManager()
 
 void CDeviceManager::UpdateDeviceList()
 {
-	m_audioInputDevList.clear();
-	m_videoDevList.clear();
-	ObtainDeviceList();
+	//m_audioInputDevList.clear();
+	//m_videoDevList.clear();
+	//ObtainDeviceList();
+	m_agCamera.ReCreateCollection();
+	ObtainCameraDevList();
+
 }
 
 void  CDeviceManager::UpdateSpeakerList()

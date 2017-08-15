@@ -16,8 +16,16 @@
 QQTrace BugTrapWrapper::m_qqLogger;
 
 
-
 void LogMessage(char *msg)
+{
+	if (msg != NULL) {
+		printf(msg);
+		printf("\n");
+	}
+}
+
+
+void LogMessageHLevel(char *msg)
 {
 	if (msg != NULL) {
 		printf(msg);

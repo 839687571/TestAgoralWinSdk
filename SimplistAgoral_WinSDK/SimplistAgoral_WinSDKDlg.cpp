@@ -249,7 +249,7 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 
 	m_deviceManager = CDeviceManager::GetInstance();
 	printf("new CDeviceManager; \n");
-	m_deviceManager->InitManager(appPath.c_str());
+	m_deviceManager->InitManager();
 	m_deviceManager->SetMsgHandleWnd(m_hWnd);
 
 	std::vector<DevicesInfo> &audioInput = m_deviceManager->GetAudioInputDeviceLists();
@@ -303,48 +303,56 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE	
 }
 
+/*
+void  OnAuidoVolumeIndication(unsigned int uId, int volume);
+void  OnLastmileQuality(int quality);
+void  OnAudioDeviceChange(const char *devId, int devType, int devState);
+void  OnVideoDeviceChange(const char *devId, int devType, int devState);
+void  OnVideoStoped(const void *wParam);
+*/
 
-void CSimplistAgoral_WinSDKDlg::onAudioVolumIndication(const void *param)
+void CSimplistAgoral_WinSDKDlg::OnAuidoVolumeIndication(unsigned int uId, int volume)
 {
-	LPAGE_AUDIO_VOLUME_INDICATION lpData = (LPAGE_AUDIO_VOLUME_INDICATION)param;
-	m_silderVolIndicate->SetPos(lpData->totalVolume);
-
-
+	m_silderVolIndicate->SetPos(volume);
 	std::string devid = m_deviceManager->GetCurrentUseMicDevId();
-
-	printf("\n vol = %d number =%d devid  = %s\n", lpData->totalVolume, lpData->speakerNumber, devid.c_str());
-	delete lpData;
+	printf("\n vol = %d number =%d devid  = %s\n", uId, volume, devid.c_str());
 }
-void  CSimplistAgoral_WinSDKDlg::onLastmileQuality(const void *wParam)
+
+void  CSimplistAgoral_WinSDKDlg::OnLastmileQuality(int quality)
 {
-	LPAGE_LASTMILE_QUALITY lpData = (LPAGE_LASTMILE_QUALITY)wParam;
-	printf("\n on quality ret  = %d\n", lpData->quality);
+	printf("\n on quality ret  = %d\n", quality);
 	///m_deviceManager->StopTestNetWork();
-	delete lpData;
 }
 
-void  CSimplistAgoral_WinSDKDlg::onAudioDeviceChange(const void *wParam)
+void  CSimplistAgoral_WinSDKDlg::OnAudioDevChange(const char *devId, int devType, int devState)
 {
-	LPAGE_VIDEO_DEVICE_STATE_CHANGED lpData = (LPAGE_VIDEO_DEVICE_STATE_CHANGED)wParam;
 
-	//lpData->deviceType = deviceType;
-	//lpData->deviceState = deviceState;
-	m_deviceManager->UpdateDeviceList();
-	printf("device state= %d type  = %d\n", lpData->deviceState, lpData->deviceType);
+	//m_deviceManager->UpdateDeviceList();
+	printf("device state= %d type  = %d\n", devState, devType);
 	/*
 	UNKNOWN_AUDIO_DEVICE(-1)
 	PLAYOUT_DEVICE(0)
 	RECORDING_DEVICE(1)
 	*/
-	if (lpData->deviceType == 0) {
-		UpdateAoutDev(lpData->deviceState);
-	} else if(lpData->deviceType == 1)
-	{
-		UpdateAinDev(lpData->deviceState);
-	}
+// 	if (devType == 0) {
+// 		UpdateAoutDev(devState);
+// 	} else if (devType == 1)
+// 	{
+// 		UpdateAinDev(devState);
+// 	}
+}
+void  CSimplistAgoral_WinSDKDlg::OnVideoDevChange(const char *devId, int devType, int devState)
+{
+	m_deviceManager->UpdateDeviceList();
+	printf("device state= %d type  = %d\n", devState, devType);
+
+	
+}
 
 
-	delete lpData;
+void CSimplistAgoral_WinSDKDlg::OnVideoStoped()
+{
+	OnUserOffline(0);
 }
 
 
@@ -504,22 +512,6 @@ void CSimplistAgoral_WinSDKDlg::UpdateVideoDev(int devState)
 }
 
 
-
-void  CSimplistAgoral_WinSDKDlg::onVideoDeviceChange(const void *wParam)
-{
-	m_deviceManager->UpdateDeviceList();
-}
-
-void CSimplistAgoral_WinSDKDlg::onLeaveChannel(const void*wParam)
-{
-
-}
-void CSimplistAgoral_WinSDKDlg::onVideoStoped( const void *wParam)
-{
-	OnUserOffline(0);
-}
-
-
 void CSimplistAgoral_WinSDKDlg::OnPaint()
 {
 	CDialogEx::OnPaint();
@@ -580,9 +572,6 @@ void CSimplistAgoral_WinSDKDlg::OnBnClickedButtonClose2()
 
 void CSimplistAgoral_WinSDKDlg::OnBnClickedLeave()
 {
-	//CAgoraObject	*lpAgoraObject = CAgoraObject::GetAgoraObject();
-	//lpAgoraObject->LeaveCahnnel();
-
 	m_pAgroObject->LeaveChanel();
 	printf("leave channel");
 
@@ -593,17 +582,12 @@ void CSimplistAgoral_WinSDKDlg::OnBnClickedLeave()
 BOOL CSimplistAgoral_WinSDKDlg::PreTranslateMessage(MSG* pMsg)
 {
 
-
 	if (pMsg->message == WM_CLOSE) {
 		printf("wmclosse\n");
 	}
 	if (m_pAgroObject != NULL) {
 		m_pAgroObject->MsgHandle(pMsg->message, pMsg->wParam);
 	}
-	if (m_deviceManager != NULL) {
-		AgoralMsgHandle(pMsg->message, pMsg->wParam);
-	}
-
 
 	if (pMsg->message == WM_KEYDOWN   &&   pMsg->wParam == VK_ESCAPE)     return   TRUE;
 	if (pMsg->message == WM_KEYDOWN   &&   pMsg->wParam == VK_RETURN)   return   TRUE;
@@ -612,31 +596,6 @@ BOOL CSimplistAgoral_WinSDKDlg::PreTranslateMessage(MSG* pMsg)
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
-
-
-
-void CSimplistAgoral_WinSDKDlg::AgoralMsgHandle(DWORD msgId, WPARAM wParam)
-{
-	switch (msgId) {
-	case WM_MSGID(EID_AUDIO_VOLUME_INDICATION):
-		onAudioVolumIndication((void*)wParam);
-		break;
-	case WM_MSGID(EID_LASTMILE_QUALITY):
-		onLastmileQuality((void*)wParam);
-		break;
-	case WM_MSGID(EID_AUDIO_DEVICE_STATE_CHANGED):
-		onAudioDeviceChange((void*)wParam);
-		break;
-	case WM_MSGID(EID_VIDEO_DEVICE_STATE_CHANGED):
-		onVideoDeviceChange((void*)wParam);
-		break;
-	case WM_MSGID(EID_VIDEO_STOPPED):
-		onVideoStoped((void*)wParam);
-	default:
-		break;
-	}
-
-}
 
 void CSimplistAgoral_WinSDKDlg::OnBnClickedCheck()
 {

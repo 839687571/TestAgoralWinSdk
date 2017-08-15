@@ -17,6 +17,8 @@ public:
 	BOOL Create(IRtcEngine *lpRtcEngine);
 	void Close();
 
+	BOOL ReCreateCollection();
+
 	UINT GetVolume();
 	BOOL SetVolume(UINT nVol);
 	UINT GetDeviceCount();

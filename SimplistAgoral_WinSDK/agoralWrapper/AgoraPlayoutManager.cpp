@@ -38,6 +38,23 @@ BOOL CAgoraPlayoutManager::Create(IRtcEngine *lpRtcEngine)
 	return m_lpCollection != NULL ? TRUE : FALSE;
 }
 
+BOOL CAgoraPlayoutManager::ReCreateCollection()
+{
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL)
+		return 0;
+
+	if (m_lpCollection != NULL) {
+		m_lpCollection->release();
+		m_lpCollection = NULL;
+	}
+	m_lpCollection = (*m_ptrDeviceManager)->enumeratePlaybackDevices();
+	if (m_lpCollection == NULL) {
+		delete m_ptrDeviceManager;
+		m_ptrDeviceManager = NULL;
+		BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" enumeratePlaybackDevices Speaker device  failed");
+	}
+}
+
 void CAgoraPlayoutManager::Close()
 {
 	if (m_lpCollection != NULL){

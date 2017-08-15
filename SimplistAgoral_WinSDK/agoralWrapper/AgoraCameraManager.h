@@ -14,6 +14,7 @@ public:
 
 	BOOL Create(IRtcEngine *lpRtcEngine);
 	void Close();
+	BOOL  ReCreateCollection();
 
 	UINT GetDeviceCount();
 
@@ -29,5 +30,6 @@ private:
 	AVideoDeviceManager			*m_ptrDeviceManager;
 	IVideoDeviceCollection		*m_lpCollection;
 	BOOL						m_bTestingOn;
+	IRtcEngine                   *m_pRtcEngin;
 };
 

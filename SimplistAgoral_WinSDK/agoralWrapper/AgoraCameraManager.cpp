@@ -8,6 +8,7 @@ CAgoraCameraManager::CAgoraCameraManager()
 	: m_ptrDeviceManager(NULL)
 	, m_lpCollection(NULL)
 	, m_bTestingOn(FALSE)
+	, m_pRtcEngin(NULL)
 {
 }
 
@@ -19,7 +20,7 @@ CAgoraCameraManager::~CAgoraCameraManager()
 
 BOOL CAgoraCameraManager::Create(IRtcEngine *lpRtcEngine)
 {
-
+	m_pRtcEngin = lpRtcEngine;
 	m_ptrDeviceManager = new AVideoDeviceManager(lpRtcEngine);
 	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL) {
 		BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" new AVideoDeviceManager Camera  device manager failed");
@@ -34,6 +35,28 @@ BOOL CAgoraCameraManager::Create(IRtcEngine *lpRtcEngine)
 	}
 
 	return m_lpCollection != NULL ? TRUE : FALSE;
+}
+
+BOOL CAgoraCameraManager::ReCreateCollection()
+{
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL) {
+		m_ptrDeviceManager = new AVideoDeviceManager(m_pRtcEngin);
+		if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL) {
+			BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" new AVideoDeviceManager Camera  device manager failed");
+			return FALSE;
+		}
+	}
+
+	if (m_lpCollection != NULL) {
+		m_lpCollection->release();
+		m_lpCollection = NULL;
+	}
+	m_lpCollection = (*m_ptrDeviceManager)->enumerateVideoDevices();
+	if (m_lpCollection == NULL) {
+		delete m_ptrDeviceManager;
+		m_ptrDeviceManager = NULL;
+		BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" enumeratePlaybackDevices Speaker device  failed");
+	}
 }
 
 void CAgoraCameraManager::Close()
