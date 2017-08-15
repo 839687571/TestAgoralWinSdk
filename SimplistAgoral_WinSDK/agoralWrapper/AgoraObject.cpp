@@ -249,6 +249,12 @@ BOOL CAgoraObject::IsVideoEnabled()
 {
 	return m_bVideoEnable;
 }
+BOOL CAgoraObject::EnableWebSdkInteroperability(bool bEnable)
+{
+	RtcEngineParameters rep(*m_lpAgoraEngine);
+	int ret = rep.enableWebSdkInteroperability(bEnable);
+	return ret != -1;
+}
 
 BOOL CAgoraObject::EnableScreenCapture(HWND hWnd, int nCapFPS, LPCRECT lpCapRect, BOOL bEnable)
 {

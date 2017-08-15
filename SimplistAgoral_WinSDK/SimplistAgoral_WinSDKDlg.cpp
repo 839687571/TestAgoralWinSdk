@@ -233,12 +233,13 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 	printf("new CAgoralWrapper; \n");
 	m_pAgroObject = new CAgoralWrapper;
 	
- 	m_pAgroObject->SetTopWnd((HWND)localCtrl->GetSafeHwnd());
-	m_pAgroObject->SetBottomWnd (local2Ctrl->GetSafeHwnd());
+	m_pAgroObject->SetTopWnd((HWND)local2Ctrl ->GetSafeHwnd());
+	m_pAgroObject->SetBottomWnd(localCtrl->GetSafeHwnd());
 	m_pAgroObject->SetLocalCamera2Hwnd((HWND)remoteCtrl->GetSafeHwnd());
 	m_pAgroObject->SetMainHWND(m_hWnd);
 	m_pAgroObject->SetMsgObserver(this);
 	m_pAgroObject->SetVideoEnabled(TRUE);
+	m_pAgroObject->EnableWebSdkInteroperability(true);
 
 	m_cmbVideoRes = (CComboBox*)GetDlgItem(IDC_COMBO_RESULOTION);
 	m_cmbVideoPPTRes = (CComboBox*)GetDlgItem(IDC_COMBO_RESULOTION_PPT);

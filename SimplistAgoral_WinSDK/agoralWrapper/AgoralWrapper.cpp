@@ -536,7 +536,11 @@ void CAgoralWrapper::BindVideoWnd(unsigned int uid, bool host)
 		m_vecJoinedUsers.push_back(info);
 	}
 }
-
+BOOL CAgoralWrapper::EnableWebSdkInteroperability(bool bEnable)
+{
+	CAgoraObject *_pAgoraObject = CAgoraObject::GetAgoraObject();
+	return _pAgoraObject->EnableWebSdkInteroperability(true);
+}
 BOOL  CAgoralWrapper::SendChatMessage(const char *msg)
 {
 	if (m_nStreamID < 0)

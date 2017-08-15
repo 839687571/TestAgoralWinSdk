@@ -69,6 +69,8 @@ public:
 	BOOL EnableVideo(BOOL bEnable = TRUE);
 	BOOL IsVideoEnabled();
 
+	BOOL EnableWebSdkInteroperability(bool bEnable);
+
 	BOOL EnableScreenCapture(HWND hWnd, int nCapFPS = 15, LPCRECT lpCapRect = NULL, BOOL bEnable = TRUE);
 	BOOL IsScreenCaptureEnabled();
 

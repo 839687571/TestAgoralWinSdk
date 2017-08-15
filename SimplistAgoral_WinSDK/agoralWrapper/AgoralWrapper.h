@@ -146,6 +146,8 @@ public:
 	void LeaveChanel();
 	void BindVideoWnd(unsigned int uid,bool host);
 
+	BOOL EnableWebSdkInteroperability(bool bEnable);
+
 	void SetMainHWND(HWND hwnd){
 		m_mMainHwnd = hwnd;
 		m_pAgoraObject->SetMsgHandlerWnd(m_mMainHwnd);
