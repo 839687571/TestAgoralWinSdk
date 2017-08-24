@@ -14,6 +14,7 @@ public:
 
 	BOOL Create(agora::rtc::IRtcEngine *lpRtcEngine);
 	void Close();
+	BOOL ReCreateCollection();
 
 	UINT GetVolume();
 	BOOL SetVolume(UINT nVol);

@@ -344,10 +344,14 @@ void  CSimplistAgoral_WinSDKDlg::OnAudioDevChange(const char *devId, int devType
 }
 void  CSimplistAgoral_WinSDKDlg::OnVideoDevChange(const char *devId, int devType, int devState)
 {
-	m_deviceManager->UpdateDeviceList();
-	printf("device state= %d type  = %d\n", devState, devType);
+//	m_deviceManager->UpdateDeviceList();
+//	printf("device state= %d type  = %d\n", devState, devType);
 
-	
+	if (devState == 0) {
+		m_pAgroObject->SetVideoEnabled(FALSE);
+	} else {
+		m_pAgroObject->SetVideoEnabled(FALSE);
+	}
 }
 
 

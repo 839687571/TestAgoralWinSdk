@@ -49,36 +49,31 @@ void CDeviceManager::InitManager()
 
 void CDeviceManager::UpdateDeviceList()
 {
-	//m_audioInputDevList.clear();
-	//m_videoDevList.clear();
-	//ObtainDeviceList();
-	m_agCamera.ReCreateCollection();
-	ObtainCameraDevList();
-
+//	m_agCamera.ReCreateCollection();
+	//ObtainCameraDevList();
 }
 
 void  CDeviceManager::UpdateSpeakerList()
 {
-	m_agPlayout.Close();
-	m_agPlayout.Create(m_lpRtcEngine);
-	m_audioOutputDevList.clear();
-
+	m_agPlayout.ReCreateCollection();
+	ObtainSpeakerDevList();
 
 }
 void  CDeviceManager::UpdateMicList()
 {
-	m_agAudioin.Close();
-	m_agAudioin.Create(m_lpRtcEngine);
+	m_agAudioin.ReCreateCollection();
+	ObtainMicDevList();
 
 }
 void  CDeviceManager::UpdateCameraList()
 {
-	m_agCamera.Close();
-	m_agCamera.Create(m_lpRtcEngine);
+	m_agCamera.ReCreateCollection();
+	ObtainCameraDevList();
 }
 
 void CDeviceManager::ObtainSpeakerDevList()
 {
+	m_audioOutputDevList.clear();
 	for (UINT nIndex = 0; nIndex < m_agPlayout.GetDeviceCount(); nIndex++) {
 		std::string strDeviceName, strDeviceID;
 		m_agPlayout.GetDevice(nIndex, strDeviceName, strDeviceID);
@@ -95,6 +90,7 @@ void CDeviceManager::ObtainSpeakerDevList()
 }
 void CDeviceManager::ObtainMicDevList()
 {
+	m_audioInputDevList.clear();
 	for (UINT nIndex = 0; nIndex < m_agAudioin.GetDeviceCount(); nIndex++) {
 		std::string strDeviceName, strDeviceID;
 		m_agAudioin.GetDevice(nIndex, strDeviceName, strDeviceID);
@@ -109,6 +105,7 @@ void CDeviceManager::ObtainMicDevList()
 }
 void CDeviceManager::ObtainCameraDevList()
 {
+	m_videoDevList.clear();
 	for (UINT nIndex = 0; nIndex < m_agCamera.GetDeviceCount(); nIndex++) {
 		std::string strDeviceName, strDeviceID;
 		m_agCamera.GetDevice(nIndex, strDeviceName, strDeviceID);

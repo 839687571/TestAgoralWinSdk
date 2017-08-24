@@ -9,6 +9,7 @@ CAgoraPlayoutManager::CAgoraPlayoutManager()
 	: m_ptrDeviceManager(NULL)
 	, m_lpCollection(NULL)
 	, m_bTestingOn(FALSE)
+	, m_pRtcEngin(NULL)
 {
 }
 
@@ -19,6 +20,7 @@ CAgoraPlayoutManager::~CAgoraPlayoutManager()
 
 BOOL CAgoraPlayoutManager::Create(IRtcEngine *lpRtcEngine)
 {
+	m_pRtcEngin = lpRtcEngine;
 	m_ptrDeviceManager = new AAudioDeviceManager(lpRtcEngine);
 	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL) {
 		BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" new AAudioDeviceManager Speaker device manager failed");
@@ -33,15 +35,19 @@ BOOL CAgoraPlayoutManager::Create(IRtcEngine *lpRtcEngine)
 		BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" enumeratePlaybackDevices Speaker device  failed");
 	}
 
-	m_pRtcEngin = lpRtcEngine;
-
 	return m_lpCollection != NULL ? TRUE : FALSE;
 }
 
 BOOL CAgoraPlayoutManager::ReCreateCollection()
 {
-	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL)
-		return 0;
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL) {
+		m_ptrDeviceManager = new AAudioDeviceManager(m_pRtcEngin);
+		if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL) {
+			BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" new AAudioDeviceManager Speaker device manager failed");
+			return FALSE;
+
+		}
+	}
 
 	if (m_lpCollection != NULL) {
 		m_lpCollection->release();

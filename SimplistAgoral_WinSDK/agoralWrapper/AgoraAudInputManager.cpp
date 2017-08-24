@@ -23,6 +23,7 @@ CAgoraAudInputManager::~CAgoraAudInputManager()
 
 BOOL CAgoraAudInputManager::Create(agora::rtc::IRtcEngine *lpRtcEngine)
 {
+	m_lpRtcEngine = lpRtcEngine;
 	m_ptrDeviceManager = new AAudioDeviceManager(lpRtcEngine);
 	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL){
 		BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" new AAudioDeviceManager Mic device  failed");
@@ -40,26 +41,28 @@ BOOL CAgoraAudInputManager::Create(agora::rtc::IRtcEngine *lpRtcEngine)
 	return m_lpCollection != NULL ? TRUE : FALSE;
 }
 
-// BOOL  CAgoraAudInputManager::UpataDevice()
-// {
-// 	if (m_lpCollection != NULL) {
-// 		m_lpCollection->release();
-// 		m_lpCollection = NULL;
-// 	}
-// 
-// 	if (m_ptrDeviceManager == NULL) {
-// 		m_ptrDeviceManager = new agora::rtc::AAudioDeviceManager(*m_lpRtcEngine);
-// 		if (m_ptrDeviceManager->get() == NULL)
-// 			return FALSE;
-// 	}
-// 
-// 	m_lpCollection = (*m_ptrDeviceManager)->enumerateRecordingDevices();
-// 	if (m_lpCollection == NULL) {
-// 		
-// 	}
-// 
-// 	return m_lpCollection != NULL ? TRUE : FALSE;
-// }
+BOOL CAgoraAudInputManager::ReCreateCollection()
+{
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL) {
+		m_ptrDeviceManager = new AAudioDeviceManager(m_lpRtcEngine);
+		if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL) {
+			BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" new AAudioDeviceManager Mic device  failed");
+			return FALSE;
+		}
+	}
+
+	if (m_lpCollection != NULL) {
+		m_lpCollection->release();
+		m_lpCollection = NULL;
+	}
+	m_lpCollection = (*m_ptrDeviceManager)->enumerateRecordingDevices();
+	if (m_lpCollection == NULL) {
+		delete m_ptrDeviceManager;
+		m_ptrDeviceManager = NULL;
+		BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" enumerateRecordingDevices Speaker device  failed");
+	}
+
+}
 
 void CAgoraAudInputManager::Close()
 {
@@ -73,6 +76,7 @@ void CAgoraAudInputManager::Close()
 		m_ptrDeviceManager = NULL;
 	}
 }
+
 
 UINT CAgoraAudInputManager::GetVolume()
 {
@@ -151,7 +155,7 @@ std::string CAgoraAudInputManager::GetCurDeviceID()
 
 BOOL CAgoraAudInputManager::SetCurDevice(const char *pDeviceID)
 {
-	if (*m_ptrDeviceManager == NULL)
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL)
 		return FALSE;
 
 	int nRet = (*m_ptrDeviceManager)->setRecordingDevice(pDeviceID);
