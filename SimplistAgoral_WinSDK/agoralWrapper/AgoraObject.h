@@ -4,7 +4,7 @@
 #include "AGEngineEventHandler.h"
 #include <string>
 
-#define AVC_VER _T("V1.7.0, Build233, 09/29/2016, SDK1.7.0")
+#define AVC_VER _T("V1.12.0, Build234, 08/14/2017, SDK1.12 .0")
 
 using namespace agora::rtc;
 
@@ -88,6 +88,8 @@ public:
 
 	BOOL EnableLastmileTest(BOOL bEnable);
 
+	BOOL EnableEchoTest(BOOL bEnable = TRUE);
+	BOOL IsEchoTesting() { return m_bEchoTest; };
 	BOOL LocalVideoPreview(HWND hVideoWnd, BOOL bPreviewOn = TRUE);
 
 	BOOL SetLogFilter(LOG_FILTER_TYPE logFilterType, LPCTSTR lpLogPath);
@@ -127,6 +129,7 @@ private:
 
 	BOOL		m_bLocalAudioMuted;
 	BOOL		m_bLocalVideoMuted;
+	BOOL		m_bEchoTest;
 
 	BOOL		m_bScreenCapture;
 

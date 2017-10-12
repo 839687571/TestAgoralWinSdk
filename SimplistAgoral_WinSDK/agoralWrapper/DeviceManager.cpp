@@ -204,6 +204,23 @@ BOOL  CDeviceManager::TestCurrentVideoDev(HWND hwnd)
 		return	m_agCamera.TestCameraDevice(hwnd, TRUE);
 	}
 }
+BOOL CDeviceManager::IsTestingAudioEcho()
+{
+	CAgoraObject *lpAgoraObject = CAgoraObject::GetAgoraObject();
+	return lpAgoraObject->IsEchoTesting();
+}
+BOOL  CDeviceManager::TestAudioEcho()
+{
+	CAgoraObject *lpAgoraObject = CAgoraObject::GetAgoraObject();
+
+	if (lpAgoraObject->IsEchoTesting()) {
+		lpAgoraObject->EnableEchoTest(FALSE);
+	} else {
+		lpAgoraObject->EnableEchoTest(TRUE);
+	}
+
+	return TRUE;
+}
 
 
 // void CDeviceManager::MsgHandle(DWORD msgId, WPARAM wParam)

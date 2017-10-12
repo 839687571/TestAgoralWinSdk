@@ -136,4 +136,5 @@ public:
 	afx_msg void OnCbnSelchangeComboResulotionPpt();
 	afx_msg void OnBnClickedButtonOpen2();
 	afx_msg void OnBnClickedCheckIsteacher();
+	afx_msg void OnBnClickedButtonEchotest();
 };

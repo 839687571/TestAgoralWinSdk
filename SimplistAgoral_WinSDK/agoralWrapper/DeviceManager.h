@@ -97,6 +97,8 @@ public:
 
 
 	BOOL TestCurrentVideoDev(HWND hwnd);
+	BOOL TestAudioEcho();
+	BOOL IsTestingAudioEcho();
 
 	int  TestCurrentAudioInputDev();
 	int  TestCurrentAudioOutDev(const char *auidoFile);

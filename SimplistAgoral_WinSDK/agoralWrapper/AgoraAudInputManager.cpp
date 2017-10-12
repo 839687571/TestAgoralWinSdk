@@ -80,11 +80,14 @@ void CAgoraAudInputManager::Close()
 
 UINT CAgoraAudInputManager::GetVolume()
 {
-	if (m_ptrDeviceManager == NULL  || m_ptrDeviceManager->get() == NULL  ) return 0;
+
 
 	int nVol = 0;
-	if (*m_ptrDeviceManager != NULL)
-		(*m_ptrDeviceManager)->getRecordingDeviceVolume(&nVol);
+
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL)
+		return 0;
+
+	(*m_ptrDeviceManager)->getRecordingDeviceVolume(&nVol);
 
 	return (UINT)nVol;
 }
@@ -169,7 +172,7 @@ int CAgoraAudInputManager::TestAudInputDevice(HWND hMsgWnd, BOOL bTestOn)
 {
 	int ret = 0;
 
-	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL) return FALSE;
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL) return -1;
 
 	if (bTestOn && !m_bTestingOn) {
 		m_hOldMsgWnd = CAgoraObject::GetAgoraObject()->GetMsgHandlerWnd();

@@ -80,6 +80,7 @@ BEGIN_MESSAGE_MAP(CSimplistAgoral_WinSDKDlg, CDialogEx)
 	ON_CBN_SELCHANGE(IDC_COMBO_RESULOTION_PPT, &CSimplistAgoral_WinSDKDlg::OnCbnSelchangeComboResulotionPpt)
 	ON_BN_CLICKED(IDC_BUTTON_OPEN2, &CSimplistAgoral_WinSDKDlg::OnBnClickedButtonOpen2)
 	ON_BN_CLICKED(IDC_CHECK_ISTEACHER, &CSimplistAgoral_WinSDKDlg::OnBnClickedCheckIsteacher)
+	ON_BN_CLICKED(IDC_BUTTON_ECHOTEST, &CSimplistAgoral_WinSDKDlg::OnBnClickedButtonEchotest)
 END_MESSAGE_MAP()
 
 void getClientType(){
@@ -996,4 +997,20 @@ void CSimplistAgoral_WinSDKDlg::OnBnClickedCheckIsteacher()
 		g_clientType = CLIENT_TYPE_TEACHER;
 		//btn->SetCheck(TRUE);
 	}
+}
+
+
+void CSimplistAgoral_WinSDKDlg::OnBnClickedButtonEchotest()
+{
+	// TODO: Add your control notification handler code here
+
+	CButton *btn = (CButton*)GetDlgItem(IDC_BUTTON_ECHOTEST);
+
+
+	if (m_deviceManager->IsTestingAudioEcho()) {
+		btn->SetWindowText(_T("ÓïÒôÍ¨»°²âÊÔ"));
+	} else {
+		btn->SetWindowText(_T("Í£Ö¹"));
+	}
+	m_deviceManager->TestAudioEcho();
 }

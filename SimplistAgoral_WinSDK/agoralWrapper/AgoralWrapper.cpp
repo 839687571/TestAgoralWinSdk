@@ -97,13 +97,6 @@ void CAgoralWrapper::LeaveChanel()
 	CAgoraObject	*lpAgoraObject = CAgoraObject::GetAgoraObject();
 	lpAgoraObject->LeaveCahnnel();
 
-// 	if (m_bottoomVideoWnd != NULL) {
-// 		::ShowWindow(m_bottoomVideoWnd, SW_HIDE);
-// 	}
-// 	if (m_topVideoWnd != NULL) {
-// 		::ShowWindow(m_topVideoWnd, SW_HIDE);
-// 	}
-
 	CUserManager::GetInstance()->onLeaveChannel();
 }
 void CAgoralWrapper::onUserJoinedMsg(DWORD msgId, WPARAM wParam)
