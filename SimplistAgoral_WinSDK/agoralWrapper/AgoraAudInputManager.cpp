@@ -61,7 +61,7 @@ BOOL CAgoraAudInputManager::ReCreateCollection()
 		m_ptrDeviceManager = NULL;
 		BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" enumerateRecordingDevices Speaker device  failed");
 	}
-
+	return TRUE;
 }
 
 void CAgoraAudInputManager::Close()
@@ -140,10 +140,12 @@ BOOL CAgoraAudInputManager::GetDevice(UINT nIndex, std::string &rDeviceName, std
 
 std::string CAgoraAudInputManager::GetCurDeviceID()
 {
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL) return "";
+
 	std::string 		str;
 	CHAR		szDeviceID[agora::rtc::MAX_DEVICE_ID_LENGTH] = { 0 };
 	
-	if (m_ptrDeviceManager != NULL  && *m_ptrDeviceManager != NULL)
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL)
 		(*m_ptrDeviceManager)->getRecordingDevice(szDeviceID);
 
 	char ansiDevId[MAX_DEVICE_ID_LENGTH];
@@ -167,7 +169,7 @@ int CAgoraAudInputManager::TestAudInputDevice(HWND hMsgWnd, BOOL bTestOn)
 {
 	int ret = 0;
 
-	if (m_ptrDeviceManager == NULL) return FALSE;
+	if (m_ptrDeviceManager == NULL || m_ptrDeviceManager->get() == NULL) return FALSE;
 
 	if (bTestOn && !m_bTestingOn) {
 		m_hOldMsgWnd = CAgoraObject::GetAgoraObject()->GetMsgHandlerWnd();

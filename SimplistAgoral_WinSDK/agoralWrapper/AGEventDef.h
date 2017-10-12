@@ -269,6 +269,8 @@ typedef union _UserInfo {
 	UINT32    userId;
 }UserInfo;
 
+#define EID_VIDEO_ENABLE					0x00000112
+
 #define  ROLE_TEACHER_MAIN       1    
 #define  ROLE_TEACHER_CAMERA2    2  /* 教师两个摄像头的时候 ,需要在登录一个用户此时设为 2*/
 

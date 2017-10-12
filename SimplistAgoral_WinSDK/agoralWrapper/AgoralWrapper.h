@@ -23,7 +23,9 @@ extern void LogMessage(char *msg);
 #define  VIRTUAL_IMPLE  {}
 
 interface  IAgoralObjectMsgMsgObserver {
-	    virtual void OnError(unsigned int err, const char *msg) VIRTUAL_IMPLE
+	virtual void OnError(unsigned int err, const char *msg) VIRTUAL_IMPLE
+		virtual void OnAudioQuality(int uid, unsigned int quality, unsigned short delay, unsigned short lost)VIRTUAL_IMPLE
+
 		virtual void OnAuidoVolumeIndication(unsigned int uId, int volume) VIRTUAL_IMPLE
 		virtual void OnAudioDevChange(const char *devId, int devType, int devState) VIRTUAL_IMPLE
 		virtual void OnVideoDevChange(const char *devId, int devType, int devState) VIRTUAL_IMPLE
@@ -45,6 +47,7 @@ interface  IAgoralObjectMsgMsgObserver {
 		virtual void OnHostJoinSuccess(unsigned int userId) VIRTUAL_IMPLE
 
 		virtual void OnVideoStoped() VIRTUAL_IMPLE
+		virtual void OnVideoEnable(unsigned int uid, bool enabled)VIRTUAL_IMPLE
 };
 
 
@@ -121,6 +124,11 @@ typedef enum  _UserIdType
 	USER_ID_TEACHER,
 }UserIdType;
 
+typedef enum  _CourseType {
+	COURSE_TYPE_1V1,
+	COURSE_TYPE_GROUP,
+};
+
 typedef enum _ClientType {
 	CLIENT_TYPE_TEACHER = 0,
 	CLIENT_TYPE_STUDENT = 1,
@@ -152,24 +160,24 @@ public:
 		m_mMainHwnd = hwnd;
 		m_pAgoraObject->SetMsgHandlerWnd(m_mMainHwnd);
 	}
+// 
+// 	void SetBottomWnd(HWND hwnd){
+// 		m_bottoomVideoWnd = hwnd;
+// 	}
+// 	
+// 	void SetLocalCamera2Hwnd(HWND hwnd)
+// 	{
+// 		m_localCamera2Wnd = hwnd;
+// 	}
+// 
+// 	void SetTopWnd(HWND hwnd){
+// 		m_topVideoWnd = hwnd;
+// 	}
 
-	void SetBottomWnd(HWND hwnd){
-		m_bottoomVideoWnd = hwnd;
-	}
-	
-	void SetLocalCamera2Hwnd(HWND hwnd)
-	{
-		m_localCamera2Wnd = hwnd;
-	}
-
-	void SetTopWnd(HWND hwnd){
-		m_topVideoWnd = hwnd;
-	}
-
-	void SetClientType(int type)
-	{
-		m_nClientType = type;
-	}
+// 	void SetClientType(int type)
+// 	{
+// 		m_nClientType = type;
+// 	}
 	// 处理引擎回调消息.
 	BOOL MsgHandle(DWORD msgId, WPARAM wParam);
 
@@ -193,6 +201,10 @@ public:
 	{
 		return  m_pAgoraObject->EnableVideo(enable);
 	}
+	static CAgoraObject  *GetAgoraObject()
+	{
+		return m_pAgoraObject;
+	}
 
 	BOOL  SendChatMessage(const char *msg);
 private:
@@ -207,7 +219,7 @@ private:
 	void onUserLeaveChannel(DWORD msgId, WPARAM wParam);
 
 	void onErrorMsg(DWORD msgId, WPARAM wParam);
-	void onAudioQulity(DWORD msgId, WPARAM wParam);
+	void onAudioQuality(DWORD msgId, WPARAM wParam);
 	void onAudioVolumeIndication(DWORD msgId, WPARAM wParam);
 
 	///void onLeaveChannel(DWORD msgId, WPARAM wParam);
@@ -238,12 +250,13 @@ private:
 	void onUserMuteVideo(DWORD msgId, WPARAM wParam);
 	void onApiCalled(DWORD msgId, WPARAM wParam);
 	void onVideoStoped(DWORD msgId, WPARAM wParam);
+	void onVideoEnabled(DWORD msgId, WPARAM wParam);
 
-	HWND  m_bottoomVideoWnd; /* 老师视频 */
-	HWND  m_localCamera2Wnd; /*教师2的摄像头*/
 
-	HWND  m_topVideoWnd; /* 远端视频视频 -- 在 老师端  看到学生视频 为远程视频*/
+	//HWND  m_bottoomVideoWnd; /* 老师视频 */
+	//HWND  m_localCamera2Wnd; /*教师2的摄像头*/
 
+	//HWND  m_topVideoWnd; /* 远端视频视频 -- 在 老师端  看到学生视频 为远程视频*/
 
 	HWND  m_mMainHwnd;
 
@@ -261,13 +274,13 @@ private:
 	2.老师.
 	3.老师2
 	*/
-	int  m_nClientType;
+///	int  m_nClientType;
 
-	std::vector<AGVIDEO_WNDINFO>   m_vecJoinedUsers;
+	//std::vector<AGVIDEO_WNDINFO>   m_vecJoinedUsers;
 	int  m_iHostId;
 
-	HWND  m_hLocalWnd;
-	HWND  m_hRemoteWnd;
+// 	HWND  m_hLocalWnd;
+// 	HWND  m_hRemoteWnd;
 
 	IAgoralObjectMsgMsgObserver  *m_pObserver;
 };

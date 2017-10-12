@@ -4,6 +4,10 @@
 #include "AGEventDef.h"
 #include "../ComUtil/BugTrapWrapper.h"
 
+#include <vector>
+
+using namespace  std;
+
 #define CUR_MODULE L"DEVICEMGR"
 
 CDeviceManager* CDeviceManager::m_pInstance = new CDeviceManager;
@@ -91,16 +95,25 @@ void CDeviceManager::ObtainSpeakerDevList()
 void CDeviceManager::ObtainMicDevList()
 {
 	m_audioInputDevList.clear();
+	vector <DevicesInfo> tempVecter;
 	for (UINT nIndex = 0; nIndex < m_agAudioin.GetDeviceCount(); nIndex++) {
 		std::string strDeviceName, strDeviceID;
 		m_agAudioin.GetDevice(nIndex, strDeviceName, strDeviceID);
 		DevicesInfo info;
 		info.deviceName = strDeviceName;
 		info.deviceId = strDeviceID;
-		m_audioInputDevList.push_back(info);
+	
+		wstring temp = CComUtil::AnsiToUnicode(strDeviceName.c_str());
+		if (temp.find(L"?ими░?") != string::npos) {
+			tempVecter.push_back(info);
+		} else {
+			m_audioInputDevList.push_back(info);
+		}
 		BugTrapWrapper::GetQQLogger()->AppendF(BTLL_INFO, CUR_MODULE, L"Obtain Mic name = %s,id= %s", CComUtil::AnsiToUnicode(strDeviceName.c_str()).c_str(),
 			CComUtil::AnsiToUnicode(strDeviceID.c_str()).c_str());
 	}
+
+	m_audioInputDevList.insert(m_audioInputDevList.end(), tempVecter.begin(), tempVecter.end());
 
 }
 void CDeviceManager::ObtainCameraDevList()

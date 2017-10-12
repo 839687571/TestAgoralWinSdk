@@ -74,13 +74,15 @@ public:
 	BOOL EnableScreenCapture(HWND hWnd, int nCapFPS = 15, LPCRECT lpCapRect = NULL, BOOL bEnable = TRUE);
 	BOOL IsScreenCaptureEnabled();
 
-	BOOL MuteLocalAudio(BOOL bMuted = TRUE);
+	int MuteLocalAudio(BOOL bMuted = TRUE);
 	BOOL IsLocalAudioMuted();
 
 
 	BOOL MuteLocalVideo(BOOL bMuted = TRUE);
 	BOOL IsLocalVideoMuted();
 
+	int MuteAllRemoteAudio(BOOL bMuted = TRUE);
+	int MuteRemoteAudio(uid_t uid ,BOOL bMuted = TRUE);
 
 	BOOL EnableAudioRecording(BOOL bEnable, LPCTSTR lpFilePath);
 

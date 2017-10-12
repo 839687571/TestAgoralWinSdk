@@ -13,6 +13,7 @@
 #include <fstream>
 #include <string>
 #include "agoralWrapper/AgoralWrapper.h"
+#include "AgoralWrapper/UserManager.h"
 
 
 #ifdef _DEBUG
@@ -22,14 +23,17 @@
 
 static int g_clientType = CLIENT_TYPE_TEACHER;// 老师
 
+extern void LogMessageHLevel(char *msg);
+
+#define  TEACHER_ID   101
+#define  TEACHER2_ID  102
+#define  STUDENT_ID   111
 
 
 #define  SET_DEVICE      1
 #define  CLOSE_CLIENT    0
 #define  WM_SEND_TEACHER2  WM_USER + 888
 // CSimplistAgoral_WinSDKDlg 对话框
-
-
 
 CSimplistAgoral_WinSDKDlg::CSimplistAgoral_WinSDKDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CSimplistAgoral_WinSDKDlg::IDD, pParent)
@@ -207,11 +211,7 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	SetIcon(m_hIcon, TRUE);			// 设置大图标
-	SetIcon(m_hIcon, FALSE);		// 设置小图标
-
 	//getClientType();
-
 	CEdit  * chanelEdit = (CEdit *)GetDlgItem(IDC_EDIT_CHANNEL);
 	chanelEdit->SetWindowTextW(_T("w"));
 
@@ -220,7 +220,6 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 	CStatic * remoteCtrl = (CStatic*)GetDlgItem(IDC_STATIC_REMOTE);
 	::ShowWindow(localCtrl->GetSafeHwnd(), SW_HIDE);
 	::ShowWindow(local2Ctrl->GetSafeHwnd(), SW_HIDE);
-
 
 	m_cmbInputAudDev = (CComboBox*)GetDlgItem(IDC_COMBO_AINPUT);
 	m_cmbOutputAudDev = (CComboBox*)GetDlgItem(IDC_COMBOX_AOUT);
@@ -233,9 +232,11 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 	printf("new CAgoralWrapper; \n");
 	m_pAgroObject = new CAgoralWrapper;
 	
-	m_pAgroObject->SetTopWnd((HWND)local2Ctrl ->GetSafeHwnd());
-	m_pAgroObject->SetBottomWnd(localCtrl->GetSafeHwnd());
-	m_pAgroObject->SetLocalCamera2Hwnd((HWND)remoteCtrl->GetSafeHwnd());
+	/* 知道user join 分别窗口.*/
+	CUserManager::GetInstance()->AddUser(remoteCtrl->GetSafeHwnd(), TEACHER2_ID);
+	CUserManager::GetInstance()->AddUser(local2Ctrl->GetSafeHwnd(), TEACHER_ID);
+	CUserManager::GetInstance()->AddUser(localCtrl->GetSafeHwnd(), STUDENT_ID);
+
 	m_pAgroObject->SetMainHWND(m_hWnd);
 	m_pAgroObject->SetMsgObserver(this);
 	m_pAgroObject->SetVideoEnabled(TRUE);
@@ -304,13 +305,6 @@ BOOL CSimplistAgoral_WinSDKDlg::OnInitDialog()
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE	
 }
 
-/*
-void  OnAuidoVolumeIndication(unsigned int uId, int volume);
-void  OnLastmileQuality(int quality);
-void  OnAudioDeviceChange(const char *devId, int devType, int devState);
-void  OnVideoDeviceChange(const char *devId, int devType, int devState);
-void  OnVideoStoped(const void *wParam);
-*/
 
 void CSimplistAgoral_WinSDKDlg::OnAuidoVolumeIndication(unsigned int uId, int volume)
 {
@@ -322,7 +316,6 @@ void CSimplistAgoral_WinSDKDlg::OnAuidoVolumeIndication(unsigned int uId, int vo
 void  CSimplistAgoral_WinSDKDlg::OnLastmileQuality(int quality)
 {
 	printf("\n on quality ret  = %d\n", quality);
-	///m_deviceManager->StopTestNetWork();
 }
 
 void  CSimplistAgoral_WinSDKDlg::OnAudioDevChange(const char *devId, int devType, int devState)
@@ -330,17 +323,8 @@ void  CSimplistAgoral_WinSDKDlg::OnAudioDevChange(const char *devId, int devType
 
 	//m_deviceManager->UpdateDeviceList();
 	printf("device state= %d type  = %d\n", devState, devType);
-	/*
-	UNKNOWN_AUDIO_DEVICE(-1)
-	PLAYOUT_DEVICE(0)
-	RECORDING_DEVICE(1)
-	*/
-// 	if (devType == 0) {
-// 		UpdateAoutDev(devState);
-// 	} else if (devType == 1)
-// 	{
-// 		UpdateAinDev(devState);
-// 	}
+
+
 }
 void  CSimplistAgoral_WinSDKDlg::OnVideoDevChange(const char *devId, int devType, int devState)
 {
@@ -428,7 +412,6 @@ void CSimplistAgoral_WinSDKDlg::UpdateAinDev(int devState)
 	for (std::vector<DevicesInfo>::iterator iter = audioInput.begin();
 		iter != audioInput.end(); iter++) {
 		DevicesInfo info = *iter;
-
 		m_cmbInputAudDev->InsertString(m_cmbInputAudDev->GetCount(), CString(info.deviceName.c_str()));
 	}
 
@@ -455,7 +438,6 @@ void CSimplistAgoral_WinSDKDlg::UpdateAinDev(int devState)
 				m_strInputAudDevId.clear();
 			}
 		}
-
 	} else { // add 
 		if (m_strInputAudDevId.empty()) {
 			if (audioInput.size() > 0) {
@@ -464,7 +446,6 @@ void CSimplistAgoral_WinSDKDlg::UpdateAinDev(int devState)
 				m_strInputAudDevId = info.deviceId;
 			}
 		}
-
 	}
 }
 
@@ -531,16 +512,21 @@ HCURSOR CSimplistAgoral_WinSDKDlg::OnQueryDragIcon()
 
 void CSimplistAgoral_WinSDKDlg::OnBnClickedJoin()
 {
-	UserInfo userType;
-	userType.index = 0;
-	if (g_clientType == CLIENT_TYPE_STUDENT) {
-		userType.role = ROLE_STUDENT;
-	} else {
-		userType.role = ROLE_TEACHER_MAIN;
-	}
+// 	UserInfo userType;
+// 	userType.index = 0;
+// 	if (g_clientType == CLIENT_TYPE_STUDENT) {
+// 		userType.role = ROLE_STUDENT;
+// 	} else {
+// 		userType.role = ROLE_TEACHER_MAIN;
+// 	}
 	int profile = m_cmbVideoRes->GetItemData(m_cmbVideoRes->GetCurSel());
-	m_pAgroObject->SetClientType(g_clientType);
-	m_pAgroObject->JoinChannel("w", userType.userId, profile);
+	//m_pAgroObject->SetClientType(g_clientType);
+	if (g_clientType == CLIENT_TYPE_STUDENT) {
+		m_pAgroObject->JoinChannel("w", STUDENT_ID, profile);
+	} else {
+		m_pAgroObject->JoinChannel("w", TEACHER_ID, profile);
+	}
+
 	LogMessage ("join channel");
 	LogMessage(__FUNCTION__);
 }
@@ -568,7 +554,6 @@ void CSimplistAgoral_WinSDKDlg::OnBnClickedButtonClose2()
 	CAgoraObject	*lpAgoraObject = CAgoraObject::GetAgoraObject();
 	lpAgoraObject->LeaveCahnnel();
 	OnBnClickedButtonLeave2();
-
 	CDialogEx::OnCancel();
 
 }
@@ -582,7 +567,10 @@ void CSimplistAgoral_WinSDKDlg::OnBnClickedLeave()
 
 }
 
-
+/*
+ 1.agora sdk 线程发送消息到主界面线程.
+ 2.主界面线程接收消息处理,调用agroaObject处理消息. 并把主界面关心的消息再次通过 监听者通知 主界面类处理 关心的事件.
+*/
 
 BOOL CSimplistAgoral_WinSDKDlg::PreTranslateMessage(MSG* pMsg)
 {
@@ -597,7 +585,7 @@ BOOL CSimplistAgoral_WinSDKDlg::PreTranslateMessage(MSG* pMsg)
 	if (pMsg->message == WM_KEYDOWN   &&   pMsg->wParam == VK_ESCAPE)     return   TRUE;
 	if (pMsg->message == WM_KEYDOWN   &&   pMsg->wParam == VK_RETURN)   return   TRUE;
 
-	
+
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
@@ -606,9 +594,6 @@ void CSimplistAgoral_WinSDKDlg::OnBnClickedCheck()
 {
 	// TODO: Add your control notification handler code here
 }
-
-
-
 
 void CSimplistAgoral_WinSDKDlg::OnBnClickedButtonPreview()
 {
@@ -957,6 +942,10 @@ void CSimplistAgoral_WinSDKDlg::HideChildWnd(BOOL show)
 
 LRESULT CSimplistAgoral_WinSDKDlg::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
+	//if (message == WM_DEVICECHANGE) {
+	//	LogMessageHLevel("receive device change \n");
+	//}
+
 	LRESULT ret = __super::WindowProc(message, wParam, lParam);
 	return ret;
 }
@@ -997,8 +986,6 @@ void CSimplistAgoral_WinSDKDlg::OnCbnSelchangeComboResulotionPpt()
 }
 
 
-
-
 void CSimplistAgoral_WinSDKDlg::OnBnClickedCheckIsteacher()
 {
 	CButton *btn = (CButton*)GetDlgItem(IDC_CHECK_ISTEACHER);
@@ -1009,5 +996,4 @@ void CSimplistAgoral_WinSDKDlg::OnBnClickedCheckIsteacher()
 		g_clientType = CLIENT_TYPE_TEACHER;
 		//btn->SetCheck(TRUE);
 	}
-	
 }

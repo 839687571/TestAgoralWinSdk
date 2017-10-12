@@ -15,6 +15,38 @@ interface  IDeviceMsgObserver {
 	virtual void  onVideoDeviceChange(const void *wParam) {};
 };
 
+typedef struct _DeviceSatus {
+	int cameraStatus;
+	int micStatus;
+	int speakerStatus;
+	int networkStatus;
+
+	bool cameraExist;
+	bool micExist;
+	bool speakerExist;
+
+	_DeviceSatus::_DeviceSatus()
+	{
+		cameraStatus = FALSE;
+		micStatus = speakerStatus = networkStatus - 1;
+		speakerExist = micExist = cameraExist = false;
+	}
+
+	void Reset()
+	{
+		cameraStatus = FALSE;
+		micStatus = speakerStatus = networkStatus - 1;
+		speakerExist = micExist = cameraExist = false;
+	}
+}DeviceSatus;
+
+typedef struct _DeviceInUse {
+
+	std::wstring cameraDevId;
+	std::wstring micDevId;
+	std::wstring speakerDevId;
+}DeviceInUse;
+
 typedef struct _DevicesInfo {
 	std::string  deviceName;
 	std::string  deviceId;
@@ -102,11 +134,27 @@ public:
 	int StartTestNetWork();
 
 	int  StopTestNetWork();
-	/*
-	  测试 音视频设备的过程中 ,引擎通过消息形式返回上传,
-	  因此需要添加 消息处理函数.
-	*/
-	///void MsgHandle(DWORD msgId, WPARAM wParam);
+
+
+	void SetDevInuse(DeviceInUse  &devInuse)
+	{
+		m_devInUse = devInuse;
+	}
+
+	void SetDevStatus(DeviceSatus &devStatus)
+	{
+		m_devStatus = devStatus;
+	}
+
+	DeviceSatus &GetDevStatus()
+	{
+		return m_devStatus;
+	}
+
+	DeviceInUse &GetDevInuse()
+	{
+		return m_devInUse;
+	}
 
 private:
 	IDeviceMsgObserver      *m_pObserver;
@@ -120,5 +168,8 @@ private:
 	std::vector<DevicesInfo>  m_audioOutputDevList; // 音频输出设备. 扬声器.
 
 	HWND m_hMsgWnd;
+
+	DeviceSatus   m_devStatus;
+	DeviceInUse   m_devInUse;
 };
 

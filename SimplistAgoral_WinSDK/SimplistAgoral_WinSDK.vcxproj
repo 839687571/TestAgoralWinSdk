@@ -43,6 +43,10 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
+    <ExcludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(MSBuild_ExecutablePath);$(VC_LibraryPath_x86);</ExcludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -55,7 +59,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>./sdk/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./sdk/include;BaseClasses;</AdditionalIncludeDirectories>
       <AdditionalOptions>/D _CRT_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -129,8 +133,10 @@
     <ClInclude Include="agoralWrapper\AgoraPlayoutManager.h" />
     <ClInclude Include="agoralWrapper\AGResourceVisitor.h" />
     <ClInclude Include="agoralWrapper\DeviceManager.h" />
+    <ClInclude Include="agoralWrapper\UserManager.h" />
     <ClInclude Include="AGSliderCtrl.h" />
     <ClInclude Include="ComUtil\BugTrapWrapper.h" />
+    <ClInclude Include="DeviceNotifyMgr.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SimplistAgoral_WinSDK.h" />
     <ClInclude Include="SimplistAgoral_WinSDKDlg.h" />
@@ -149,6 +155,7 @@
     <ClCompile Include="agoralWrapper\AgoraPlayoutManager.cpp" />
     <ClCompile Include="agoralWrapper\AGResourceVisitor.cpp" />
     <ClCompile Include="agoralWrapper\DeviceManager.cpp" />
+    <ClCompile Include="agoralWrapper\UserManager.cpp" />
     <ClCompile Include="AGSliderCtrl.cpp" />
     <ClCompile Include="ComUtil\BugTrapWrapper.cpp" />
     <ClCompile Include="SimplistAgoral_WinSDK.cpp" />

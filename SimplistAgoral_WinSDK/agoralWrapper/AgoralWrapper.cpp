@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "AgoralWrapper.h"
+#include "UserManager.h"
 
 #pragma comment( lib, "agorartc.lib")
 
@@ -14,8 +15,8 @@ CAgoraObject *CAgoralWrapper::m_pAgoraObject = NULL;
 std::string  CAgoralWrapper::m_strAppId = "";
 
 CAgoralWrapper::CAgoralWrapper() :m_pObserver(NULL), m_iHostId(0)
-, m_hLocalWnd(NULL)
-, m_hRemoteWnd(NULL)
+// , m_hLocalWnd(NULL)
+// , m_hRemoteWnd(NULL)
 {
 }
 
@@ -96,20 +97,20 @@ void CAgoralWrapper::LeaveChanel()
 	CAgoraObject	*lpAgoraObject = CAgoraObject::GetAgoraObject();
 	lpAgoraObject->LeaveCahnnel();
 
-	if (m_bottoomVideoWnd != NULL) {
-		::ShowWindow(m_bottoomVideoWnd, SW_HIDE);
-	}
-	if (m_topVideoWnd != NULL) {
-		::ShowWindow(m_topVideoWnd, SW_HIDE);
-	}
+// 	if (m_bottoomVideoWnd != NULL) {
+// 		::ShowWindow(m_bottoomVideoWnd, SW_HIDE);
+// 	}
+// 	if (m_topVideoWnd != NULL) {
+// 		::ShowWindow(m_topVideoWnd, SW_HIDE);
+// 	}
+
+	CUserManager::GetInstance()->onLeaveChannel();
 }
 void CAgoralWrapper::onUserJoinedMsg(DWORD msgId, WPARAM wParam)
 {
 	LPAGE_USER_JOINED lpData = (LPAGE_USER_JOINED)wParam;
 
-	{  
-		BindVideoWnd( lpData->uid,false);
-	}
+	BindVideoWnd( lpData->uid,false);
 
 	char buf[512];
 	sprintf_s(buf, "==============================role = %d Joined the channel ", lpData->uid);
@@ -126,25 +127,7 @@ void CAgoralWrapper::onUserOfflineMsg(DWORD msgId, WPARAM wParam)
 	sprintf_s(buf, "==============================%d user leave the channel   ", lpData->uid);
 	LogMessage(buf);
 
-	for (auto iter = m_vecJoinedUsers.begin();
-		iter != m_vecJoinedUsers.end(); iter++) {
-		AGVIDEO_WNDINFO info = *iter;
-		if (info.nUID == lpData->uid) {
-			bool  bInUse = false;
-			for (auto iter2 = m_vecJoinedUsers.begin(); iter2 != m_vecJoinedUsers.end(); iter2++) {
-				AGVIDEO_WNDINFO info2 = *iter2;
-				if (info2.nUID != lpData->uid&&info2.hHwnd==info.hHwnd) {
-					bInUse = true;
-				}
-			}
-			
-			if (!bInUse) {
-				::ShowWindow(info.hHwnd, SW_HIDE);
-			}
-			m_vecJoinedUsers.erase(iter);
-			break;
-		}
-	}
+	CUserManager::GetInstance()->onUserOffline(lpData->uid);
 
 	if (m_pObserver != NULL) {
 		m_pObserver->OnUserOffline(lpData->uid);
@@ -193,9 +176,14 @@ void CAgoralWrapper::onErrorMsg(DWORD msgId, WPARAM wParam)
 
 }
 
-void  CAgoralWrapper::onAudioQulity(DWORD msgId, WPARAM wParam)
+void  CAgoralWrapper::onAudioQuality(DWORD msgId, WPARAM wParam)
 {
 	LPAGE_AUDIO_QUALITY lpData = (LPAGE_AUDIO_QUALITY)wParam;
+
+	if (m_pObserver) {
+		m_pObserver->OnAudioQuality(lpData->uid, lpData->quality,lpData->delay,lpData->lost);
+	}
+
 	delete lpData;
 }
 
@@ -263,9 +251,11 @@ void CAgoralWrapper::onFirstLocalVideoFrame(DWORD msgId, WPARAM wParam)
 	if (m_pObserver) {
 		m_pObserver->OnLocalVideframeShow(lpData->elapsed);
 	}
-	if (m_hLocalWnd != NULL) {
-		::ShowWindow(m_hLocalWnd, SW_SHOW);
-	}
+
+	CUserManager::GetInstance()->onFirstHostFrame(m_iHostId);
+	char buf[512];
+	sprintf_s(buf, "onFirstLocalVideoFrame  show\n");
+	LogMessageHLevel(buf);
 
 	delete lpData;
 }
@@ -278,19 +268,18 @@ void CAgoralWrapper::onFirstRemoteVideoDecoded(DWORD msgId, WPARAM wParam)
 }
 void CAgoralWrapper::onFirstRemoteVideoShow(DWORD msgId, WPARAM wParam)
 {
-	LPAGE_FIRST_REMOTE_VIDEO_FRAME lpData = new AGE_FIRST_REMOTE_VIDEO_FRAME;
+	LPAGE_FIRST_REMOTE_VIDEO_FRAME lpData = (LPAGE_FIRST_REMOTE_VIDEO_FRAME)wParam;
+	//LPAGE_FIRST_REMOTE_VIDEO_FRAME lpData = new AGE_FIRST_REMOTE_VIDEO_FRAME;
 	if (m_pObserver) {
 		m_pObserver->OnFirstRemoteVidoeFrameShow(lpData->uid, lpData->elapsed);
 	}
-
-	if (m_hRemoteWnd != NULL) {
-		::ShowWindow(m_hRemoteWnd, SW_SHOW);
-	}
+	CUserManager::GetInstance()->onFirstRemoteFrame(lpData->uid);
 	delete lpData;
 }
 void CAgoralWrapper::onUserMuteAuido(DWORD msgId, WPARAM wParam)
 {
-	LPAGE_USER_MUTE_VIDEO lpData = new AGE_USER_MUTE_VIDEO;
+	LPAGE_USER_MUTE_VIDEO lpData = (LPAGE_USER_MUTE_VIDEO)wParam;
+
 	delete lpData;
 }
 
@@ -300,14 +289,33 @@ void CAgoralWrapper::onUserMuteVideo(DWORD msgId, WPARAM wParam)
 }
 void CAgoralWrapper::onApiCalled(DWORD msgId, WPARAM wParam)
 {
-	LPAGE_APICALL_EXECUTED lpData = new AGE_APICALL_EXECUTED;
+	LPAGE_APICALL_EXECUTED lpData = (LPAGE_APICALL_EXECUTED)wParam;
+
 	delete lpData;
 }
 
 void CAgoralWrapper::onVideoStoped(DWORD msgId, WPARAM wParam)
 {
+	char buf[512];
+	sprintf_s(buf, "ERROR recv onVideoStoped  ");
+	LogMessageHLevel(buf);
+
 	if (m_pObserver) {
 		m_pObserver->OnVideoStoped();
+	}
+}
+void CAgoralWrapper::onVideoEnabled(DWORD msgId, WPARAM wParam)
+{
+	if (m_pObserver) {
+		LPAGE_USER_MUTE_VIDEO lpData = (LPAGE_USER_MUTE_VIDEO)wParam;
+		m_pObserver->OnVideoEnable(lpData->uid,lpData->muted);
+		CUserManager::GetInstance()->onUserMuteVideo(lpData->uid,lpData->muted);
+
+		char buf[512];
+		sprintf_s(buf, "recv onVideoEnabled  uid = %d, enable  =  %d ", lpData->uid, lpData->muted);
+		LogMessageHLevel(buf);
+
+		delete lpData;
 	}
 }
 
@@ -321,6 +329,18 @@ void CAgoralWrapper::onStatisticRemoteVideoInfo(DWORD msgId, WPARAM wParam)
 	rWndInfo.nWidth = lpData->width;
 	rWndInfo.nHeight = lpData->height;
 	LogWinInfo(rWndInfo);
+
+	RemoteVideoStats stats;
+	stats.uid = lpData->uid;
+	stats.delay = lpData->delay;
+	stats.receivedBitrate = lpData->receivedBitrate ;
+	stats.receivedFrameRate = lpData->receivedFrameRate;
+	stats.width= lpData->width;
+	stats.height = lpData->height;
+
+	if (m_pObserver) {
+		m_pObserver->OnRemoteVideoStats(stats);
+	}
 
 	delete lpData;
 }
@@ -336,8 +356,8 @@ void CAgoralWrapper::onHostJoinSuccess(DWORD msgId, WPARAM wParam)
 		, _pAgoraObject->GetVendorKey().c_str());
 
 
-	AGVIDEO_WNDINFO  videoInfo;
-	videoInfo.nUID = lpData->uid;
+// 	AGVIDEO_WNDINFO  videoInfo;
+// 	videoInfo.nUID = lpData->uid;
 	BindVideoWnd(lpData->uid,true);
 	m_iHostId = lpData->uid;
 
@@ -349,6 +369,7 @@ void CAgoralWrapper::onHostJoinSuccess(DWORD msgId, WPARAM wParam)
 void CAgoralWrapper::onRejoinSuccess(DWORD msgId, WPARAM wParam)
 {
 	PAGE_REJOINCHANNEL_SUCCESS pData = (PAGE_REJOINCHANNEL_SUCCESS)wParam;
+	BindVideoWnd(pData->uid, true);
 	delete pData;
 }
 void CAgoralWrapper::onStatisticLocalVideoInfo(DWORD msgId, WPARAM wParam)
@@ -397,7 +418,9 @@ BOOL CAgoralWrapper::MsgHandle(DWORD msgId, WPARAM wParam)
 		onErrorMsg(msgId, wParam);
 		return TRUE;
 		break;
-
+	case WM_MSGID(EID_AUDIO_QUALITY):
+		onAudioQuality(msgId, wParam);
+		return TRUE;
 	case WM_MSGID(EID_LASTMILE_QUALITY):
 		onLastmileQuality(msgId, wParam);
 		return TRUE;
@@ -480,7 +503,9 @@ BOOL CAgoralWrapper::MsgHandle(DWORD msgId, WPARAM wParam)
 		onVideoDevStateChanged(msgId, wParam);
 		return TRUE;
 		break;
-
+	case WM_MSGID(EID_VIDEO_ENABLE):
+		onVideoEnabled(msgId, wParam);
+		return TRUE;
 
 	default:
 		break;
@@ -490,50 +515,20 @@ BOOL CAgoralWrapper::MsgHandle(DWORD msgId, WPARAM wParam)
 
 void CAgoralWrapper::BindVideoWnd(unsigned int uid, bool host)
 {
-	HWND  displayWnd = NULL;
-	if (m_nClientType == CLIENT_TYPE_STUDENT) {
-		if (host) {
-			displayWnd = m_topVideoWnd;
-			VideoCanvas canvas;
-			canvas.uid = uid;
-			canvas.view = displayWnd;
-			canvas.renderMode = RENDER_MODE_TYPE::RENDER_MODE_FIT;
-			CAgoraObject::GetEngine()->setupLocalVideo(canvas);
-			m_hLocalWnd = displayWnd;
-		} else {
-			  displayWnd = m_bottoomVideoWnd;
-			VideoCanvas canvas;
-			canvas.uid = uid;
-			canvas.view = displayWnd;
-			canvas.renderMode = RENDER_MODE_TYPE::RENDER_MODE_FIT;
-			CAgoraObject::GetEngine()->setupRemoteVideo(canvas);
-			m_hRemoteWnd = displayWnd;
-
-		}
-	} else if (m_nClientType == CLIENT_TYPE_TEACHER) {
-		if (host) {
-			  displayWnd = m_bottoomVideoWnd ;
-			VideoCanvas canvas;
-			canvas.uid = uid;
-			canvas.view = displayWnd;
-			canvas.renderMode = RENDER_MODE_TYPE::RENDER_MODE_FIT;
-			CAgoraObject::GetEngine()->setupLocalVideo(canvas);
-			m_hLocalWnd = displayWnd;
-		} else {
-			  displayWnd = m_topVideoWnd;
-			VideoCanvas canvas;
-			canvas.uid = uid;
-			canvas.view = displayWnd;
-			canvas.renderMode = RENDER_MODE_TYPE::RENDER_MODE_FIT;
-			CAgoraObject::GetEngine()->setupRemoteVideo(canvas);
-			m_hRemoteWnd = displayWnd;
-		}
+	char buf[512];
+	int i = uid % 10;// 最后是1 老师, 0 学生.
+	sprintf_s(buf, "on user join  uid = %d,role is = %s ", uid, i==0? "student" : (i == 1 ? "teacher" : "unkown"));
+	LogMessageHLevel(buf);
+	if (uid % 10 != 0 && uid %10 != 1) {
+		sprintf_s(buf, "on user join but uid = %d,not Student Or Teacher", uid);
+		LogMessageHLevel(buf);
+		return;
 	}
-	if (displayWnd != NULL) {
-		AGVIDEO_WNDINFO info;
-		info.hHwnd = displayWnd;
-		info.nUID = uid;
-		m_vecJoinedUsers.push_back(info);
+	if (host) {
+		CUserManager::GetInstance()->onHostJoin(uid);
+	} else {
+		CUserManager::GetInstance()->onUserJoin(uid);
+
 	}
 }
 BOOL CAgoralWrapper::EnableWebSdkInteroperability(bool bEnable)

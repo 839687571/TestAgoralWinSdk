@@ -57,6 +57,8 @@ BOOL CAgoraCameraManager::ReCreateCollection()
 		m_ptrDeviceManager = NULL;
 		BugTrapWrapper::GetQQLogger()->Append(BTLL_ERROR, L" enumeratePlaybackDevices Speaker device  failed");
 	}
+
+	return TRUE;
 }
 
 void CAgoraCameraManager::Close()

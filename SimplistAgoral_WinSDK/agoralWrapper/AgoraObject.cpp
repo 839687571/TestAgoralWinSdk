@@ -291,17 +291,16 @@ BOOL CAgoraObject::IsScreenCaptureEnabled()
 	return m_bScreenCapture;
 }
 
-BOOL CAgoraObject::MuteLocalAudio(BOOL bMuted)
+int  CAgoraObject::MuteLocalAudio(BOOL bMuted)
 {
 	ASSERT(m_lpAgoraEngine != NULL);
 
 	RtcEngineParameters rep(*m_lpAgoraEngine);
-
 	int ret = rep.muteLocalAudioStream((bool)bMuted);
 	if (ret == 0)
 		m_bLocalAudioMuted = bMuted;
 
-	return ret == 0 ? TRUE : FALSE;
+	return ret;
 }
 
 BOOL CAgoraObject::IsLocalAudioMuted()
@@ -328,6 +327,25 @@ BOOL CAgoraObject::IsLocalVideoMuted()
 	return m_bLocalVideoMuted;
 }
 
+int  CAgoraObject::MuteAllRemoteAudio(BOOL bMuted )
+{
+	if (m_lpAgoraEngine == NULL) return FALSE;
+
+	RtcEngineParameters rep(*m_lpAgoraEngine);
+	int ret = rep.muteAllRemoteAudioStreams((bool)bMuted);
+
+	return ret;
+}
+int  CAgoraObject::MuteRemoteAudio(uid_t uid,BOOL bMuted )
+{// 禁音 指定用户 该方法不影响音频数据流的接收，只是不播放音频流。
+
+	if (m_lpAgoraEngine == NULL) return FALSE;
+
+	RtcEngineParameters rep(*m_lpAgoraEngine);
+	int ret = rep.muteRemoteAudioStream(uid,(bool)bMuted);
+
+	return ret;
+}
 
 BOOL CAgoraObject::EnableAudioRecording(BOOL bEnable, LPCTSTR lpFilePath)
 {

@@ -312,58 +312,57 @@ void CAGEngineEventHandler::onUserMuteAudio(uid_t uid, bool muted)
 
 void CAGEngineEventHandler::onUserMuteVideo(uid_t uid, bool muted)
 {
-	LPAGE_USER_MUTE_VIDEO lpData = new AGE_USER_MUTE_VIDEO;
+	if (m_hMainWnd != NULL) {
+		LPAGE_USER_MUTE_VIDEO lpData = new AGE_USER_MUTE_VIDEO;
 
-	lpData->uid = uid;
-	lpData->muted = muted;
-
-	if(m_hMainWnd != NULL)
+		lpData->uid = uid;
+		lpData->muted = muted;
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_USER_MUTE_VIDEO), (WPARAM)lpData, 0);
+	}
+
 	LogMessageHLevel(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onStreamMessage(uid_t uid, int streamId, const char* data, size_t length)
 {
-   LPAGE_STREAM_MESSAGE lpData = new AGE_STREAM_MESSAGE;
+	if (m_hMainWnd != NULL) {
+		LPAGE_STREAM_MESSAGE lpData = new AGE_STREAM_MESSAGE;
+		lpData->uid = uid;
+		lpData->streamId = streamId;
+		lpData->data = new char[length];
+		lpData->length = length;
+		memcpy_s(lpData->data, length, data, length);
 
-   lpData->uid = uid;
-   lpData->streamId = streamId;
-   lpData->data = new char[length];
-   lpData->length = length;
-
-   memcpy_s(lpData->data, length, data, length);
-
-   if (m_hMainWnd != NULL)
-       ::PostMessage(m_hMainWnd, WM_MSGID(EID_STREAM_MESSAGE), (WPARAM)lpData, 0);
-
+		::PostMessage(m_hMainWnd, WM_MSGID(EID_STREAM_MESSAGE), (WPARAM)lpData, 0);
+	}
 	LogMessage(__FUNCTION__);
 
 }
 
 void CAGEngineEventHandler::onApiCallExecuted(const char* api, int error)
 {
-	LPAGE_APICALL_EXECUTED lpData = new AGE_APICALL_EXECUTED;
-//
-	strcpy_s(lpData->api, 128, api);
-	lpData->error = error;
-//
-	if (m_hMainWnd != NULL)
+	if (m_hMainWnd != NULL) {
+		LPAGE_APICALL_EXECUTED lpData = new AGE_APICALL_EXECUTED;
+		strcpy_s(lpData->api, 128, api);
+		lpData->error = error;
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_APICALL_EXECUTED), (WPARAM)lpData, 0);
 
+	}
 	LogMessage(__FUNCTION__);
-	LogMessage(lpData->api);
-
+	LogMessage((char*)api);
 }
 
 void CAGEngineEventHandler::onLocalVideoStats(const LocalVideoStats& stats)
 {
-	LPAGE_LOCAL_VIDEO_STAT lpData = new AGE_LOCAL_VIDEO_STAT;
 
-	lpData->sentBitrate = stats.sentBitrate;
-	lpData->sentFrameRate = stats.sentFrameRate;
+	if (m_hMainWnd != NULL) {
+		LPAGE_LOCAL_VIDEO_STAT lpData = new AGE_LOCAL_VIDEO_STAT;
 
-	if(m_hMainWnd != NULL)
+		lpData->sentBitrate = stats.sentBitrate;
+		lpData->sentFrameRate = stats.sentFrameRate;
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_LOCAL_VIDEO_STAT), (WPARAM)lpData, 0);
+
+	}
 
 	LogMessage(__FUNCTION__);
 
@@ -371,18 +370,19 @@ void CAGEngineEventHandler::onLocalVideoStats(const LocalVideoStats& stats)
 
 void CAGEngineEventHandler::onRemoteVideoStats(const RemoteVideoStats& stats)
 {
-	LPAGE_REMOTE_VIDEO_STAT lpData = new AGE_REMOTE_VIDEO_STAT;
+	if (m_hMainWnd != NULL) {
+		LPAGE_REMOTE_VIDEO_STAT lpData = new AGE_REMOTE_VIDEO_STAT;
 
-	lpData->uid = stats.uid;
-	lpData->delay = stats.delay;
-	lpData->width = stats.width;
-	lpData->height = stats.height;
-	lpData->receivedFrameRate = stats.receivedFrameRate;
-	lpData->receivedBitrate = stats.receivedBitrate;
-	lpData->receivedFrameRate = stats.receivedFrameRate;
-
-	if(m_hMainWnd != NULL)
+		lpData->uid = stats.uid;
+		lpData->delay = stats.delay;
+		lpData->width = stats.width;
+		lpData->height = stats.height;
+		lpData->receivedFrameRate = stats.receivedFrameRate;
+		lpData->receivedBitrate = stats.receivedBitrate;
+		lpData->receivedFrameRate = stats.receivedFrameRate;
 		::PostMessage(m_hMainWnd, WM_MSGID(EID_REMOTE_VIDEO_STAT), (WPARAM)lpData, 0);
+
+	}
 
 	LogMessage(__FUNCTION__);
 }
@@ -414,15 +414,19 @@ void CAGEngineEventHandler::onConnectionLost()
 
 void CAGEngineEventHandler::onConnectionInterrupted()
 {
-	std::string str = ("onConnectionInterrupted");
-
 	LogMessageHLevel(__FUNCTION__);
 }
 
 void CAGEngineEventHandler::onUserEnableVideo(uid_t uid, bool enabled)
 {
-	if (m_hMainWnd != NULL)
-		::PostMessage(m_hMainWnd, WM_MSGID(EID_CONNECTION_LOST), 0, 0);
+
+	if (m_hMainWnd != NULL) {
+		LPAGE_USER_MUTE_VIDEO lpData = new AGE_USER_MUTE_VIDEO;
+		lpData->uid = uid;
+		lpData->muted = !enabled;
+
+		::PostMessage(m_hMainWnd, WM_MSGID(EID_VIDEO_ENABLE), (WPARAM)lpData, 0);
+	}
 	LogMessageHLevel(__FUNCTION__);
 }
 
